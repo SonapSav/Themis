@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Thetis">
+  <title>Thetis</title>
+  <style>
+    /* Ink follows the app's accent, lightened where the tab strip is dark. */
+    .ink { stroke: #7a3b2e; fill: none; }
+    .solid { fill: #7a3b2e; }
+    @media (prefers-color-scheme: dark) {
+      .ink { stroke: #e0a08d; }
+      .solid { fill: #e0a08d; }
+    }
+  </style>
+  <g class="ink" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- beam, post and foot -->
+    <path d="M6 11h20" />
+    <path d="M16 8.6v17.4" />
+    <path d="M10.5 26h11" />
+    <!-- hangers -->
+    <path d="M6 11v3" />
+    <path d="M26 11v3" />
+    <!-- pans -->
+    <path d="M2 14a4 3 0 0 0 8 0" />
+    <path d="M22 14a4 3 0 0 0 8 0" />
+  </g>
+  <circle class="solid" cx="16" cy="6.6" r="1.9" />
+</svg>
