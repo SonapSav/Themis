@@ -119,7 +119,7 @@ describe('the mode switch', () => {
     setup();
     expect(screen.getByRole('button', { name: 'OSCOLA' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('button', { name: 'OU Dual' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText(/W1xx–W3xx/)).toBeInTheDocument();
+    expect(screen.getByText(/^Open University law modules:/)).toBeInTheDocument();
   });
 
   const fillBook = async (user: ReturnType<typeof userEvent.setup>) => {

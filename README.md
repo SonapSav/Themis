@@ -3,9 +3,9 @@
 A citation manager for UK law students, in two schemes:
 
 - **OSCOLA** — Oxford's 4th edn, every source in a footnote.
-- **OU dual** — the Open University's undergraduate law scheme (W1xx–W3xx):
-  legal sources in CTR OSCOLA footnotes, general academic sources in Cite Them
-  Right Harvard, cited in the text with a reference list at the end.
+- **OU dual** — the Open University's undergraduate law scheme: legal sources
+  in CTR OSCOLA footnotes, general academic sources in Cite Them Right Harvard,
+  cited in the text with a reference list at the end.
 
 Cases and legislation format identically in both. Only books, chapters,
 articles and websites diverge.

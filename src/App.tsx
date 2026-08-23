@@ -33,7 +33,7 @@ const MODES: ReadonlyArray<{ value: CitationMode; label: string; hint: string }>
   {
     value: 'ou-dual',
     label: 'OU Dual',
-    hint: 'Open University law modules (W1xx–W3xx): legal sources in OSCOLA footnotes; academic sources in Cite Them Right Harvard, cited in the text.',
+    hint: 'Open University law modules: legal sources in OSCOLA footnotes; academic sources in Cite Them Right Harvard, cited in the text.',
   },
 ];
 
