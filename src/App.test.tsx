@@ -120,7 +120,7 @@ describe('citing a case', () => {
     await user.type(group(/^Court and date$/).getByLabelText('Court'), 'HL');
 
     // Legal sources get no end entry in OU dual mode, so switch to OSCOLA.
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
 
     expect(citation('Bibliography entry')).toBe('Page v Smith [1996] AC 155 (HL)');
     expect(italics('Bibliography entry')).toEqual([]);
@@ -130,7 +130,7 @@ describe('citing a case', () => {
 describe('the mode switch', () => {
   it('offers both schemes, defaulting to the OU one', () => {
     setup();
-    expect(screen.getByRole('button', { name: 'OSCOLA' })).toHaveAttribute('aria-pressed', 'false');
+    expect(screen.getByRole('button', { name: 'OSCOLA only' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('button', { name: 'OU Dual' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText(/^Open University law modules:/)).toBeInTheDocument();
   });
@@ -161,7 +161,7 @@ describe('the mode switch', () => {
   it('re-cites the same book in OSCOLA when the mode changes', async () => {
     const user = setup();
     await fillBook(user);
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
 
     expect(screen.getByText('Legal source — OSCOLA')).toBeInTheDocument();
     expect(citation('Footnote')).toBe(
@@ -190,7 +190,7 @@ describe('the mode switch', () => {
     await chooseType(user, 'OU module material');
     expect(screen.getByLabelText('Module code')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
 
     expect(screen.queryByRole('option', { name: 'OU module material' })).toBeNull();
     expect(screen.getByLabelText('Case name')).toBeInTheDocument();
@@ -218,7 +218,7 @@ describe('websites render differently by scheme', () => {
     // OU dual mode: a website is an academic source, so Harvard.
     expect(italics('Reference list entry')).toEqual(['Virtual Friend Fires Employee']);
 
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
     expect(italics('Footnote')).toEqual(['Naked Law']);
     expect(citation('Footnote')).toContain("'Virtual Friend Fires Employee'");
   });
@@ -248,7 +248,7 @@ describe('chapters in edited books', () => {
       "Rose, F. (2006) 'The Evolution of the Species', in Burrows, A. (ed.) Mapping the Law. OUP.",
     );
 
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
     expect(citation('Footnote')).toBe(
       "Francis Rose, 'The Evolution of the Species' in Andrew Burrows (ed), Mapping the Law (OUP 2006).",
     );
@@ -365,12 +365,12 @@ describe('persistence', () => {
 
   it('keeps the chosen scheme across a reload', async () => {
     const user = setup();
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
 
     user.unmount();
     render(<App />);
 
-    expect(screen.getByRole('button', { name: 'OSCOLA' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'OSCOLA only' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('clears the library on request, and it stays cleared', async () => {
@@ -408,7 +408,7 @@ describe('the assembled lists', () => {
   it('builds an OSCOLA table of cases when the scheme changes', async () => {
     const user = setup();
     await addPageVSmith(user);
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
 
     const table = within(screen.getByRole('heading', { name: 'Table of cases' }).closest('section')!);
     expect(table.getByRole('listitem')).toHaveTextContent('Page v Smith [1996] AC 155 (HL)');
@@ -550,7 +550,7 @@ describe('export and import', () => {
     await user.upload(importInput(), exportFile([smith], 'oscola'));
 
     expect(await screen.findByRole('status')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'OSCOLA' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'OSCOLA only' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('leaves the chosen scheme alone when merging into an existing library', async () => {
@@ -1097,7 +1097,7 @@ describe('further neutral citations and later history', () => {
 
 describe('multi-volume books (3.2.1)', () => {
   const fillVonBar = async (user: ReturnType<typeof setup>) => {
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
     await chooseType(user, 'Book');
     const authors = group('Authors or editors');
     await user.click(authors.getByRole('button', { name: 'Add author' }));
@@ -1139,7 +1139,7 @@ describe('journal articles online, forthcoming and as case notes', () => {
   // A journal article is an academic source, so the OU scheme cites it in
   // Harvard and shows no OSCOLA footnote. These rules are OSCOLA's.
   const fillArticle = async (user: ReturnType<typeof setup>, title: string) => {
-    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
     await chooseType(user, 'Journal article');
     const authors = group('Authors');
     await user.click(authors.getByRole('button', { name: 'Add author' }));
