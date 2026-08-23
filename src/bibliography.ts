@@ -206,7 +206,7 @@ function harvardWarnings(sources: readonly Source[]): string[] {
     .map(
       ([key]) =>
         `Two or more sources share an author and year (${key.split('|')[0] || 'no author'}, ${key.split('|')[1]}). ` +
-        'Cite Them Right distinguishes these with a letter after the date — 2023a, 2023b — assigned in the order they appear in the reference list. Add the letter yourself so it matches your in-text citations.',
+        'CTR distinguishes these with a letter after the date — 2023a, 2023b — assigned in the order they appear in the reference list. Add the letter yourself so it matches your in-text citations.',
     );
 }
 

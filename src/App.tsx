@@ -42,7 +42,7 @@ const MODES: ReadonlyArray<{ value: CitationMode; label: string; hint: string }>
   {
     value: 'ou-dual',
     label: 'OU Dual',
-    hint: 'Open University law modules: legal sources in OSCOLA footnotes; academic sources in Cite Them Right Harvard, cited in the text.',
+    hint: 'Open University law modules: legal sources in OSCOLA footnotes; academic sources in CTR Harvard, cited in the text.',
   },
 ];
 
@@ -208,7 +208,7 @@ export default function App() {
             <ScalesIcon className="mark" />
             Themis
           </h1>
-          <p>OSCOLA (5th edn) and Cite Them Right Harvard (13th edn) citations.</p>
+          <p>OSCOLA (5th edn) and CTR Harvard (13th edn) citations.</p>
         </div>
         <AppearanceControls appearance={appearance} onChange={setAppearance} />
       </header>
