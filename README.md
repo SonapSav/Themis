@@ -345,7 +345,7 @@ Nothing in the suite is invented.
 | **Book volumes** | §3.2.1: the volume "follows the publication details, unless the publication details of the volumes vary, in which case it precedes them, and is separated from the title by a comma". A **Volume position** select chooses between `Halsbury's Laws (5th edn, 2010) vol 57` and `The Common European Law of Torts, vol 2 (CH Beck 2000)`. A pinpoint after a trailing volume takes a comma — `vol 57, para 53`, `vol 1, ch 3` — where one after the publication bracket alone takes a space. A `vol` already typed is not doubled. |
 | **Book paragraphs** | §3.2.1: "Pinpoint to paragraphs rather than pages if the paragraphs are numbered." A book's paragraphs are **labelled**, `para 76`, not bracketed as a case's are (§2.1.6). No plural is inferred: the guide prints no `paras` for a book, and its looseleaf `para 8–106` is one paragraph's number rather than a range, so a `paras` the student types is respected and nothing is guessed. |
 | **Case year brackets** | An explicit `yearFormat` field, defaulting to square. §2.1.1: square where the year identifies the volume (`Barrett v Enfield LBC [2001] 2 AC 550 (HL)`), round for the year of *judgment* where the volumes are independently numbered (`Barrett v Enfield LBC (1999) 49 BMLR 1 (HL)`). Not inferable — `[2008] 1 AC 884` has both a volume and square brackets. |
-| **Unreported cases** | §2.1.4: a case that is unreported and has no neutral citation is given by its court and date of judgment in place of a report — `Stubbs v Sayer (CA, 8 November 1990)` — with no need for the word "unreported". A neutral citation, where there is one, is given instead. EU cases follow §2.6.2 the same way: `Case T–277/08 Bayer Healthcare v OHMI—Uriach Aquilea OTC (CFI, 11 November 2009)`. |
+| **Unreported cases** | §2.1.4: a case that is unreported and has no neutral citation is given by its court and date of judgment in place of a report — `Stubbs v Sayer (CA, 8 November 1990)` — with no need for the word "unreported". A medium neutral citation, where there is one, is given instead. EU cases no longer work this way: §4.4.2 gives every EU decision since 1954 an ECLI, so there is no unreported form to fall back to. |
 | **Court in brackets** | §2.1.3 and §2.1.5: the court is **not** cited where there is a neutral citation, because the neutral citation identifies the court, nor for cases decided before 1865. A court entered alongside a neutral citation is dropped from the output and a warning says so. Where it is cited, it follows the first page and precedes any pinpoint. |
 | **Table of cases** | §1.6.2: case names are **not** italicised in a table of cases, though they are in footnotes (§2.1.1). The two formatters differ accordingly. |
 | **Neutral citations** | Modelled separately from the law report and cited first: `Corr v IBC Vehicles Ltd [2008] UKHL 13, [2008] 1 AC 884`. The two carry independent years, because they differ (`[2004] EWCA Civ 1031, [2005] QB 410`). |
@@ -475,6 +475,54 @@ the warning fired on correct citations — `Re Guardian News and Media Ltd [2010
 UKSC 1` among them. A panel that cries wolf on valid input is worse than a
 quieter one, and the existing tests caught it.
 
+## Migrating to the 5th edition
+
+OSCOLA's 5th edition was published in December 2025 and renumbered heavily.
+The hazard is not that the old numbers disappeared. It is that most of them
+still exist and now mean something else, so a stale reference sends a reader
+somewhere real and wrong — which is worse than sending them nowhere.
+
+Of the 27 sections `rules.ts` cited, 12 were unchanged. The rest:
+
+| 4th edn | 5th edn number now means | Moved to |
+|---|---|---|
+| 4.1 Guide to neutral citations | **Treaties** | 5.1 Guide to medium neutral citations |
+| 4.2.1 Abbreviations of law reports | **UN Charter** | 5.2.1 |
+| 2.6.1 EU legislation | **Cases** (other jurisdictions) | 4.4.1 |
+| 2.6.2 EU court judgments | **Legislation** (other jurisdictions) | 4.4.2 |
+| 2.5.2 Rules of court | Parts of statutory instruments | 2.5.3 |
+| 2.5.3 Parts of statutory instruments | Rules of court | 2.5.2 |
+| 3.2.2 Edited and translated books | **Ebooks** | 3.2.3 |
+| 3.2.3 Contributions to edited books | Edited and translated books | 3.2.4 |
+| 3.3.1/3.3.3/3.3.4 journals | — | 3.3, which lost its subsections |
+| 3.3.2 Case notes | — | 3.4 |
+| 3.4.8 Websites and blogs | — | 3.7.1 Websites |
+
+2.5.2 and 2.5.3 trade places, which is why the literals were remapped in a
+single pass: rewriting them one after another collapses both onto one number.
+
+Three changes were substantive rather than editorial.
+
+- **Medium neutral citations.** §2.1.3's name, and the term throughout the app.
+- **EU cases are cited by ECLI.** §4.4.2 replaced the law report reference with
+  the European Case Law Identifier: `Case T-344/99 Arne Mathisen AS v Council
+  [2002] ECR II-2905` is now `… EU:T:2002:174`. Every EU decision since 1954
+  has one, so the ECR, CMLR, court and judgment-date fields are gone rather
+  than optional, and the table of cases gained the ECLI too — §1.6.2 prints
+  `Schempp v Finanzamt (Case C-403/03) EU:C:2005:446`, keeping the word "Case"
+  inside the brackets.
+- **The court table grew.** §5.1 is a strict superset of §4.1: thirteen rows
+  added, none removed. EWFC is the one to know about, because the 4th edition
+  had no row for it and Themis used it as its example of a court the guide does
+  not list.
+
+Known to have changed and **not** carried across yet: §2.1.5 now gives the
+court identifiers as `KBD`, `QBD`, `Ch D` and `Fam` where the 4th edition had
+`QB`, `Ch` and `F`; §2.5.3 adds the CrPR and FPR to the rules of court; and the
+5th edition has whole source types Themis has never had — assimilated EU law
+(§2.4.9), ebooks (§3.2.2), dictionaries (§3.2.8), book reviews (§3.5) and
+generative AI (§3.7.13).
+
 ## Where the data comes from
 
 `src/oscola/courts.ts` is generated from OSCOLA §4.1's appendix, and how it was
@@ -565,9 +613,10 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 - **A pinpoint alongside subsequent history.** Themis attaches the pinpoint to
   the primary citation, before the `affd` clause, because that is the decision
   the pinpoint refers to. The guide shows no example of the two together.
-- **EU case numbers** are passed through as typed. OSCOLA prints them with an
-  en dash (`C–176/03`); Themis does not silently convert a hyphen, because the
-  official EU form uses a hyphen and guessing either way would be wrong.
+- **EU case numbers** are passed through as typed. The 5th edition prints them
+  with a plain hyphen (`C-403/03`), where the 4th used an en dash; Themis
+  converts neither way, because guessing at a character the reader can see is
+  how a citation tool stops being checkable.
 - **Shortened footnotes for EU cases** — §1.1.1's "name given in the text" rule
   is stated for case names, and the guide shows no shortened form for a
   citation that leads with a registration number, so Themis does not extrapolate.

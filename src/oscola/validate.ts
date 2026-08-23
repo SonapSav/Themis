@@ -697,7 +697,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           error(
             'caseName',
-            'An EU case needs its name. It follows the registration number, in italics, with no punctuation between the two.',
+            'An EU case needs its name. It sits between the registration number and the ECLI, in italics, with no punctuation between it and the number.',
             '4.4.2',
           ),
         );
@@ -714,20 +714,27 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           warning(
             'caseNumber',
-            'Cases registered since 1989 carry a prefix: C- for the Court of Justice, T- for the General Court, F- for the Civil Service Tribunal. Only pre-1989 cases take none.',
+            'Cases registered since 1989 carry a prefix: C- for the Court of Justice, T- for the General Court, F- for the Civil Service Tribunal, which sat from 2005 to 2016. Only pre-1989 cases take none.',
             '4.4.2',
           ),
         );
       }
-      issues.push(...reportIssues('report', source.report, '4.4.2'));
-      issues.push(...fullStopIssues('report.abbreviation', source.report?.abbreviation));
-      issues.push(...fullStopIssues('court', source.court));
-      // 4.4.2: a case not yet reported gives the court and date instead.
-      if (!source.report && blank(source.court) && blank(source.judgmentDate)) {
+      // 4.4.2: the ECLI replaced the law report reference outright. "An ECLI
+      // has been assigned to all decisions delivered by EU courts since 1954",
+      // so there is no such thing as an EU case that has none.
+      if (blank(source.ecli)) {
+        issues.push(
+          error(
+            'ecli',
+            'An EU case needs its European Case Law Identifier, e.g. "EU:C:2005:446". It replaced the ECR reference, and every EU decision since 1954 has been assigned one.',
+            '4.4.2',
+          ),
+        );
+      } else if (!/^EU:[CTF]:\d{4}:\d+$/.test(source.ecli!.trim())) {
         issues.push(
           warning(
-            'report',
-            'Cite the official ECR report where there is one — ECJ cases in volume one (ECR I-), General Court cases in volume two (ECR II-); otherwise the CMLR, or, if the case is not yet reported, the court and date of judgment.',
+            'ecli',
+            'An ECLI runs EU:court:year:number — "EU:C:2005:446" for the Court of Justice, "EU:T:2002:174" for the General Court, "EU:F:" for the Civil Service Tribunal.',
             '4.4.2',
           ),
         );

@@ -218,14 +218,10 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
         { value: 'joined', label: 'Joined cases' },
       ],
     },
-    { key: 'caseNumber', label: 'Registration number', placeholder: 'C–176/03', hint: 'Without the "Case" prefix. C– for the Court of Justice, T– for the General Court, F– for the Civil Service Tribunal.' },
+    { key: 'caseNumber', label: 'Registration number', placeholder: 'C-403/03', hint: 'Without the "Case" prefix. C- for the Court of Justice, T- for the General Court, F- for the Civil Service Tribunal.' },
     { key: 'caseName', label: 'Case name', placeholder: 'Commission v Council', hint: 'Italicised automatically. No punctuation between the number and the name.' },
-    { key: 'report.year', label: 'Year', placeholder: '2005', group: 'Report' },
-    { key: 'report.abbreviation', label: 'Report series', placeholder: 'ECR', hint: 'Prefer the official ECR; otherwise CMLR.' },
-    { key: 'report.firstPage', label: 'First page', placeholder: 'I–7879', hint: 'Include the volume prefix: I– for the Court of Justice, II– for the General Court.' },
-    { key: 'court', label: 'Court', placeholder: 'CFI', group: 'Court, date and pinpoint', hint: 'Only where the case is not yet reported.' },
-    { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Cited with the court where the case is not yet reported.' },
-    { key: 'pinpoint', label: 'Pinpoint', placeholder: 'paras 47–48' },
+    { key: 'ecli', label: 'ECLI', placeholder: 'EU:C:2005:446', hint: 'The European Case Law Identifier, which replaces the ECR reference. Every EU decision since 1954 has one (4.4.2).' },
+    { key: 'pinpoint', label: 'Pinpoint', placeholder: '[19]', hint: 'A paragraph in square brackets takes no comma before it; a form in words, such as "point 51" for an Advocate General’s opinion, does.' },
   ],
   bookChapter: [
     { key: 'chapterTitle', label: 'Chapter title', placeholder: 'The Evolution of the Species' },
@@ -512,24 +508,13 @@ export function buildSource(
     }
 
     case 'euCase': {
-      const hasReport = Boolean(
-        opt(draft, 'report.abbreviation') || opt(draft, 'report.firstPage'),
-      );
       const source: EuCaseSource = {
         id,
         type: 'euCase',
         caseNumber: req(draft, 'caseNumber'),
         joined: draft['joined'] === 'joined',
         caseName: req(draft, 'caseName'),
-        court: opt(draft, 'court'),
-        judgmentDate: opt(draft, 'judgmentDate'),
-        report: hasReport
-          ? {
-              year: req(draft, 'report.year'),
-              abbreviation: req(draft, 'report.abbreviation'),
-              firstPage: req(draft, 'report.firstPage'),
-            }
-          : undefined,
+        ecli: opt(draft, 'ecli'),
         pinpoint: opt(draft, 'pinpoint'),
       };
       return source;
@@ -704,14 +689,8 @@ export function toDraft(source: Source): DraftState {
       draft['joined'] = source.joined ? 'joined' : '';
       set(draft, 'caseNumber', source.caseNumber);
       set(draft, 'caseName', source.caseName);
-      set(draft, 'court', source.court);
-      set(draft, 'judgmentDate', source.judgmentDate);
+      set(draft, 'ecli', source.ecli);
       set(draft, 'pinpoint', source.pinpoint);
-      if (source.report) {
-        set(draft, 'report.year', source.report.year);
-        set(draft, 'report.abbreviation', source.report.abbreviation);
-        set(draft, 'report.firstPage', source.report.firstPage);
-      }
       break;
 
     case 'journalArticle':

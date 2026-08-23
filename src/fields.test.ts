@@ -83,14 +83,14 @@ const sources: Record<string, Source> = {
     pinpoint: 'art 50', shortForm: 'TEU',
   },
   'a joined EU case': {
-    id: 's7', type: 'euCase', caseNumber: 'C–430 and 431/93', joined: true,
+    id: 's7', type: 'euCase', caseNumber: 'C-430 and 431/93', joined: true,
     caseName: 'Jereon van Schijndel v Stichting Pensioenfonds',
-    report: { year: '1995', abbreviation: 'ECR', firstPage: 'I–4705' },
+    ecli: 'EU:C:1995:441',
     pinpoint: 'paras 47–48',
   },
-  'an unreported EU case': {
-    id: 's8', type: 'euCase', caseNumber: 'T–277/08', joined: false,
-    caseName: 'Bayer Healthcare v OHMI', court: 'CFI', judgmentDate: '2009-11-11',
+  'an EU case with no pinpoint': {
+    id: 's8', type: 'euCase', caseNumber: 'T-277/08', joined: false,
+    caseName: 'Bayer Healthcare v OHMI', ecli: 'EU:T:2009:433',
   },
   'an untitled case note': {
     id: 's9a', type: 'journalArticle', authors: [person('Andrew', 'Ashworth')],

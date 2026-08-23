@@ -534,13 +534,16 @@ describe('the checks reach the types that had least (2.1.3, 2.4, 2.6.2)', () => 
     expect(validate(euCase('C-176/03')).filter((i) => i.field === 'caseNumber')).toEqual([]);
   });
 
-  it('checks an EU case report the same way as a UK one (2.6.2)', () => {
-    const partial: Source = {
-      id: 'e1', type: 'euCase', caseName: 'Vodafone', caseNumber: 'C-176/03',
-      report: { year: '2005', abbreviation: '', firstPage: '' },
-    };
-    expect(fields(partial, 'error')).toEqual(
-      expect.arrayContaining(['report.abbreviation', 'report.firstPage']),
-    );
+  // 4.4.2 replaced the ECR reference with the ECLI outright, so a missing one
+  // is an error rather than a preference: "an ECLI has been assigned to all
+  // decisions delivered by EU courts since 1954".
+  it('requires an ECLI, and checks its shape (4.4.2)', () => {
+    const euCase = (ecli?: string): Source => ({
+      id: 'e1', type: 'euCase', caseName: 'Schempp v Finanzamt',
+      caseNumber: 'C-403/03', ecli,
+    });
+    expect(fields(euCase(), 'error')).toContain('ecli');
+    expect(fields(euCase('2005 ECR I-7879'), 'warning')).toContain('ecli');
+    expect(validate(euCase('EU:C:2005:446'))).toEqual([]);
   });
 });

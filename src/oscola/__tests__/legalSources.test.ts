@@ -144,77 +144,81 @@ describe('EU legislation (2.6.1)', () => {
   });
 });
 
-describe('EU cases (2.6.2)', () => {
+describe('EU cases (4.4.2)', () => {
+  // The 5th edition's own worked examples. It replaced the ECR reference with
+  // the European Case Law Identifier: the very citation the 4th edition gave as
+  // `[2002] ECR II-2905` is now `EU:T:2002:174`. Note the plain hyphen in the
+  // case number — the 4th edition printed an en dash.
   const mathisen: EuCaseSource = {
     id: 'ec1',
     type: 'euCase',
-    caseNumber: 'T–344/99',
+    caseNumber: 'T-344/99',
     caseName: 'Arne Mathisen AS v Council',
-    report: { year: '2002', abbreviation: 'ECR', firstPage: 'II–2905' },
+    ecli: 'EU:T:2002:174',
   };
 
-  it('gives the registration number then the case name, with no punctuation between', () => {
-    expect(fn(mathisen)).toBe('Case T–344/99 Arne Mathisen AS v Council [2002] ECR II–2905.');
+  it('gives the number, then the name, then the ECLI', () => {
+    expect(fn(mathisen)).toBe('Case T-344/99 Arne Mathisen AS v Council EU:T:2002:174.');
   });
 
-  it('pinpoints paragraphs after a comma', () => {
-    const commission: EuCaseSource = {
+  // Verbatim from the guide's own exemplar citation in 4.4.2.
+  it('matches the guide’s worked example, pinpoint and all', () => {
+    const schempp: EuCaseSource = {
       id: 'ec2',
       type: 'euCase',
-      caseNumber: 'C–176/03',
-      caseName: 'Commission v Council',
-      report: { year: '2005', abbreviation: 'ECR', firstPage: 'I–7879' },
-      pinpoint: 'paras 47–48',
+      caseNumber: 'C-403/03',
+      caseName: 'Schempp v Finanzamt',
+      ecli: 'EU:C:2005:446',
+      pinpoint: '[19]',
     };
-    expect(fn(commission)).toBe(
-      'Case C–176/03 Commission v Council [2005] ECR I–7879, paras 47–48.',
-    );
+    expect(fn(schempp)).toBe('Case C-403/03 Schempp v Finanzamt EU:C:2005:446 [19].');
   });
 
   it('says "Joined Cases" for joined proceedings', () => {
     const schijndel: EuCaseSource = {
       id: 'ec3',
       type: 'euCase',
-      caseNumber: 'C–430 and 431/93',
+      caseNumber: 'C-430 and 431/93',
       joined: true,
       caseName: 'Jereon van Schijndel v Stichting Pensioenfonds voor Fysiotherapeuten',
-      report: { year: '1995', abbreviation: 'ECR', firstPage: 'I–4705' },
+      ecli: 'EU:C:1995:441',
     };
     expect(fn(schijndel)).toBe(
-      'Joined Cases C–430 and 431/93 Jereon van Schijndel v Stichting Pensioenfonds voor ' +
-        'Fysiotherapeuten [1995] ECR I–4705.',
+      'Joined Cases C-430 and 431/93 Jereon van Schijndel v Stichting Pensioenfonds voor ' +
+        'Fysiotherapeuten EU:C:1995:441.',
     );
   });
 
-  // 2.6.2: "If the case is not yet reported in the OJ, then cite the case
-  // number and case name, followed by the court and date of judgment in brackets."
-  it('gives the court and date for a case not yet reported', () => {
-    const bayer: EuCaseSource = {
-      id: 'ec4',
-      type: 'euCase',
-      caseNumber: 'T–277/08',
-      caseName: 'Bayer Healthcare v OHMI—Uriach Aquilea OTC',
-      court: 'CFI',
-      judgmentDate: '2009-11-11',
-    };
-    expect(fn(bayer)).toBe(
-      'Case T–277/08 Bayer Healthcare v OHMI—Uriach Aquilea OTC (CFI, 11 November 2009).',
+  // 2.1.6: a paragraph pinpoint is bracketed and takes no comma before it.
+  // 4.4.2 pinpoints an Advocate General's opinion as ", point 51" instead, so
+  // the bracket is what decides which separator is right.
+  it('drops the comma before a bracketed pinpoint but keeps it before a worded one', () => {
+    const withPin = (pinpoint: string): EuCaseSource => ({ ...mathisen, pinpoint });
+    expect(fn(withPin('[19]'))).toBe(
+      'Case T-344/99 Arne Mathisen AS v Council EU:T:2002:174 [19].',
+    );
+    expect(fn(withPin('point 51'))).toBe(
+      'Case T-344/99 Arne Mathisen AS v Council EU:T:2002:174, point 51.',
     );
   });
 
   it('italicises only the case name', () => {
     expect(formatFootnote(mathisen)).toEqual([
-      { text: 'Case T–344/99 ', style: 'plain' },
+      { text: 'Case T-344/99 ', style: 'plain' },
       { text: 'Arne Mathisen AS v Council', style: 'italic' },
-      { text: ' [2002] ECR II–2905.', style: 'plain' },
+      { text: ' EU:T:2002:174.', style: 'plain' },
     ]);
   });
 
-  // OSCOLA 1.6.2 tables the case under the first party name, with the case
-  // number following in brackets, and case names are not italicised there.
-  it('tables the case name with the number in brackets (1.6.2)', () => {
-    expect(bib(mathisen)).toBe('Arne Mathisen AS v Council (T–344/99)');
-    expect(formatBibliography(mathisen).every((s) => s.style === 'plain')).toBe(true);
+  // OSCOLA 1.6.2: "List European Union ('EU') court decisions alphabetically by
+  // case name and state the case number in round brackets before providing the
+  // European Case Law Identifier." Verbatim from the guide's own example.
+  it('tables the name, the bracketed number and the ECLI (1.6.2)', () => {
+    const schempp: EuCaseSource = {
+      id: 'ec4', type: 'euCase', caseNumber: 'C-403/03',
+      caseName: 'Schempp v Finanzamt', ecli: 'EU:C:2005:446',
+    };
+    expect(bib(schempp)).toBe('Schempp v Finanzamt (Case C-403/03) EU:C:2005:446');
   });
 });
 

@@ -372,21 +372,19 @@ export interface EuCaseSource extends SourceBase {
   /** Renders "Joined Cases" instead of "Case". */
   readonly joined?: boolean;
   readonly caseName: string;
-  readonly report?: {
-    readonly year: string;
-    /** Report abbreviation, usually "ECR"; "CMLR" where no ECR exists. */
-    readonly abbreviation: string;
-    /** First page including the volume prefix, e.g. "I-7879". */
-    readonly firstPage: string;
-  };
+  /**
+   * European Case Law Identifier, e.g. "EU:C:2005:446".
+   *
+   * This replaces the law report reference the 4th edition asked for. OSCOLA
+   * 4.4.2: an ECLI "has been assigned to all decisions delivered by EU courts
+   * since 1954 and to the opinions of the Advocates General", and "all such
+   * material should now be cited using the appropriate ECLI". So there is no
+   * ECR or CMLR field any more, and no court-and-date fallback for a case that
+   * is not yet reported — every decision has an identifier.
+   */
+  readonly ecli?: string;
   /** Pinpoint, e.g. "paras 47-48". */
   readonly pinpoint?: string;
-  /**
-   * Court, for a case not yet reported in the OJ, e.g. "CFI". OSCOLA 2.6.2
-   * then gives the court and the date of judgment in brackets.
-   */
-  readonly court?: string;
-  readonly judgmentDate?: OscolaDate;
 }
 
 export interface BookChapterSource extends SourceBase {

@@ -1,11 +1,14 @@
 import { italic, segments, type FormattedCitation, type Part } from '../../model/segments';
 import type { EuCaseSource } from '../../model/types';
-import { formatDayMonthYear } from '../../model/dates';
 
 /**
- * OSCOLA 2.6.2: `case number | case name | [year] | report abbreviation |
- * first page`. "Give the case registration number in roman and then the name
- * of the case in italics, with no punctuation between them."
+ * OSCOLA 4.4.2: `case number | case name | European Case Law Identifier`.
+ * "Give the case registration number in roman and then the name of the case in
+ * italics, with no punctuation between them."
+ *
+ * The 5th edition replaced the law report reference with the ECLI, so
+ * `Case T-344/99 Arne Mathisen AS v Council [2002] ECR II-2905` became
+ * `Case T-344/99 Arne Mathisen AS v Council EU:T:2002:174`.
  */
 function caseNumber(source: EuCaseSource): string {
   const number = source.caseNumber.trim();
@@ -13,54 +16,47 @@ function caseNumber(source: EuCaseSource): string {
   return `${source.joined ? 'Joined Cases' : 'Case'} ${number}`;
 }
 
-function report(source: EuCaseSource): string {
-  if (!source.report) return '';
-  const { year, abbreviation, firstPage } = source.report;
-  return [year.trim() && `[${year.trim()}]`, abbreviation.trim(), firstPage.trim()]
-    .filter(Boolean)
-    .join(' ');
-}
-
-/**
- * OSCOLA 2.6.2: where a case is not yet reported in the OJ, the case number and
- * name are followed by the court and the date of judgment in brackets.
- */
-function unreportedBracket(source: EuCaseSource): string {
-  if (source.report) return '';
-  const court = source.court?.trim();
-  const date = formatDayMonthYear(source.judgmentDate);
-  const parts = [court, date].filter(Boolean);
-  return parts.length > 0 ? ` (${parts.join(', ')})` : '';
-}
-
 function body(source: EuCaseSource, italicised: boolean): Part[] {
   const number = caseNumber(source);
   const name = source.caseName.trim();
-  const reported = report(source);
+  const ecli = source.ecli?.trim() ?? '';
   return [
     number,
     number && name && ' ',
     italicised ? italic(name) : name,
-    reported && ' ',
-    reported,
-    unreportedBracket(source),
+    ecli && (name || number) && ' ',
+    ecli,
   ];
 }
 
 export function formatEuCaseFootnote(source: EuCaseSource): FormattedCitation {
-  // 2.6.2: "When pinpointing, use 'para' or 'paras' after a comma."
+  /*
+   * A paragraph pinpoint goes in square brackets with no comma before it, as
+   * for UK cases under 2.1.6 — the guide's own example is
+   * `Case C-403/03 Schempp v Finanzamt EU:C:2005:446 [19]`.
+   *
+   * A comma is still right for the forms that are words rather than brackets:
+   * 4.4.2 pinpoints an Advocate General's opinion as `, point 51`. So the
+   * bracket is what decides, and what the student typed is what is read.
+   */
   const pinpoint = source.pinpoint?.trim();
-  return segments(...body(source, true), pinpoint && `, ${pinpoint}`, '.');
+  const separator = pinpoint?.startsWith('[') ? ' ' : ', ';
+  return segments(...body(source, true), pinpoint && `${separator}${pinpoint}`, '.');
 }
 
 /**
- * Table of cases entry. OSCOLA 1.6.2 files EU cases alphabetically by first
- * party name "with the case number following the name of the case in
- * brackets", so `Case T-344/99 Arne Mathisen AS v Council [2002] ECR II-2905`
- * is tabled as `Arne Mathisen AS v Council (T-344/99)`. Case names are not
+ * Table of cases entry. OSCOLA 1.6.2: "List European Union ('EU') court
+ * decisions alphabetically by case name and state the case number in round
+ * brackets before providing the European Case Law Identifier." Its example is
+ *
+ *     Schempp v Finanzamt (Case C-403/03) EU:C:2005:446
+ *
+ * so the brackets keep the word "Case", and the ECLI follows them. The 4th
+ * edition tabled the number alone and stopped there. Case names are not
  * italicised in a table of cases.
  */
 export function formatEuCaseBibliography(source: EuCaseSource): FormattedCitation {
-  const number = source.caseNumber.trim();
-  return segments(source.caseName.trim(), number && ` (${number})`);
+  const number = caseNumber(source);
+  const ecli = source.ecli?.trim() ?? '';
+  return segments(source.caseName.trim(), number && ` (${number})`, ecli && ` ${ecli}`);
 }
