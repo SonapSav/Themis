@@ -129,7 +129,7 @@ form is settled — see `VERIFY.md` §3e. Module materials would settle them fas
 than more reading of the public pages, and until then this is blocked rather
 than merely unstarted.
 
-One thing the case form has now outgrown: it carries 31 fields, most of them
+One thing the case form has now outgrown: it carries 33 fields, most of them
 blank for any given case. The groups keep it navigable, but conditional or
 collapsible sections are worth a look before more are added.
 
