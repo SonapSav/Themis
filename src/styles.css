@@ -1,3 +1,6 @@
+/* The light palette, and the default. Every colour here has a counterpart in
+   the dark block below; `appearance.test.ts` asserts that, because a colour
+   defined in one theme and forgotten in the other fails silently. */
 :root {
   --bg: #fbfaf8;
   --panel: #ffffff;
@@ -5,6 +8,11 @@
   --muted: #6b6459;
   --line: #ddd7cd;
   --accent: #7a3b2e;
+  /* Text on an accent fill, and the ground under a text field. Both were once
+     a literal #fff, which is wrong the moment the accent is the light half. */
+  --on-accent: #ffffff;
+  --field: #ffffff;
+  --editing: #f4ede9;
   --error: #a02020;
   --warn: #8a6100;
   --ok: #2a6b3a;
@@ -12,18 +20,54 @@
   color-scheme: light;
 }
 
+/* Warm rather than neutral, so the dark theme reads as the same paper turned
+   down rather than a different application. --bg must match THEME_COLOUR.dark
+   in `appearance.ts`. */
+:root[data-theme='dark'] {
+  --bg: #16140f;
+  --panel: #1e1c16;
+  --ink: #ece7dc;
+  --muted: #a89e8d;
+  --line: #35312a;
+  --accent: #e0a08d;
+  --on-accent: #2a1610;
+  --field: #12100c;
+  --editing: #2b2419;
+  --error: #f0938a;
+  --warn: #e2b25c;
+  --ok: #86c294;
+  color-scheme: dark;
+}
+
+/* Faces the machine already has; nothing is fetched. The stacks name a Linux
+   metric-compatible substitute after each proprietary face, so a Pi renders
+   the choice rather than silently falling back to the same serif twice. */
+:root[data-typeface='georgia'] { --font-body: Georgia, 'Times New Roman', serif; }
+:root[data-typeface='times'] { --font-body: 'Times New Roman', Times, 'Liberation Serif', Tinos, serif; }
+:root[data-typeface='arial'] { --font-body: Arial, Helvetica, 'Liberation Sans', Arimo, sans-serif; }
+:root[data-typeface='verdana'] { --font-body: Verdana, Geneva, 'DejaVu Sans', sans-serif; }
+
 * { box-sizing: border-box; }
 
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font: 16px/1.5 Georgia, 'Times New Roman', serif;
+  font: 16px/1.5 var(--font-body, Georgia, 'Times New Roman', serif);
 }
 
 .app { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
-.masthead { border-bottom: 2px solid var(--line); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+.masthead {
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 2rem;
+  flex-wrap: wrap;
+}
 .masthead h1 {
   margin: 0;
   font-size: 2rem;
@@ -39,6 +83,20 @@ body {
   color: var(--accent);
 }
 .masthead p { margin: 0.25rem 0 0; color: var(--muted); }
+
+/* Two selects, sized to their own content rather than the full-width rule the
+   form's fields follow. The label rule names all three classes deliberately:
+   `.field .label` below is just as specific, and would otherwise win on order
+   alone and restore the form's heavier label. */
+.appearance { display: flex; gap: 0.75rem; flex: none; }
+.appearance .field { margin-bottom: 0; }
+.appearance .field .label { font-size: 0.75rem; font-weight: 400; color: var(--muted); }
+.appearance select { width: auto; min-width: 8.5rem; padding: 0.3rem 0.45rem; font-size: 0.85rem; }
+@media (max-width: 560px) {
+  .appearance { width: 100%; }
+  .appearance .field { flex: 1 1 0; min-width: 0; }
+  .appearance select { width: 100%; min-width: 0; }
+}
 
 .columns { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
 @media (max-width: 860px) { .columns { grid-template-columns: 1fr; } }
@@ -65,7 +123,7 @@ input, select {
   font-size: 0.95rem;
   border: 1px solid var(--line);
   border-radius: var(--radius);
-  background: #fff;
+  background: var(--field);
   color: inherit;
 }
 input:focus, select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
@@ -131,11 +189,11 @@ button {
   border-radius: var(--radius);
   border: 1px solid var(--accent);
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   cursor: pointer;
 }
 button:disabled { opacity: 0.45; cursor: not-allowed; }
-button.secondary { background: #fff; color: var(--accent); }
+button.secondary { background: var(--field); color: var(--accent); }
 button.small { padding: 0.25rem 0.55rem; font-size: 0.8rem; }
 button.icon {
   border: none; background: none; color: var(--muted);
@@ -225,11 +283,11 @@ button.icon {
   margin-bottom: 1.5rem;
 }
 button.mode {
-  background: #fff;
+  background: var(--field);
   color: var(--muted);
   border-color: var(--line);
 }
-button.mode.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+button.mode.active { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
 .mode-bar .note { margin: 0; flex: 1 1 16rem; min-width: 12rem; }
 
 .style-badge {
@@ -319,7 +377,7 @@ button.linklike {
   border-radius: var(--radius);
   padding: 0.25rem 0.55rem;
   font-size: 0.8rem;
-  background: #fff;
+  background: var(--field);
   color: var(--accent);
   cursor: pointer;
 }
@@ -390,5 +448,5 @@ button.linklike:disabled { color: var(--muted); text-decoration: none; cursor: n
 /* ---- Editing a saved source ---- */
 
 .library-buttons { display: flex; align-items: baseline; gap: 0.5rem; white-space: nowrap; }
-.library li.editing { background: #f4ede9; }
-.save .secondary { background: #fff; color: var(--accent); }
+.library li.editing { background: var(--editing); }
+.save .secondary { background: var(--field); color: var(--accent); }

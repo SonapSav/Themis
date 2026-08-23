@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
+import { installMatchMedia, resetMatchMedia } from './matchMedia';
 
 // jsdom implements neither Blob.text() nor Blob.arrayBuffer(), both of which
 // browsers have had since 2019 and both of which the app uses — to read an
@@ -28,10 +29,15 @@ if (typeof Blob !== 'undefined' && typeof Blob.prototype.arrayBuffer !== 'functi
   };
 }
 
+// jsdom has no matchMedia either. Unlike the Blob polyfills this one is
+// driveable, so the system-theme branch can be tested rather than assumed.
+installMatchMedia();
+
 // Vitest is not configured with globals-aware auto-cleanup, so unmount between
 // tests to keep queries scoped to the component under test.
 afterEach(() => {
   cleanup();
+  resetMatchMedia();
   // App persists to localStorage, so one test's library must not leak into the next.
   try {
     localStorage.clear();

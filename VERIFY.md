@@ -211,17 +211,34 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
 
 ## 6. Small things
 
+- [ ] **The dark theme, with your own eyes.** There is no browser I can drive
+      here, so every colour in it was reasoned about rather than seen. The
+      palette is warm rather than neutral — the same paper turned down, not a
+      different application. Tests assert that every light colour *has* a dark
+      counterpart, which is a different claim from it being the right one.
+      Worth a look at: the `.rendered` citations against `--panel`; the warning
+      and error text (`#e2b25c`, `#f0938a`) against the dark ground; the
+      focus outline on a text field; and the accent buttons, whose label is now
+      dark ink on light rust rather than white.
+- [ ] **The four typefaces on your machine.** Georgia, Times New Roman, Arial
+      and Verdana are all system faces, so what you actually get depends on what
+      is installed. On this Pi the proprietary three are likely to resolve to
+      their metric-compatible substitutes — Liberation Serif, Liberation Sans,
+      DejaVu Sans. Check the four are visibly different from one another, and
+      that italics still read as italic in each, since a citation depends on
+      them.
 - [ ] **The mark at 16px, in a dark tab strip.** The mark is now `balance` from
       Google Material Symbols (Apache 2.0, attributed in the README). You have
       seen it in the masthead and approved it; what is still unchecked is the
-      browser tab at 16px, and whether the dark-mode colour `#e0a08d` is legible
-      if your tab strip is dark. There is no SVG rasteriser on this machine, so
-      I cannot see it at all.
+      browser tab at 16px, and whether the dark-mode colour `#e0a08d` — now also
+      the accent across the whole dark theme — is legible if your tab strip is
+      dark. There is no SVG rasteriser on this machine, so I cannot see it at
+      all.
 - [ ] **LAN access.** `http://harmony.local:5173/` and
       `http://192.168.0.63:5173/` both answer to `curl`, but I have not loaded
       them in a browser from another machine.
-- [ ] **The tests take about two minutes**, nearly all of it the DOM tests
-      typing character by character. `npx vitest run src/oscola src/harvard
+- [ ] **The tests take about two and a half minutes**, nearly all of it the DOM
+      tests typing character by character. `npx vitest run src/oscola src/harvard
       src/document` runs just the engines in about two seconds if you want a
       fast loop.
 - [ ] **A full run can flake on this Pi.** Once, two `src/App.test.tsx` tests

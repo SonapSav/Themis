@@ -19,7 +19,7 @@ For whoever picks this up next, including a future session of me.
 | 3. Word output | **Working end to end** — a `.docx` whose footnote markers copy into a student's own document and renumber, confirmed in Word on 23 August 2026; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-444 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+471 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -84,6 +84,9 @@ Each is documented in the README's gaps list so the decision is visible.
 
 jsdom lags browsers. `Blob.text()` and `Blob.arrayBuffer()` are feature-detected
 polyfills in `src/test/setup.ts` — app code targets browsers, not jsdom.
+`matchMedia` is missing too, but a stub that always answered "light" would look
+tested without being tested, so `src/test/matchMedia.ts` is *driveable*: a test
+plays the laptop that switches at dusk and asserts the theme follows.
 jsdom is pinned to v25 because v26 needs Node 22 and this builds on Node 20.
 
 ---
@@ -102,6 +105,8 @@ Do not relitigate these without a reason. Each was settled deliberately.
 | OSCOLA sources **never** get an in-text citation | §1.1 rules them out explicitly. Harvard in-text is a different scheme, not an OSCOLA variant |
 | **localStorage only**, no backend | No auth, no hosting, no GDPR exposure. Durability solved by export/import instead of sync |
 | The store API is **synchronous** | Making it async today would push a loading state through the UI to serve a backend that does not exist |
+| Theme and typeface are **presentation only**, and stored apart | They cannot change a citation, so they live outside the engines; and clearing your sources is not a factory reset |
+| **No font-size control** | Browser zoom already does it, better, and applies to everything |
 | A dependency for `.docx`, none for the mark | OOXML must open cleanly in Word and cannot be checked here; the mark is one copied SVG path — Material Symbols' `balance`, Apache 2.0, attributed in the README — not an icon font or library |
 
 ---
@@ -206,7 +211,9 @@ src/document/        footnote sequencing: ibid, cross-citations, short forms
 src/bibliography.ts  end-of-work lists, ordered per scheme
 src/export/docx.ts   Word output, with real Word footnotes
 src/clipboard.ts     rich-text copy, so italics survive a paste
-src/store/           localStorage persistence and JSON export/import
+src/store/           localStorage persistence and JSON export/import, through
+                     one guarded accessor in store/storage.ts
+src/appearance.ts    theme and typeface: which palette, never what is in it
 src/search.ts        search and filter over the saved library
 src/citations.ts     mode-aware dispatcher; the module the UI imports
 src/fields.ts        form field specs, draft → source, and its lossless inverse

@@ -37,6 +37,8 @@ src/harvard/         Cite Them Right Harvard — authors, pages, format
 src/citations.ts     mode-aware dispatcher; the module the UI imports
 src/bibliography.ts  assembles the end-of-work lists, ordered per scheme
 src/store/library.ts browser-local persistence for the source library
+src/store/storage.ts the one guarded way in to localStorage
+src/appearance.ts    theme and typeface — which palette, never what it holds
 src/search.ts        search and filter over the saved library
 src/document/        footnote sequencing: ibid, cross-citations, short forms
 src/export/docx.ts   Word output, with real Word footnotes
@@ -209,10 +211,49 @@ outright. An OU module runs nine months. So:
 - A first import onto an empty library adopts the file's scheme; merging into a
   library that already has sources leaves the current choice alone.
 
-`src/store/library.ts` and `src/store/transfer.ts` are the only modules that
-touch storage, so a future backend is a contained change. The store API is
+`src/store/library.ts`, `src/store/transfer.ts` and `src/store/appearance.ts`
+are the only modules that touch storage, all of them through the single guarded
+accessor in `src/store/storage.ts`, so a future backend is a contained change. The store API is
 deliberately synchronous: making it async today would push a loading state
 through the UI to serve a backend that does not exist.
+
+## Theme and typeface
+
+Two selects in the masthead, and neither touches a citation.
+
+**Theme** is Light, Dark, or *Match my system*, which is the default: someone
+who wants a dark screen has usually already said so once, to their operating
+system. That choice is watched rather than read once, so a laptop set to switch
+at dusk switches Thetis with it, without a reload.
+
+**Typeface** is Georgia, Times New Roman, Arial or Verdana. Nothing is
+downloaded — every one is a face the machine already has, so the choice costs no
+request and works offline. Georgia is the house face; Times New Roman is what
+most essays are set in; Arial and Verdana are there because the OU's own
+accessibility guidance names them, Verdana for its wide letterforms. Each stack
+names a metric-compatible Linux substitute after the proprietary face, so a Pi
+renders the choice rather than falling back to the same serif twice.
+
+There is no font-size control: the browser's own zoom does it better, and
+applies to everything.
+
+`src/appearance.ts` decides *which* palette and *which* stack; the palettes and
+stacks themselves live in `styles.css`, keyed off `data-theme` and
+`data-typeface` on the root element. Two things follow from that split, and both
+are asserted rather than trusted, because either would fail silently:
+
+- every typeface offered has a `--font-body` rule behind it;
+- every colour in the light palette has a dark counterpart.
+
+The choice is applied in `main.tsx` **before the first paint**, not in an effect
+after it, so a dark reader is never shown a white page for a frame. It is stored
+under its own key, `thetis.appearance`, apart from the library: clearing your
+sources is about sources, and is not a factory reset.
+
+Dark mode also forced two colours into the open that had been literal `#fff` —
+the text on an accent fill, and the ground under a text field. Both are now
+`--on-accent` and `--field`, because white text on the accent is unreadable the
+moment the accent is the light half of the pair.
 
 ## Source types
 

@@ -2,12 +2,13 @@
  * Browser-local persistence for the source library.
  *
  * Everything stays on the student's own machine: there is no backend, and
- * nothing here leaves the browser. Storage can be unavailable — a private
- * window, storage disabled, a quota that is already full — so every access is
- * guarded and failure degrades to an in-memory session rather than an error.
+ * nothing here leaves the browser. Reaching storage at all is guarded in
+ * `storage.ts`, and failure degrades to an in-memory session rather than an
+ * error.
  */
 import { SOURCE_TYPE_LABELS, type CitationMode, type Source } from '../model/types';
 import type { FootnoteInput } from '../document';
+import { storage } from './storage';
 
 const KEY = 'thetis.library';
 const VERSION = 1;
@@ -21,15 +22,6 @@ export interface LibraryState {
 
 interface Persisted extends LibraryState {
   readonly version: number;
-}
-
-function storage(): Storage | undefined {
-  try {
-    // Accessing localStorage itself throws when site data is blocked.
-    return typeof window === 'undefined' ? undefined : window.localStorage;
-  } catch {
-    return undefined;
-  }
 }
 
 const isMode = (value: unknown): value is CitationMode =>

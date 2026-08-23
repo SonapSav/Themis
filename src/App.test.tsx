@@ -1,7 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App';
+import { setSystemPrefersDark } from './test/matchMedia';
 
 /**
  * End-to-end tests through the real app: fill the form, read the preview.
@@ -1347,5 +1348,73 @@ describe('finding a source in the library', () => {
 
     await user.click(screen.getByRole('button', { name: 'Clear filters' }));
     expect(listed()[0]).toMatch(/^Bell, J\./);
+  });
+});
+
+describe('choosing a theme and a typeface', () => {
+  const root = () => document.documentElement;
+
+  // The stylesheet is keyed off these two attributes; nothing else reads them.
+  it('starts on the system theme in the house face', () => {
+    setup();
+    expect(screen.getByLabelText('Theme')).toHaveValue('system');
+    expect(screen.getByLabelText('Typeface')).toHaveValue('georgia');
+    expect(root().dataset.theme).toBe('light');
+    expect(root().dataset.typeface).toBe('georgia');
+  });
+
+  it('switches to dark on being asked', async () => {
+    const user = setup();
+    await user.selectOptions(screen.getByLabelText('Theme'), 'dark');
+    expect(root().dataset.theme).toBe('dark');
+  });
+
+  it('follows the system, and keeps following it as the system changes', async () => {
+    const user = setup();
+    await user.selectOptions(screen.getByLabelText('Theme'), 'system');
+    expect(root().dataset.theme).toBe('light');
+
+    act(() => setSystemPrefersDark(true));
+    expect(root().dataset.theme).toBe('dark');
+
+    act(() => setSystemPrefersDark(false));
+    expect(root().dataset.theme).toBe('light');
+  });
+
+  // An explicit choice is a choice, and outranks whatever the laptop does.
+  it('ignores the system once a theme has been chosen outright', async () => {
+    const user = setup();
+    await user.selectOptions(screen.getByLabelText('Theme'), 'light');
+    act(() => setSystemPrefersDark(true));
+    expect(root().dataset.theme).toBe('light');
+  });
+
+  it('changes the typeface', async () => {
+    const user = setup();
+    await user.selectOptions(screen.getByLabelText('Typeface'), 'verdana');
+    expect(root().dataset.typeface).toBe('verdana');
+  });
+
+  it('remembers both across a reload', async () => {
+    const first = setup();
+    await first.selectOptions(screen.getByLabelText('Theme'), 'dark');
+    await first.selectOptions(screen.getByLabelText('Typeface'), 'times');
+    first.unmount();
+
+    setup();
+    expect(screen.getByLabelText('Theme')).toHaveValue('dark');
+    expect(screen.getByLabelText('Typeface')).toHaveValue('times');
+    expect(root().dataset.theme).toBe('dark');
+  });
+
+  // Clearing the library is about sources; it is not a factory reset.
+  it('survives clearing the source library', async () => {
+    const user = setup();
+    await addPageVSmith(user);
+    await user.selectOptions(screen.getByLabelText('Theme'), 'dark');
+
+    await user.click(screen.getByRole('button', { name: 'Clear all' }));
+    expect(screen.getByLabelText('Theme')).toHaveValue('dark');
+    expect(root().dataset.theme).toBe('dark');
   });
 });

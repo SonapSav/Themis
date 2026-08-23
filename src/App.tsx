@@ -8,6 +8,14 @@ import {
   type SourceType,
 } from './citations';
 import { DEFAULT_DRAFTS, buildSource, isDraftEmpty, toDraft, type Draft } from './fields';
+import {
+  DEFAULT_APPEARANCE,
+  applyAppearance,
+  systemPrefersDark,
+  watchSystemTheme,
+  type Appearance,
+} from './appearance';
+import { AppearanceControls } from './components/AppearanceControls';
 import { SourceForm } from './components/SourceForm';
 import { CitationPreview } from './components/CitationPreview';
 import { ScalesIcon } from './components/ScalesIcon';
@@ -16,6 +24,7 @@ import { SourceLibrary } from './components/SourceLibrary';
 import { FootnoteSequence } from './components/FootnoteSequence';
 import type { FootnoteInput } from './document';
 import { clear as clearLibrary, load, save } from './store/library';
+import { load as loadAppearance, save as saveAppearance } from './store/appearance';
 import {
   exportFilename,
   mergeSources,
@@ -57,6 +66,21 @@ export default function App() {
   const [footnotes, setFootnotes] = useState<readonly FootnoteInput[]>(restored?.footnotes ?? []);
   /** Set while the form holds a saved source rather than a new one. */
   const [editingId, setEditingId] = useState<string>();
+
+  // Appearance is stored apart from the library, so clearing sources keeps it.
+  const [appearance, setAppearance] = useState<Appearance>(
+    () => loadAppearance() ?? DEFAULT_APPEARANCE,
+  );
+  const [prefersDark, setPrefersDark] = useState(systemPrefersDark);
+
+  // A reader on 'Match my system' should follow a laptop that switches at dusk
+  // without reloading, so the query is watched rather than read once.
+  useEffect(() => watchSystemTheme(setPrefersDark), []);
+
+  useEffect(() => {
+    applyAppearance(appearance, prefersDark);
+    saveAppearance(appearance);
+  }, [appearance, prefersDark]);
 
   useEffect(() => {
     save({ mode, sources: saved, footnotes });
@@ -179,11 +203,14 @@ export default function App() {
   return (
     <div className="app">
       <header className="masthead">
-        <h1>
-          <ScalesIcon className="mark" />
-          Thetis
-        </h1>
-        <p>OSCOLA (4th edn) and Cite Them Right Harvard citations.</p>
+        <div>
+          <h1>
+            <ScalesIcon className="mark" />
+            Thetis
+          </h1>
+          <p>OSCOLA (4th edn) and Cite Them Right Harvard citations.</p>
+        </div>
+        <AppearanceControls appearance={appearance} onChange={setAppearance} />
       </header>
 
       <div className="mode-bar" role="group" aria-label="Referencing scheme">
