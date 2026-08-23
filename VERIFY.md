@@ -53,11 +53,14 @@ If italics are lost, that is a real citation error, not a cosmetic one.
 
 ---
 
-## 3. Cite Them Right — four judgement calls
+## 3. Cite Them Right — the judgement calls and the blank templates
 
 CTR is paywalled. I worked from the OU Library's own public guidance, which is
 arguably the better authority for OU students but does not cover everything.
 If you have CTR access, these are the gaps.
+
+3a–3d are calls where the guide says two things or says nothing. 3e is a
+different problem: five templates the guide names but never works through.
 
 ### 3a. Plural editors
 
@@ -91,6 +94,33 @@ The OU's own two pages disagree — their 2019 Harvard quick guide still shows t
 11th edition form with `Maidenhead:`. I followed the current law-modules page.
 
 - [ ] Confirm your modules expect the 12th edition
+
+### 3e. Five templates the OU guide names but never shows
+
+These are different in kind from 3a–3d. The OU guide *names* each of these
+slots, but prints no worked example, so the exact form — capitalisation,
+abbreviation, punctuation, position — is not fixed by anything I can read.
+Rather than guess, Thetis does not model them at all, and the README records
+each as a gap. Every one is a source a law student can actually hit.
+
+- [ ] **Book volumes.** The book template ends "Series and volume number if
+      relevant." No example shows whether that is `Vol. 2.`, `vol. 2`, or
+      something else. A volume currently appears in an OSCOLA footnote and not
+      in a Harvard reference.
+- [ ] **`doi:`** The journal template allows `doi: 10.1080/02619761003602246`
+      as an optional tail. Not modelled.
+- [ ] **Case notes.** The OU guides have no case-note template at all. In
+      Harvard, Thetis renders an untitled case note's case name where the
+      article title goes — the same substitution OSCOLA §3.3.2 makes — and does
+      **not** add `(note)`, because that is an OSCOLA marker and no CTR
+      equivalent has been seen.
+- [ ] **Forum messages** and **newspaper articles.** Templated, no example.
+- [ ] **Secondary referencing** — `Fernandez (2015, quoted in Nabokov, 2017)`.
+      Templated, no example of the reference-list half.
+
+If your module materials show any of these worked through, that settles it and
+each becomes a small piece of work. This is the main thing blocking the Harvard
+half, so it is worth more than a guess from the public pages.
 
 ---
 
@@ -136,20 +166,72 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
 - [ ] **One judge over several passages** is named once, at the end:
       `[42], [45] (Lord Woolf CJ)`. The guide only shows different judges on
       different passages.
+- [ ] **`(note)` and `(forthcoming)` sit before a web address.** §3.3.2 puts
+      `(note)` "at the end of the citation" and §3.3.4 describes the address as
+      *following* the citation, so Thetis takes the citation to end first:
+      `… EJLT (note) <http://…> accessed 27 July 2010`. No example combines
+      them.
+- [ ] **A titled case note gets no automatic `(note)`.** §3.3.2 says to treat
+      one "as if it were a journal article", and prints `(note)` only in the
+      untitled example. The Case note switch still adds it if you want it.
+- [ ] **No plural is inferred for a book's paragraphs.** §3.2.1 prints
+      `para 76`, and the guide's looseleaf `para 8–106` is one paragraph's
+      number rather than a range — so a dash proves nothing about plurals.
+      Type `paras 76, 78` yourself and Thetis will respect it.
+- [ ] **A bare, unbracketed journal year is not modelled.** §3.3.4's Boyle
+      example prints `2004 Duke L & Tech Rev 0009` with no brackets at all,
+      following that journal's own citation advice rather than a rule. Thetis
+      gives it §3.3.1's square brackets, `[2004]`. If a journal's own guidance
+      says otherwise, follow the journal.
+- [ ] **A CPR pinpoint written `r 5.2` warns rather than being corrected.**
+      §2.5.3 says to omit `r` and `rr` for the CPR, but Thetis never silently
+      rewrites what you typed. The warning is stated for the CPR only; the RSC
+      and CCR keep theirs, as `RSC Ord 24, r 14A` shows.
 
 ---
 
 ## 6. Small things
 
-- [ ] **The favicon in a real tab.** I drew it and rasterised it to check the
-      geometry, but never saw it in a browser tab. Check it reads as scales at
-      16px, and that the dark-mode colour is legible if your tab strip is dark.
+- [ ] **The mark at 16px, in a dark tab strip.** The mark is now `balance` from
+      Google Material Symbols (Apache 2.0, attributed in the README). You have
+      seen it in the masthead and approved it; what is still unchecked is the
+      browser tab at 16px, and whether the dark-mode colour `#e0a08d` is legible
+      if your tab strip is dark. There is no SVG rasteriser on this machine, so
+      I cannot see it at all.
 - [ ] **LAN access.** `http://harmony.local:5173/` and
       `http://192.168.0.63:5173/` both answer to `curl`, but I have not loaded
       them in a browser from another machine.
-- [ ] **The tests take about 95 seconds**, nearly all of it the DOM tests typing
-      character by character. `npx vitest run src/oscola src/harvard src/document`
-      runs just the engines in about two seconds if you want a fast loop.
+- [ ] **The tests take about 105 seconds**, nearly all of it the DOM tests
+      typing character by character. `npx vitest run src/oscola src/harvard
+      src/document` runs just the engines in about two seconds if you want a
+      fast loop.
+- [ ] **A full run can flake on this Pi.** Once, two `src/App.test.tsx` tests
+      failed in a full run and passed 61/61 when that file ran alone; a second
+      full run was green. It is load, not a regression — the DOM tests are slow
+      enough here to brush against their timeout when everything runs at once.
+      If you see it, re-run the file alone before believing it.
+
+---
+
+## 7. The repository and the GitHub account
+
+Not about citations, but raised and still open. I have no access to your
+account settings, so none of this can be checked from here.
+
+- [ ] **Is `sonap.sav@gmail.com` verified on your GitHub account?** Commits are
+      authored with it. If it is not on the account, they will not link to your
+      profile or count toward your contribution graph — https://github.com/settings/emails
+      fixes it retroactively.
+- [ ] **Repository visibility.** `SonapSav/Thetis` may be public or private; I
+      did not check and it is worth being deliberate. Nothing sensitive is in it
+      — no keys, no backend, and `.gitignore` covers `node_modules` and `dist`.
+- [ ] **The SSH key.** `~/.ssh/id_ed25519` on this Pi, fingerprint
+      `SHA256:TWfPo99XDG4sFT4JZ9cm07zH+gaNWxEwkBnG7L1YDSQ`, no passphrase so
+      pushes run unattended. Add one with `ssh-keygen -p -f ~/.ssh/id_ed25519`
+      if this machine is shared.
+- [ ] **A local tag `pre-amend-backup`** still points at the pre-rewrite version
+      of the licence commit. It was never pushed. Delete it with
+      `git tag -d pre-amend-backup` once you are happy the history is right.
 
 ---
 
@@ -164,4 +246,17 @@ For contrast — these were checked against the primary sources, not recalled:
   Working Time Directive), §2.1.7's footnote 101, and §1.7's Hart and Honoré
   bibliography all reproduce line for line.
 - The OSCOLA PDF was read directly — extracted from the file, not from memory —
-  after two recalled "official examples" turned out not to exist.
+  after two recalled "official examples" turned out not to exist. Every section
+  added since — §2.5 (SIs, SR & O, rules of court), §3.3.2–3.3.4 (case notes,
+  forthcoming and online articles) and §3.2.1 (book volumes and paragraphs) —
+  was read the same way, and each of the guide's worked examples for them is
+  asserted verbatim in a test.
+- **Online articles carry no web address in Harvard**, and that is correct, not
+  an omission. The OU's journal template says in terms: "Reference online
+  articles the same way as print articles." Checked rather than assumed, so it
+  needs none of your time.
+- **The `balance` icon's licence.** Material Symbols is Apache 2.0, confirmed
+  from the repository's own `LICENSE`. Upstream ships no `NOTICE` file, and
+  Google's wording is "We'd love attribution in your app's *about* screen, but
+  it's not required". Attribution is given in the README regardless, because the
+  icon is redistributed here.
