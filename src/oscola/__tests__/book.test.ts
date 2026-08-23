@@ -239,3 +239,116 @@ describe('books — markup', () => {
     );
   });
 });
+
+// Both citations asserted here are verbatim from OSCOLA 4th edn.
+describe('volume numbers (3.2.1)', () => {
+  // "the volume number follows the publication details, unless the publication
+  // details of the volumes vary, in which case it precedes them, and is
+  // separated from the title by a comma. Pinpoint to paragraphs rather than
+  // pages if the paragraphs are numbered."
+  it('puts the volume before the publication details where they vary', () => {
+    const vonBar = book({
+      authors: [person('Christian', 'von Bar')],
+      authorRole: 'author',
+      title: 'The Common European Law of Torts',
+      volume: '2',
+      volumesVary: true,
+      publisher: 'CH Beck',
+      year: '2000',
+      pinpoint: { kind: 'paragraph', value: '76' },
+    });
+    expect(footnote(vonBar)).toBe(
+      'Christian von Bar, The Common European Law of Torts, vol 2 (CH Beck 2000) para 76.',
+    );
+  });
+
+  // 3.2.5's encyclopedia example shows the ordinary placing, and that a
+  // pinpoint after a trailing volume takes a comma.
+  it('puts the volume after the publication details otherwise', () => {
+    const halsbury = book({
+      authors: [],
+      authorRole: 'author',
+      title: "Halsbury's Laws",
+      edition: '5',
+      volume: '57',
+      publisher: '',
+      year: '2010',
+      pinpoint: { kind: 'paragraph', value: '53' },
+    });
+    expect(footnote(halsbury)).toBe("Halsbury's Laws (5th edn, 2010) vol 57, para 53.");
+  });
+
+  it('takes a page pinpoint after a trailing volume with a comma too', () => {
+    const franks = book({
+      authors: [{ kind: 'corporate', name: 'University of Oxford' }],
+      authorRole: 'author',
+      title: 'Report of Commission of Inquiry',
+      volume: '1',
+      publisher: 'OUP',
+      year: '1966',
+      pinpoint: { kind: 'page', value: 'ch 3' },
+    });
+    // 3.4.1's own example, which pinpoints to a chapter.
+    expect(footnote(franks)).toBe(
+      'University of Oxford, Report of Commission of Inquiry (OUP 1966) vol 1, ch 3.',
+    );
+  });
+
+  it('keeps the volume in the bibliography and drops the pinpoint', () => {
+    const vonBar = book({
+      authors: [person('Christian', 'von Bar')],
+      authorRole: 'author',
+      title: 'The Common European Law of Torts',
+      volume: '2',
+      volumesVary: true,
+      publisher: 'CH Beck',
+      year: '2000',
+      pinpoint: { kind: 'paragraph', value: '76' },
+    });
+    expect(bibliography(vonBar)).toBe(
+      'von Bar C, The Common European Law of Torts, vol 2 (CH Beck 2000)',
+    );
+  });
+
+  it('does not double a "vol" the student has already typed', () => {
+    const source = book({
+      authors: [person('Christian', 'von Bar')],
+      authorRole: 'author',
+      title: 'The Common European Law of Torts',
+      volume: 'vol 2',
+      publisher: 'CH Beck',
+      year: '2000',
+    });
+    expect(footnote(source)).toBe(
+      'Christian von Bar, The Common European Law of Torts (CH Beck 2000) vol 2.',
+    );
+  });
+
+  it('labels a book paragraph rather than bracketing it, unlike a case', () => {
+    const source = book({
+      authors: [person('Christian', 'von Bar')],
+      authorRole: 'author',
+      title: 'The Common European Law of Torts',
+      publisher: 'CH Beck',
+      year: '2000',
+      pinpoint: { kind: 'paragraph', value: '76' },
+    });
+    expect(footnote(source)).toBe(
+      'Christian von Bar, The Common European Law of Torts (CH Beck 2000) para 76.',
+    );
+  });
+
+  it('respects a "paras" the student typed, rather than inferring a plural', () => {
+    const source = book({
+      authors: [person('Christian', 'von Bar')],
+      authorRole: 'author',
+      title: 'The Common European Law of Torts',
+      publisher: 'CH Beck',
+      year: '2000',
+      pinpoint: { kind: 'paragraph', value: 'paras 76, 78' },
+    });
+    expect(footnote(source)).toBe(
+      'Christian von Bar, The Common European Law of Torts (CH Beck 2000) paras 76, 78.',
+    );
+  });
+});

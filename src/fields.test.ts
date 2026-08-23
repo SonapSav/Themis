@@ -73,6 +73,18 @@ const sources: Record<string, Source> = {
     firstPage: '', forthcoming: true,
     url: 'http://ejlt.org/article/view/17', accessDate: '2010-07-27',
   },
+  'a multi-volume book whose volumes vary': {
+    id: 's10a', type: 'book', authors: [person('Christian', 'von Bar')], authorRole: 'author',
+    title: 'The Common European Law of Torts', volume: '2', volumesVary: true,
+    publisher: 'CH Beck', year: '2000',
+    pinpoint: { kind: 'paragraph', value: '76' },
+  },
+  'a multi-volume book with a trailing volume': {
+    id: 's10b', type: 'book', authors: [person('Gareth', 'Jones')], authorRole: 'author',
+    title: 'The Law of Restitution', volume: '1',
+    publisher: 'Sweet & Maxwell', year: '2007',
+    pinpoint: { kind: 'page', value: '317' },
+  },
   'a journal article': {
     id: 's9', type: 'journalArticle', authors: [person('Alison L', 'Young')],
     title: 'In Defence of Due Deference', year: '2009', volume: '72', issue: '3',

@@ -118,7 +118,19 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'publisher', label: 'Publisher', placeholder: 'Sweet & Maxwell' },
     { key: 'year', label: 'Year', placeholder: '2007' },
     { key: 'place', label: 'Place of publication', placeholder: 'London', hint: 'Recorded but not cited: OSCOLA 4th edn dropped the place of publication.' },
-    { key: 'pinpoint.value', label: 'Pinpoint', placeholder: '317', hint: 'Page numbers stand alone, without "p". Use ch, pt or para where the work is numbered that way — pinpoint to paragraphs if they are numbered.' },
+    { key: 'volume', label: 'Volume', placeholder: '2', group: 'Multi-volume works', hint: 'A bare numeral; "vol" is added for you. Only for a work published in more than one volume.' },
+    {
+      key: 'volumesVary',
+      label: 'Volume position',
+      control: 'select',
+      options: [
+        { value: '', label: 'After the publication details — (CH Beck 2000) vol 2' },
+        { value: 'vary', label: 'Before them — , vol 2 (CH Beck 2000)' },
+      ],
+      hint: 'The volume normally follows the publication details. It precedes them, after a comma, where the volumes were published separately so their details differ.',
+    },
+    { key: 'pinpoint.kind', label: 'Pinpoint type', control: 'select', group: 'Other', options: PINPOINT_KIND },
+    { key: 'pinpoint.value', label: 'Pinpoint', placeholder: '317', hint: 'Page numbers stand alone, without "p". Paragraphs are labelled "para" — pinpoint to paragraphs where the work numbers them. Type "paras" yourself for several.' },
     { key: 'shortTitle', label: 'Short title', placeholder: 'Principles', hint: 'Used when you cite more than one work by this author.' },
   ],
   statutoryInstrument: [
@@ -222,7 +234,7 @@ export const DEFAULT_DRAFTS: Record<SourceType, Draft> = {
   euLegislation: { ojSeries: 'L' },
   euCase: { joined: '' },
   journalArticle: {},
-  book: { authorRole: 'author' },
+  book: { authorRole: 'author', 'pinpoint.kind': 'page' },
   bookChapter: {},
   website: {},
   ouModuleMaterial: {},
@@ -332,7 +344,13 @@ export function buildSource(
         publisher: req(draft, 'publisher'),
         year: req(draft, 'year'),
         place: opt(draft, 'place'),
-        pinpoint: pinpointValue ? { kind: 'page', value: pinpointValue } : undefined,
+        volume: opt(draft, 'volume'),
+        // Undefined rather than false, so a library saved before the field
+        // existed round-trips through an edit unchanged.
+        volumesVary: draft['volumesVary'] ? true : undefined,
+        pinpoint: pinpointValue
+          ? { kind: draft['pinpoint.kind'] === 'paragraph' ? 'paragraph' : 'page', value: pinpointValue }
+          : undefined,
         shortTitle: opt(draft, 'shortTitle'),
       };
       return source;
@@ -581,8 +599,10 @@ export function toDraft(source: Source): DraftState {
       set(draft, 'publisher', source.publisher);
       set(draft, 'year', source.year);
       set(draft, 'place', source.place);
+      set(draft, 'volume', source.volume);
+      draft['volumesVary'] = source.volumesVary ? 'vary' : '';
       set(draft, 'shortTitle', source.shortTitle);
-      setPinpoint(draft, source.pinpoint, false);
+      setPinpoint(draft, source.pinpoint, true);
       break;
 
     case 'bookChapter':

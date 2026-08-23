@@ -884,6 +884,43 @@ describe('editing a saved source', () => {
   });
 });
 
+describe('multi-volume books (3.2.1)', () => {
+  const fillVonBar = async (user: ReturnType<typeof setup>) => {
+    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await chooseType(user, 'Book');
+    const authors = group('Authors or editors');
+    await user.click(authors.getByRole('button', { name: 'Add author' }));
+    await user.type(authors.getByLabelText('Given names'), 'Christian');
+    await user.type(authors.getByLabelText('Surname'), 'von Bar');
+    await user.type(screen.getByLabelText('Title'), 'The Common European Law of Torts');
+    await user.type(screen.getByLabelText('Publisher'), 'CH Beck');
+    await user.type(screen.getByLabelText('Year'), '2000');
+    await user.type(group(/Multi-volume/).getByLabelText('Volume'), '2');
+  };
+
+  it('moves the volume ahead of the publication details where they vary', async () => {
+    const user = setup();
+    await fillVonBar(user);
+    await user.selectOptions(group(/Multi-volume/).getByLabelText('Volume position'), 'vary');
+    await user.selectOptions(group(/Other/).getByLabelText('Pinpoint type'), 'paragraph');
+    await user.type(group(/Other/).getByLabelText('Pinpoint'), '76');
+
+    expect(citation('Footnote')).toBe(
+      'Christian von Bar, The Common European Law of Torts, vol 2 (CH Beck 2000) para 76.',
+    );
+  });
+
+  it('leaves the volume after them by default, with a comma before the pinpoint', async () => {
+    const user = setup();
+    await fillVonBar(user);
+    await user.type(group(/Other/).getByLabelText('Pinpoint'), '317');
+
+    expect(citation('Footnote')).toBe(
+      'Christian von Bar, The Common European Law of Torts (CH Beck 2000) vol 2, 317.',
+    );
+  });
+});
+
 describe('journal articles online, forthcoming and as case notes', () => {
   // A journal article is an academic source, so the OU scheme cites it in
   // Harvard and shows no OSCOLA footnote. These rules are OSCOLA's.

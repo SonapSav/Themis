@@ -223,6 +223,17 @@ export interface BookSource extends SourceBase {
   readonly title: string;
   /** Edition number as a bare numeral, e.g. "7". First editions are not cited. */
   readonly edition?: string;
+  /**
+   * OSCOLA 3.2.1: the volume of a multi-volume work, as a bare numeral — the
+   * `vol` label is added when it is rendered.
+   */
+  readonly volume?: string;
+  /**
+   * 3.2.1: the volume "follows the publication details, unless the publication
+   * details of the volumes vary, in which case it precedes them, and is
+   * separated from the title by a comma". True selects that second placing.
+   */
+  readonly volumesVary?: boolean;
   /** Year of original publication, for reprints and translations. */
   readonly firstPublished?: string;
   /**

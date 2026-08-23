@@ -34,20 +34,37 @@ export function bracketParagraphs(value: string): string {
     .join(', ');
 }
 
+export interface PinpointOptions {
+  /**
+   * How a paragraph reference is written. Cases bracket them — `[76]` (2.1.6).
+   * Books label them instead: 3.2.1 says to "pinpoint to paragraphs rather than
+   * pages if the paragraphs are numbered", and prints `para 76`.
+   */
+  readonly paragraphStyle?: 'bracketed' | 'labelled';
+}
+
 /**
  * The rendered pinpoint: paragraph numbers bracketed, each reference followed
  * by its judge in brackets where one is given, several separated by commas —
  * `[34] (Lord Hope), [39] (Lord Scott)` (OSCOLA 2.1.6, 2.1.7).
  */
-export function renderPinpoint(pinpoint: Pinpoint): string {
-  return pinpointReferences(pinpoint)
+export function renderPinpoint(pinpoint: Pinpoint, options: PinpointOptions = {}): string {
+  const labelled = options.paragraphStyle === 'labelled' && pinpoint.kind === 'paragraph';
+  const rendered = pinpointReferences(pinpoint)
     .map(({ locus, judge }) => {
-      const rendered = pinpoint.kind === 'paragraph' ? bracketParagraph(locus) : locus;
+      const base = pinpoint.kind === 'paragraph' && !labelled ? bracketParagraph(locus) : locus;
       const attributed = judge?.trim();
-      return attributed ? `${rendered} (${attributed})` : rendered;
+      return attributed ? `${base} (${attributed})` : base;
     })
     .filter(Boolean)
     .join(', ');
+
+  if (!labelled || !rendered) return rendered;
+  // 3.2.1's example is `para 76`, and the guide prints no plural for a book —
+  // its looseleaf `para 8–106` is one paragraph's number, not a range — so
+  // `paras` is never inferred. A prefix the student has typed is respected,
+  // as it is for Harvard page references.
+  return /^paras?\b/i.test(rendered) ? rendered : `para ${rendered}`;
 }
 
 /**

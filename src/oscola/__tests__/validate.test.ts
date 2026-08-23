@@ -285,3 +285,20 @@ describe('validation — journal articles (3.3.2–3.3.4)', () => {
     expect(fields(source, 'warning')).toContain('url');
   });
 });
+
+describe('validation — book volumes (3.2.1)', () => {
+  const base: Source = {
+    id: 'b1', type: 'book', authors: [person('Christian', 'von Bar')], authorRole: 'author',
+    title: 'The Common European Law of Torts', publisher: 'CH Beck', year: '2000',
+  };
+
+  it('accepts a volume with either placing', () => {
+    expect(validate({ ...base, volume: '2' })).toEqual([]);
+    expect(validate({ ...base, volume: '2', volumesVary: true })).toEqual([]);
+  });
+
+  it('says the placing means nothing without a volume number', () => {
+    expect(fields({ ...base, volumesVary: true }, 'warning')).toContain('volume');
+    expect(fields({ ...base, volumesVary: true }, 'error')).toEqual([]);
+  });
+});

@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 380 tests
+npm test           # 393 tests
 npm run typecheck
 ```
 
@@ -290,6 +290,8 @@ Nothing in the suite is invented.
 | **Book place of publication** | Omitted. §3.2.1: "The place of publication need not be given." The `place` field is kept on the type so data round-trips, and entering one raises a warning explaining it will not appear. |
 | **Book publication bracket** | §3.2.1's order is `(additional information, edition, publisher year)`, publisher and year separated by a space and no punctuation. "Additional information" is a general slot — an editor or translator of an *authored* work (`John Gardner ed`, `Tony Weir tr`), a series, or `first published 1651` — and always precedes the edition. |
 | **Editions** | §3.2.1: `2nd edn`, or `rev edn` for a revised edition. A first edition is not cited, so `1` renders nothing. Non-numeric input passes through, so `rev` gives `rev edn`. |
+| **Book volumes** | §3.2.1: the volume "follows the publication details, unless the publication details of the volumes vary, in which case it precedes them, and is separated from the title by a comma". A **Volume position** select chooses between `Halsbury's Laws (5th edn, 2010) vol 57` and `The Common European Law of Torts, vol 2 (CH Beck 2000)`. A pinpoint after a trailing volume takes a comma — `vol 57, para 53`, `vol 1, ch 3` — where one after the publication bracket alone takes a space. A `vol` already typed is not doubled. |
+| **Book paragraphs** | §3.2.1: "Pinpoint to paragraphs rather than pages if the paragraphs are numbered." A book's paragraphs are **labelled**, `para 76`, not bracketed as a case's are (§2.1.6). No plural is inferred: the guide prints no `paras` for a book, and its looseleaf `para 8–106` is one paragraph's number rather than a range, so a `paras` the student types is respected and nothing is guessed. |
 | **Case year brackets** | An explicit `yearFormat` field, defaulting to square. §2.1.1: square where the year identifies the volume (`Barrett v Enfield LBC [2001] 2 AC 550 (HL)`), round for the year of *judgment* where the volumes are independently numbered (`Barrett v Enfield LBC (1999) 49 BMLR 1 (HL)`). Not inferable — `[2008] 1 AC 884` has both a volume and square brackets. |
 | **Unreported cases** | §2.1.4: a case that is unreported and has no neutral citation is given by its court and date of judgment in place of a report — `Stubbs v Sayer (CA, 8 November 1990)` — with no need for the word "unreported". A neutral citation, where there is one, is given instead. EU cases follow §2.6.2 the same way: `Case T–277/08 Bayer Healthcare v OHMI—Uriach Aquilea OTC (CFI, 11 November 2009)`. |
 | **Court in brackets** | §2.1.3 and §2.1.5: the court is **not** cited where there is a neutral citation, because the neutral citation identifies the court, nor for cases decided before 1865. A court entered alongside a neutral citation is dropped from the output and a warning says so. Where it is cited, it follows the first page and precedes any pinpoint. |
@@ -343,6 +345,10 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 - **The corporate-author full stop** — the OU template prints
   `The Open University. (Year)`, its own example prints
   `The Open University (2025)`. Thetis follows the example.
+- **Harvard book volumes** are named in the OU's book template — "Series and
+  volume number if relevant" — but it prints no worked example, so the form is
+  not fixed and is not guessed at. A volume shows in an OSCOLA footnote and not
+  in a Harvard reference.
 - **Harvard forum messages, newspaper articles and secondary referencing**
   (`Fernandez (2015, quoted in Nabokov, 2017)`) are templated in the OU guide
   but not yet modelled here.
@@ -358,9 +364,6 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 
 **Secondary sources**
 
-- **Book volume numbers** — §3.2.1: the volume follows the publication details
-  (`(CH Beck 2000) vol 2`), unless the volumes' publication details vary, in
-  which case it precedes them and follows the title.
 - **No publisher** — §3.2.1 requires one, but its own research-report example
   (`(Ministry of Justice Research Series 1/09, 2009)`) has none. Validation
   currently treats a missing publisher as an error; such reports belong to

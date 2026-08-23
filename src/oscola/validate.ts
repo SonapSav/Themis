@@ -184,6 +184,12 @@ export function validate(source: Source): readonly ValidationIssue[] {
           warning('place', 'OSCOLA 4th edn omits the place of publication, so it will not appear in the citation.'),
         );
       }
+      // 3.2.1's placing rule only bites where there is a volume to place.
+      if (source.volumesVary && blank(source.volume)) {
+        issues.push(
+          warning('volume', 'The volume position only applies to a work with a volume number, so give one or leave the position alone.'),
+        );
+      }
       break;
     }
 

@@ -95,7 +95,12 @@ function withPinpoint(source: Source, ref: CitationRef): Source {
 function trailingPinpoint(ref: CitationRef, source: Source | undefined): string {
   const pinpoint = pinpointOf(ref, source);
   if (!pinpoint) return '';
-  const rendered = renderPinpoint(pinpoint);
+  // 3.2.1 labels a book's paragraph pinpoints — `para 76` — where a case's are
+  // bracketed. `ibid` carries the same form as the full citation would.
+  const rendered = renderPinpoint(
+    pinpoint,
+    source?.type === 'book' ? { paragraphStyle: 'labelled' } : {},
+  );
   return rendered ? ` ${rendered}` : '';
 }
 
