@@ -1,4 +1,5 @@
 import {
+  SOURCE_CATEGORY,
   formatSource,
   nameInTextForm,
   toHtml,
@@ -123,8 +124,16 @@ export function CitationPreview({ source, mode, issues, empty }: Props) {
 
   return (
     <div className="preview">
+      {/*
+        * Two independent facts, and reading one off the other was a bug: in
+        * OSCOLA-only mode every source is styled 'oscola', so a book announced
+        * itself as a legal source. What kind of source it is comes from its
+        * type and never changes; which scheme cites it depends on the mode.
+        */}
       <p className="style-badge">
-        {output.style === 'oscola' ? 'Legal source — OSCOLA' : 'Academic source — Harvard'}
+        {SOURCE_CATEGORY[source.type] === 'legal' ? 'Legal source' : 'Academic source'}
+        {' — '}
+        {output.style === 'oscola' ? 'OSCOLA' : 'CTR Harvard'}
       </p>
 
       {output.style === 'oscola' ? (

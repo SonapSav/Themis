@@ -150,7 +150,7 @@ describe('the mode switch', () => {
     const user = setup();
     await fillBook(user);
 
-    expect(screen.getByText('Academic source — Harvard')).toBeInTheDocument();
+    expect(screen.getByText('Academic source — CTR Harvard')).toBeInTheDocument();
     expect(citation('In-text citation')).toBe('(Bell, 2014)');
     expect(citation('In-text citation, narrative')).toBe('Bell (2014)');
     expect(citation('Reference list entry')).toBe(
@@ -163,7 +163,10 @@ describe('the mode switch', () => {
     await fillBook(user);
     await user.click(screen.getByRole('button', { name: 'OSCOLA only' }));
 
-    expect(screen.getByText('Legal source — OSCOLA')).toBeInTheDocument();
+    // A book is an academic source in either mode. Only the scheme changes,
+    // and this assertion used to read "Legal source" because the badge read
+    // the category off the style.
+    expect(screen.getByText('Academic source — OSCOLA')).toBeInTheDocument();
     expect(citation('Footnote')).toBe(
       'J Bell, Doing your research project (Open University Press 2014).',
     );

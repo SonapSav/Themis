@@ -77,10 +77,27 @@ describe('CitationPreview', () => {
     expect(screen.queryByRole('heading', { name: 'Footnote instead' })).toBeNull();
   });
 
+  /*
+   * The badge carries two independent facts. Reading the category off the
+   * style made every source "legal" in OSCOLA-only mode, because that mode
+   * styles every source in OSCOLA.
+   */
+  it('names the source category and the scheme separately', () => {
+    renderPreview(bell, 'oscola');
+    expect(screen.getByText('Academic source — OSCOLA')).toBeInTheDocument();
+  });
+
+  it('keeps a legal source legal whichever mode is chosen', () => {
+    renderPreview(austin, 'oscola');
+    expect(screen.getByText('Legal source — OSCOLA')).toBeInTheDocument();
+    renderPreview(austin, 'ou-dual');
+    expect(screen.getAllByText('Legal source — OSCOLA').length).toBeGreaterThan(0);
+  });
+
   it('switches to Harvard panels for an academic source in OU dual mode', () => {
     renderPreview(bell, 'ou-dual');
 
-    expect(screen.getByText('Academic source — Harvard')).toBeInTheDocument();
+    expect(screen.getByText('Academic source — CTR Harvard')).toBeInTheDocument();
     expect(block('In-text citation')).toHaveTextContent('(Bell, 2014)');
     expect(block('Reference list entry')).toHaveTextContent(
       'Bell, J. (2014) Doing your research project. Open University Press.',
