@@ -15,11 +15,11 @@ For whoever picks this up next, including a future session of me.
 | Phase | State |
 | --- | --- |
 | 1. Manual entry → correct footnote and bibliography entry | **Done**, ten source types, two schemes |
-| 2. Repeat citations: ibid, cross-references, renumbering | **Engine done**, hosted by a preview panel; no rich-text editor |
+| 2. Repeat citations: cross-references, renumbering | **Engine done**, hosted by a preview panel; no rich-text editor. **Emits `ibid`, which the 5th edition forbids — see item 0** |
 | 3. Word output | **Working end to end** — a `.docx` whose footnote markers copy into a student's own document and renumber, confirmed in Word on 23 August 2026; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-471 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+499 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -116,6 +116,39 @@ Do not relitigate these without a reason. Each was settled deliberately.
 Roughly in the order I would take them. Item 3 used to lead this list; the Word
 export test moved it to the back — see below.
 
+### 0. `ibid` is forbidden by the 5th edition — Themis still emits it
+
+**Found 23 August 2026, while clearing VERIFY.md. This is a correctness bug, not
+a feature, so it leads the list.**
+
+OSCOLA 5th edn §1.2.1, in terms: "In a subsequent citation of a source, briefly
+identify the source and provide a cross-citation in brackets to the footnote in
+which the full citation can be found. **'ibid' should not be used.**" §1.2.3
+repeats it, listing `ibid` among the Latin gadgets to avoid alongside `supra`,
+`infra`, `op cit` and the rest — where the 4th edition had listed the others but
+carved `ibid` out as permitted.
+
+The footnote sequence still produces `ibid`, and `FootnoteSequence.tsx` still
+advertises it: "Cite a source again and the short form follows automatically:
+*ibid* straight after…". So the app emits, and teaches, a form the guide it
+claims to follow now forbids.
+
+What it should produce instead is what §1.2.1's own example shows — a short form
+plus a cross-citation, with the pinpoint after it:
+
+    1 [2009] UKHL 5, [2009] AC 564.
+    2 Austin (n 1) [34], [39], [43]–[47].
+
+The work is not just deleting a branch. `repeatStyle` currently offers `ibid` or
+`cross-citation` as a choice; under the 5th edition there is no choice, so the
+setting and the UI copy explaining it both go. Decide deliberately whether to
+keep `ibid` reachable for anyone still on the 4th edition — the rest of the app
+does not, and a half-migrated tool is worse than either.
+
+- `src/document/footnotes.ts` — the sequence logic and `repeatStyle`
+- `src/components/FootnoteSequence.tsx` — the explanatory copy
+- `src/document/shortForms.ts`, and the tests asserting `ibid` output
+
 ### 1. The remaining citation gaps — small each, listed in the README
 
 Every one is a wall a student can hit: "I cannot cite this source."
@@ -126,13 +159,24 @@ journals (§3.3.2–3.3.4), five fields on the journal article; book volumes and
 paragraph pinpoints (§3.2.1); `sub nom`, subsequent history and more than one
 neutral citation (§2.1.2, §2.1.3, §2.1.8).
 
-**That clears the OSCOLA side of the list.** What remains is all Harvard: forum
-messages, newspaper articles, secondary referencing, book volumes, and the
-`doi:` the OU's journal template allows. Each is templated in the OU guide but
-printed **without a worked example**, so none can be coded honestly until the
-form is settled — see `VERIFY.md` §3e. Module materials would settle them faster
-than more reading of the public pages, and until then this is blocked rather
-than merely unstarted.
+**That clears the OSCOLA side of the list.** What remains is all Harvard, and it
+split in two on 23 August 2026 when the OU's law-modules page was read properly.
+
+**Unblocked — the page works these through, so they are ordinary work:**
+
+- **`doi:`** — the page prints them, both bare
+  (`https://doi.org/10.1093/ref:odnb/93883`) and proxied through
+  `libezproxy.open.ac.uk`. Decide which form to store.
+- **Newspaper articles** — `Ashton, J. (2023) 'Capital flows through
+  London…', *Evening Standard*, 13 June, p. 23.`
+- **Forum messages** — `Gilbert, B. (2025) 'Any questions?', *W111 Module
+  community forum*…`
+
+**Still blocked, because the page names the slot and prints no example:** book
+volumes ("Series and volume number if relevant"), Harvard case notes (no
+template at all), and the reference-list half of secondary referencing. See
+`VERIFY.md` §3. Module materials would settle these faster than more reading of
+the public pages.
 
 The case form carries 33 fields, of which nine are visible. The rule is in the
 README: a reader sees everything a citation cannot be saved without and opts in
