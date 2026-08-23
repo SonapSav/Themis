@@ -101,7 +101,9 @@ export default function App() {
     () => buildSource('draft', type, draft, authors, editors),
     [type, draft, authors, editors],
   );
-  const issues = useMemo(() => validate(source), [source]);
+  // The mode decides the scheme, and the scheme decides which rules apply:
+  // an academic source is OSCOLA's in OSCOLA mode and CTR Harvard's in OU Dual.
+  const issues = useMemo(() => validate(source, mode), [source, mode]);
 
   /** Empty the form for a type, abandoning any edit in progress. */
   const resetForm = (forType: SourceType) => {

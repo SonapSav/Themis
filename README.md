@@ -443,6 +443,31 @@ The failure mode for a tool like this is a silent citation error a student does
 not catch, so the checks are deliberately noisy about the ambiguous cases rather
 than guessing.
 
+### The scheme decides which rules a check may name
+
+`validate(source, mode)` takes the mode, because the mode decides the scheme
+and the scheme decides which rules apply. A book is OSCOLA's in OSCOLA mode and
+Cite Them Right's in OU Dual, and a check that named `OSCOLA 3.2.1` against a
+Harvard reference sent a reader to a rule that did not govern their citation.
+
+Two things follow from the scheme, not one.
+
+- **No OSCOLA section is named** on a Harvard-cited source. CTR is paywalled and
+  the OU's page carries no section numbers, so the honest answer is no citation
+  rather than a wrong one — the rule OU module material has followed from the
+  start.
+- **Checks that exist only because OSCOLA says so do not fire at all.** The
+  no-full-stops rule (§5.2.1), the `http://` rule (§3.1.4), the square-bracket
+  year and the volume position are OSCOLA's, not Harvard's. Unlabelling them
+  would leave a reader being told off in the name of nothing.
+
+Where a requirement is shared but the reason differs, the explanation follows
+the scheme: both want a book's year, but only OSCOLA closes a bracket with it,
+where Harvard puts it in round brackets after the author.
+
+Legal sources are unaffected — they are cited in OSCOLA in both modes, so they
+name their section in both.
+
 ### Every check names its rule
 
 A check that only says a field is missing asks to be taken on trust. Each issue

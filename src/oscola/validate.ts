@@ -1,4 +1,4 @@
-import type { NeutralCitation, Source } from '../model/types';
+import { styleFor, type CitationMode, type NeutralCitation, type Source } from '../model/types';
 import { COURT_CODES, DIVISIONS_BY_CODE, codeByLooseMatch } from './courts';
 import type { RuleSection } from './rules';
 
@@ -252,8 +252,25 @@ function neutralIssues(prefix: string, neutral: NeutralCitation | undefined): re
  * Every check that a section of the guide governs carries that section, so the
  * panel can say not just what is missing but which rule asks for it.
  */
-export function validate(source: Source): readonly ValidationIssue[] {
+export function validate(source: Source, mode: CitationMode = 'oscola'): readonly ValidationIssue[] {
   const issues: ValidationIssue[] = [];
+
+  /*
+   * In OU Dual mode an academic source is cited in CTR Harvard, not OSCOLA, so
+   * naming an OSCOLA section against it points a reader at a rule that does not
+   * govern their citation. Two things follow.
+   *
+   * `oscolaOnly` drops the checks that exist only because OSCOLA says so — the
+   * no-full-stops rule, the http:// rule, the square-bracket year, the volume
+   * position. None of them is a Harvard rule, so none should fire.
+   *
+   * `pick` chooses between two explanations where the requirement is shared but
+   * the reason differs: both schemes want a book's year, but only OSCOLA closes
+   * a bracket with it.
+   */
+  const harvard = styleFor(source.type, mode) === 'harvard';
+  const oscolaOnly = (items: readonly ValidationIssue[]) => (harvard ? [] : items);
+  const pick = (oscola: string, ctr: string) => (harvard ? ctr : oscola);
 
   switch (source.type) {
     case 'case': {
@@ -490,12 +507,15 @@ export function validate(source: Source): readonly ValidationIssue[] {
           ),
         );
       }
-      issues.push(...fullStopIssues('journal', source.journal));
+      issues.push(...oscolaOnly(fullStopIssues('journal', source.journal)));
       if (blank(source.year)) {
         issues.push(
           error(
             'year',
-            'A journal article needs its year. It goes in square brackets where it identifies the volume, and round brackets where a volume number does.',
+            pick(
+              'A journal article needs its year. It goes in square brackets where it identifies the volume, and round brackets where a volume number does.',
+              'A journal article needs its year. It follows the author’s name, in round brackets.',
+            ),
             '3.3',
           ),
         );
@@ -513,7 +533,8 @@ export function validate(source: Source): readonly ValidationIssue[] {
           ),
         );
       }
-      if (blank(source.volume) && source.forthcoming !== true) {
+      // The square-bracket year is an OSCOLA rule; Harvard always uses round.
+      if (!harvard && blank(source.volume) && source.forthcoming !== true) {
         issues.push(
           warning(
             'volume',
@@ -523,7 +544,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
         );
       }
       if (!blank(source.url)) {
-        issues.push(...urlIssues(source.url!));
+        issues.push(...oscolaOnly(urlIssues(source.url!)));
         if (blank(source.accessDate)) {
           issues.push(
             error(
@@ -550,7 +571,10 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           error(
             'authors',
-            'A book needs its author or editor. The citation opens with the name, and an editor is marked "(ed)" or "(eds)".',
+            pick(
+              'A book needs its author or editor. The citation opens with the name, and an editor is marked "(ed)" or "(eds)".',
+              'A book needs its author or editor. The reference opens with the name, and the reference list is ordered by it.',
+            ),
             source.authorRole === 'editor' ? '3.2.3' : '3.2.1',
           ),
         );
@@ -562,7 +586,10 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           error(
             'publisher',
-            'A book needs its publisher. The edition, publisher and year sit together in one bracket at the end of the citation.',
+            pick(
+              'A book needs its publisher. The edition, publisher and year sit together in one bracket at the end of the citation.',
+              'A book needs its publisher. It closes the reference, after the title and any edition.',
+            ),
             '3.2.1',
           ),
         );
@@ -571,7 +598,10 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           error(
             'year',
-            'A book needs its year of publication, which closes the publication bracket.',
+            pick(
+              'A book needs its year of publication, which closes the publication bracket.',
+              'A book needs its year of publication, which follows the author’s name in round brackets.',
+            ),
             '3.2.1',
           ),
         );
@@ -586,7 +616,9 @@ export function validate(source: Source): readonly ValidationIssue[] {
         );
       }
       // 3.2.1's placing rule only bites where there is a volume to place.
-      if (source.volumesVary && blank(source.volume)) {
+      // 3.2.1's volume position is an OSCOLA rule, and a volume is not cited
+      // in a Harvard reference at all.
+      if (!harvard && source.volumesVary && blank(source.volume)) {
         issues.push(
           warning(
             'volume',
@@ -800,7 +832,10 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           error(
             'editors',
-            'A chapter needs the edited book’s editor, cited after "in" and marked "(ed)" or "(eds)".',
+            pick(
+              'A chapter needs the edited book’s editor, cited after "in" and marked "(ed)" or "(eds)".',
+              'A chapter needs the edited book’s editor, cited after "in" and marked as an editor.',
+            ),
             '3.2.4',
           ),
         );
@@ -888,12 +923,15 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           error(
             'url',
-            'A web page needs its address, in angle brackets, since there is no volume or page to find it by.',
+            pick(
+              'A web page needs its address, in angle brackets, since there is no volume or page to find it by.',
+              'A web page needs its address. It is given after "Available at:", with the date you accessed it.',
+            ),
             '3.7.1',
           ),
         );
       } else {
-        issues.push(...urlIssues(source.url));
+        issues.push(...oscolaOnly(urlIssues(source.url)));
       }
       if (blank(source.accessDate)) {
         issues.push(
@@ -917,5 +955,11 @@ export function validate(source: Source): readonly ValidationIssue[] {
     }
   }
 
-  return issues;
+  /*
+   * A source cited in Harvard is not governed by OSCOLA, so no section is
+   * named. Cite Them Right is paywalled and the OU's page carries no section
+   * numbers, so the honest answer is no citation rather than a wrong one —
+   * which is the rule OU module material has followed from the start.
+   */
+  return harvard ? issues.map((issue) => ({ ...issue, rule: undefined })) : issues;
 }

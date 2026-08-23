@@ -8,6 +8,12 @@ import type { SourceType } from '../../model/types';
 
 const messages = (source: Source) => validate(source).map((issue) => issue.message);
 
+const messagesFor = (source: Source, mode: 'oscola' | 'ou-dual') =>
+  validate(source, mode).map((issue) => issue.message);
+
+const fieldsFor = (source: Source, mode: 'oscola' | 'ou-dual') =>
+  validate(source, mode).map((issue) => issue.field);
+
 const fields = (source: Source, severity?: 'error' | 'warning') =>
   validate(source)
     .filter((issue) => !severity || issue.severity === severity)
@@ -481,6 +487,64 @@ describe('every check names the rule it comes from', () => {
 
   it('renders a section as the guide names it', () => {
     expect(ruleLabel('2.1.3')).toBe('OSCOLA 2.1.3 — Medium neutral citations');
+  });
+});
+
+describe('the scheme decides which rules are named', () => {
+  const emptyOf = (type: SourceType) =>
+    buildSource('t', type, DEFAULT_DRAFTS[type], [], []);
+  const ACADEMIC: SourceType[] = ['book', 'bookChapter', 'journalArticle', 'website'];
+  const LEGAL: SourceType[] = ['case', 'act', 'statutoryInstrument', 'euLegislation', 'euCase'];
+
+  // The bug this fixes: an academic source in OU Dual is cited in CTR Harvard,
+  // and every check against it named an OSCOLA section anyway.
+  it.each(ACADEMIC)('%s: names no OSCOLA section in OU Dual, where it is Harvard', (type) => {
+    const issues = validate(emptyOf(type), 'ou-dual');
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues.filter((issue) => issue.rule)).toEqual([]);
+  });
+
+  it.each(ACADEMIC)('%s: still names one in OSCOLA mode, where OSCOLA governs it', (type) => {
+    const issues = validate(emptyOf(type), 'oscola');
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues.every((issue) => issue.rule)).toBe(true);
+  });
+
+  // A legal source is OSCOLA's in both modes, so nothing changes for it.
+  it.each(LEGAL)('%s: names its OSCOLA section whichever mode is chosen', (type) => {
+    for (const mode of ['oscola', 'ou-dual'] as const) {
+      const issues = validate(emptyOf(type), mode);
+      expect(issues.length).toBeGreaterThan(0);
+      expect(issues.every((issue) => issue.rule)).toBe(true);
+    }
+  });
+
+  it('defaults to OSCOLA when no mode is given', () => {
+    expect(validate(emptyOf('book')).every((issue) => issue.rule)).toBe(true);
+  });
+
+  // Checks that exist only because OSCOLA says so must not fire in Harvard.
+  it('drops the OSCOLA-only checks rather than merely unlabelling them', () => {
+    const article: Source = {
+      id: 'j1', type: 'journalArticle', authors: [person('Paul', 'Craig')],
+      title: 'Theory', year: '2005', journal: 'M.L.R.', firstPage: '440',
+      url: 'http://www.example.com/a', accessDate: '2026-08-23',
+    };
+    // OSCOLA: the no-full-stops rule, the http:// rule, and the square-bracket
+    // year all have something to say about this article.
+    const oscola = fieldsFor(article, 'oscola');
+    expect(oscola).toEqual(expect.arrayContaining(['journal', 'url', 'volume']));
+    // Harvard: none of the three is a Harvard rule.
+    const dual = fieldsFor(article, 'ou-dual');
+    expect(dual).not.toContain('journal');
+    expect(dual).not.toContain('url');
+    expect(dual).not.toContain('volume');
+  });
+
+  it('explains a shared requirement in the terms of the scheme in use', () => {
+    const book = emptyOf('book');
+    expect(messagesFor(book, 'oscola').join(' ')).toMatch(/closes the publication bracket/);
+    expect(messagesFor(book, 'ou-dual').join(' ')).toMatch(/follows the author’s name in round brackets/);
   });
 });
 
