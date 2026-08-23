@@ -45,7 +45,7 @@ const PINPOINT_KIND = [
 export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
   case: [
     { key: 'caseName', label: 'Case name', placeholder: 'Corr v IBC Vehicles Ltd', hint: 'Both parties joined by "v", with no full stop. Italicised automatically.' },
-    { key: 'neutral.year', label: 'Year', placeholder: '2008', group: 'Neutral citation', hint: 'Required for cases from 2001 onwards. Always cited first.' },
+    { key: 'neutral.year', label: 'Year', placeholder: '2008', group: 'Medium neutral citation', hint: 'Required for cases from 2001 onwards. Always cited first.' },
     { key: 'neutral.court', label: 'Court', placeholder: 'UKHL' },
     { key: 'neutral.number', label: 'Judgment number', placeholder: '13' },
     { key: 'neutral.division', label: 'Division', placeholder: 'QB', hint: 'High Court only, e.g. [2006] EWHC 407 (QB).' },
@@ -60,13 +60,13 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'report.volume', label: 'Volume', placeholder: '1' },
     { key: 'report.abbreviation', label: 'Report series', placeholder: 'AC' },
     { key: 'report.firstPage', label: 'First page', placeholder: '884' },
-    { key: 'court', label: 'Court', placeholder: 'HL', group: 'Court and date', hint: 'Not cited where there is a neutral citation, nor for cases decided before 1865.' },
-    { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Only for an unreported case with no neutral citation: this date and the court are cited in place of a report (2.1.4).' },
+    { key: 'court', label: 'Court', placeholder: 'HL', group: 'Court and date', hint: 'Not cited where there is a medium neutral citation, nor for cases decided before 1865. The guide gives HL, PC, CA, KBD, QBD, Ch D and Fam (2.1.5).' },
+    { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Only for an unreported case with no medium neutral citation: this date and the court are cited in place of a report (2.1.4).' },
     { key: 'pinpoint.kind', label: 'Pinpoint type', control: 'select', group: 'Pinpoint and short name', options: PINPOINT_KIND },
     { key: 'pinpoint.value', label: 'Pinpoint', placeholder: '14', hint: 'Paragraph numbers are bracketed automatically. Ranges: 1-37. Lists: 42, 45. Each footnote in the sequence can carry its own pinpoint instead.' },
     { key: 'pinpoint.judge', label: 'Judge', placeholder: 'Laws LJ', hint: 'Added in brackets after the pinpoint (2.1.7). Surname and judicial office, no honorifics and no "per".' },
     { key: 'shortName', label: 'Short name', placeholder: 'Austin', hint: 'Used when the case is cited again. Derived from the first party if left blank.' },
-    { key: 'neutral2.year', label: 'Year', placeholder: '2003', group: 'Second neutral citation', hint: 'Only where one report holds more than one judgment (2.1.3). Listed after the first, oldest first.' },
+    { key: 'neutral2.year', label: 'Year', placeholder: '2003', group: 'Second medium neutral citation', hint: 'Only where one report holds more than one judgment (2.1.3). Listed after the first, oldest first.' },
     { key: 'neutral2.court', label: 'Court', placeholder: 'EWCA Civ' },
     { key: 'neutral2.number', label: 'Judgment number', placeholder: '70' },
     { key: 'neutral2.division', label: 'Division', placeholder: 'QB' },
@@ -93,7 +93,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
       hint: 'For a report using a significantly different name, or a name changed at a later stage (2.1.2).',
     },
     { key: 'history.caseName', label: 'Name at that stage', placeholder: 'AB v South West Water Services Ltd', hint: 'Italicised. Leave blank where the name is unchanged.' },
-    { key: 'history.neutral.year', label: 'Year', placeholder: '2007', group: 'Later neutral citation' },
+    { key: 'history.neutral.year', label: 'Year', placeholder: '2007', group: 'Later medium neutral citation' },
     { key: 'history.neutral.court', label: 'Court', placeholder: 'EWCA Civ' },
     { key: 'history.neutral.number', label: 'Judgment number', placeholder: '721' },
     { key: 'history.neutral.division', label: 'Division', placeholder: 'QB' },
@@ -102,7 +102,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'history.report.volume', label: 'Volume', placeholder: '1' },
     { key: 'history.report.abbreviation', label: 'Report series', placeholder: 'QB' },
     { key: 'history.report.firstPage', label: 'First page', placeholder: '502' },
-    { key: 'history.court', label: 'Court', placeholder: 'HL', hint: 'Not cited where the later neutral citation already identifies it.' },
+    { key: 'history.court', label: 'Court', placeholder: 'HL', hint: 'Not cited where the later medium neutral citation already identifies it.' },
   ],
   act: [
     { key: 'shortTitle', label: 'Short title', placeholder: 'Human Rights Act', hint: 'Without the year — it has its own field.' },
@@ -160,7 +160,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'year', label: 'Year', placeholder: '2007' },
     { key: 'firstPublished', label: 'First published', placeholder: '1651', group: 'Reprints and translations', hint: 'Year of original publication, for a reprint or a translation.' },
     { key: 'additionalInfo', label: 'Additional information', placeholder: 'John Gardner ed', hint: 'Editor or translator of an authored work, series, or other clarifying detail. Sits before the edition.' },
-    { key: 'place', label: 'Place of publication', placeholder: 'London', hint: 'Recorded but not cited: OSCOLA 4th edn dropped the place of publication.' },
+    { key: 'place', label: 'Place of publication', placeholder: 'London', hint: 'Recorded but not cited: OSCOLA says the place of publication need not be given.' },
     { key: 'volume', label: 'Volume', placeholder: '2', group: 'Multi-volume works', hint: 'A bare numeral; "vol" is added for you. Only for a work published in more than one volume.' },
     {
       key: 'volumesVary',
@@ -288,9 +288,9 @@ export const OPTIONAL_GROUPS: ReadonlySet<string> = new Set([
   'Pinpoint and short name',
   'Pinpoint and short title',
   'Reprints and translations',
-  'Second neutral citation',
+  'Second medium neutral citation',
   'Later history',
-  'Later neutral citation',
+  'Later medium neutral citation',
   'Later law report',
   'Multi-volume works',
   'Case note, forthcoming, online',
@@ -316,7 +316,7 @@ const opt = (draft: Draft, key: string): string | undefined => {
 const req = (draft: Draft, key: string): string => draft[key]?.trim() ?? '';
 
 /**
- * A neutral citation under a dotted prefix, or undefined where the form's
+ * A medium neutral citation under a dotted prefix, or undefined where the form's
  * group was left empty. The court and number are what make one real; a stray
  * year alone does not.
  */
@@ -659,7 +659,7 @@ export function toDraft(source: Source): DraftState {
       set(draft, 'shortName', source.shortName);
       if (source.neutral) setNeutral(draft, 'neutral', source.neutral);
       if (source.report) setReport(draft, 'report', source.report);
-      // The form offers one further neutral citation; the model holds any
+      // The form offers one further medium neutral citation; the model holds any
       // number, so an imported library with more keeps them and shows the
       // second. See the README's gap list.
       if (source.furtherNeutrals?.[0]) setNeutral(draft, 'neutral2', source.furtherNeutrals[0]);

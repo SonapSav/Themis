@@ -384,7 +384,7 @@ describe('abbreviations take no full stops (4.2.1)', () => {
   });
 });
 
-describe('neutral citation court codes (4.1)', () => {
+describe('medium neutral citation court codes (5.1)', () => {
   const withNeutral = (court: string, division?: string): Source => ({
     ...modernCase,
     neutral: { year: '2008', court, number: '13', division },
@@ -403,22 +403,29 @@ describe('neutral citation court codes (4.1)', () => {
     );
   });
 
-  // 4.1 is the 2012 list, so "unknown" cannot mean "wrong".
-  it('warns softly about a code the 4th edition does not have', () => {
-    expect(fields(withNeutral('EWFC'), 'warning')).toContain('neutral.court');
-    expect(fields(withNeutral('EWFC'), 'error')).toEqual([]);
-    expect(messages(withNeutral('EWFC')).join(' ')).toMatch(/postdates the 4th edition/);
+  // 5.1 is the December 2025 list, so "unknown" cannot mean "wrong": a court
+  // created since it went to press is genuinely absent from it.
+  it('warns softly about a code the 5th edition does not have', () => {
+    expect(fields(withNeutral('EWCR'), 'warning')).toContain('neutral.court');
+    expect(fields(withNeutral('EWCR'), 'error')).toEqual([]);
+    expect(messages(withNeutral('EWCR')).join(' ')).toMatch(/postdates the 5th edition/);
+  });
+
+  // EWFC was the 4th edition's missing-court example. The 5th edition has it,
+  // which is the sort of thing the migration had to catch rather than carry.
+  it('accepts the Family Court, which the 5th edition added', () => {
+    expect(validate(withNeutral('EWFC'))).toEqual([]);
   });
 
   // 2.1.3: High Court neutral citations carry the division in brackets.
   it('asks for a division where the court takes one', () => {
     expect(fields(withNeutral('EWHC'), 'warning')).toContain('neutral.division');
-    expect(messages(withNeutral('EWHC')).join(' ')).toMatch(/Ch, Fam, QB, Admin/);
+    expect(messages(withNeutral('EWHC')).join(' ')).toMatch(/Admin, Admlty, Comm, Ch, Fam, KB, Pat, QB, TCC/);
   });
 
   it('rejects a division that is not listed for that court', () => {
     expect(messages(withNeutral('EWHC', 'Costs'))).toContain(
-      'The guide lists Ch, Fam, QB, Admin, Admlty, Comm, Pat, TCC for EWHC, not "Costs".',
+      'The guide lists Admin, Admlty, Comm, Ch, Fam, KB, Pat, QB, TCC for EWHC, not "Costs".',
     );
   });
 
@@ -473,7 +480,7 @@ describe('every check names the rule it comes from', () => {
   });
 
   it('renders a section as the guide names it', () => {
-    expect(ruleLabel('2.1.3')).toBe('OSCOLA 2.1.3 — Neutral citations');
+    expect(ruleLabel('2.1.3')).toBe('OSCOLA 2.1.3 — Medium neutral citations');
   });
 });
 

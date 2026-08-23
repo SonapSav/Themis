@@ -56,7 +56,7 @@ function stripTerminator(citation: FormattedCitation): FormattedCitation {
 }
 
 /**
- * OSCOLA 2.1.3: "All cases with neutral citations have numbered paragraphs",
+ * OSCOLA 2.1.3: "All cases with medium neutral citations have numbered paragraphs",
  * and 2.1.6 pinpoints those by paragraph. A case without one is pinpointed by
  * page, as is everything else. Overridden by an explicit `pinpointKind`.
  */

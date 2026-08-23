@@ -76,7 +76,7 @@ describe('citing a case', () => {
     const user = setup();
 
     await user.type(screen.getByLabelText('Case name'), 'Corr v IBC Vehicles Ltd');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2008');
     await user.type(neutral.getByLabelText('Court'), 'UKHL');
     await user.type(neutral.getByLabelText('Judgment number'), '13');
@@ -97,7 +97,7 @@ describe('citing a case', () => {
     const user = setup();
 
     await user.type(screen.getByLabelText('Case name'), 'Re Guardian News and Media Ltd');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2010');
     await user.type(neutral.getByLabelText('Court'), 'UKSC');
     await user.type(neutral.getByLabelText('Judgment number'), '1');
@@ -293,7 +293,7 @@ describe('validation and the session list', () => {
 
     await user.type(screen.getByLabelText('Case name'), 'Page v Smith');
     expect(add()).toBeDisabled();
-    expect(screen.getAllByText(/needs a neutral citation, a law report/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/needs a medium neutral citation, a law report/i).length).toBeGreaterThan(0);
 
     const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '1996');
@@ -579,7 +579,7 @@ describe('judge attribution', () => {
   it('adds the judge in brackets after the pinpoint (2.1.7)', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Arscott v The Coal Authority');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2004');
     await user.type(neutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(neutral.getByLabelText('Judgment number'), '892');
@@ -601,7 +601,7 @@ describe('judge attribution', () => {
   it('names one judge once across several passages', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Callery v Gray');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2001');
     await user.type(neutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(neutral.getByLabelText('Judgment number'), '1117');
@@ -621,7 +621,7 @@ describe('the footnote sequence', () => {
   /** Add a second, distinct case so ordering can be exercised. */
   async function addBuntVTilley(user: ReturnType<typeof setup>) {
     await user.type(screen.getByLabelText('Case name'), 'Bunt v Tilley');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2006');
     await user.type(neutral.getByLabelText('Court'), 'EWHC');
     await user.type(neutral.getByLabelText('Judgment number'), '407');
@@ -903,7 +903,7 @@ describe('folding away the situational fields', () => {
   it('starts the situational groups folded and the core ones open', () => {
     setup();
     // Every case needs these; almost none needs a later history.
-    expect(screen.getByRole('group', { name: /^Neutral citation$/ })).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: /^Medium neutral citation$/ })).toBeInTheDocument();
     expect(screen.getByLabelText('Case name')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Later history' })).toHaveAttribute(
       'aria-expanded',
@@ -990,7 +990,7 @@ describe('abbreviation and court-code checks', () => {
   it('asks a High Court neutral citation for its division (4.1)', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Bunt v Tilley');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2006');
     await user.type(neutral.getByLabelText('Court'), 'EWHC');
     await user.type(neutral.getByLabelText('Judgment number'), '407');
@@ -1001,7 +1001,7 @@ describe('abbreviation and court-code checks', () => {
   it('names the right capitalisation for a miscased court code', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Corr v IBC Vehicles Ltd');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2008');
     await user.type(neutral.getByLabelText('Court'), 'ukhl');
     await user.type(neutral.getByLabelText('Judgment number'), '13');
@@ -1014,12 +1014,12 @@ describe('further neutral citations and later history', () => {
   it('lists a second neutral citation before the report (2.1.3)', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Masterman-Lister v Brutton & Co (Nos 1 and 2)');
-    const first = group(/^Neutral citation$/);
+    const first = group(/^Medium neutral citation$/);
     await user.type(first.getByLabelText('Year'), '2002');
     await user.type(first.getByLabelText('Court'), 'EWCA Civ');
     await user.type(first.getByLabelText('Judgment number'), '1889');
-    await openGroup(user, 'Second neutral citation');
-    const second = group(/^Second neutral citation$/);
+    await openGroup(user, 'Second medium neutral citation');
+    const second = group(/^Second medium neutral citation$/);
     await user.type(second.getByLabelText('Year'), '2003');
     await user.type(second.getByLabelText('Court'), 'EWCA Civ');
     await user.type(second.getByLabelText('Judgment number'), '70');
@@ -1066,7 +1066,7 @@ describe('further neutral citations and later history', () => {
   it('marks a decision affirmed on appeal (2.1.8)', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Roberts v Gable');
-    const neutral = group(/^Neutral citation$/);
+    const neutral = group(/^Medium neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2006');
     await user.type(neutral.getByLabelText('Court'), 'EWHC');
     await user.type(neutral.getByLabelText('Judgment number'), '1025');
@@ -1078,8 +1078,8 @@ describe('further neutral citations and later history', () => {
 
     await openGroup(user, 'Later history');
     await user.selectOptions(group(/^Later history$/).getByLabelText('Later outcome'), 'affd');
-    await openGroup(user, 'Later neutral citation');
-    const laterNeutral = group(/^Later neutral citation$/);
+    await openGroup(user, 'Later medium neutral citation');
+    const laterNeutral = group(/^Later medium neutral citation$/);
     await user.type(laterNeutral.getByLabelText('Year'), '2007');
     await user.type(laterNeutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(laterNeutral.getByLabelText('Judgment number'), '721');

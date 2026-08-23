@@ -1,18 +1,24 @@
 /**
- * OSCOLA 4th edn §4.1, "Guide to neutral citations" — every court that issues a
- * neutral citation, with the code it uses and, for the High Court and the
- * tribunals, the division in brackets.
+ * OSCOLA 5th edn §5.1, "Guide to medium neutral citations" — every court that
+ * issues a medium neutral citation, with the code it uses and, for the High
+ * Court and the tribunals, the division in brackets.
  *
  * Generated from the guide's own appendix rather than typed from memory: the
  * PDF text was extracted, and each row anchored on the `[Year] CODE number`
  * pattern rather than on column alignment, because a court name that wraps to a
- * second line shifts every pair after it and does so silently. `courts.test.ts`
- * asserts a sample against the printed guide so a regeneration cannot corrupt
- * the table unnoticed.
+ * second line shifts every pair after it and does so silently. That anchoring
+ * is what rejoins "High Court, Technology and | Construction Court".
+ * `courts.test.ts` asserts every row against the printed guide so a
+ * regeneration cannot corrupt the table unnoticed.
  *
- * The list is OSCOLA 4th edn's, published 2012. Courts created since — and the
- * later Upper Tribunal chambers — are not in it, which is why an unrecognised
- * code is a warning and never an error.
+ * The list is OSCOLA 5th edn's, published December 2025. It is a strict
+ * superset of the 4th edition's: nothing was removed, and thirteen rows were
+ * added — among them EWCOP, EWFC, the King's Bench divisions EWHC (KB) and
+ * NIKB, the Sheriff Appeal Court, and three more Upper Tribunal chambers.
+ *
+ * §5.1.3 also gives the Sheriff Court as "[Year] SC, followed by a court
+ * identifier and judgment number". That is prose rather than a fixed code, so
+ * it has no row here and an SC citation is not recognised.
  */
 export interface NeutralCitationCourt {
   /** The code as it appears in the citation, e.g. `EWCA Civ`, `EWHC`. */
@@ -29,36 +35,49 @@ export const NEUTRAL_CITATION_COURTS: readonly NeutralCitationCourt[] = [
   { code: 'UKPC', division: undefined, jurisdiction: 'United Kingdom', name: 'Privy Council' },
   { code: 'EWCA Civ', division: undefined, jurisdiction: 'England and Wales', name: 'Court of Appeal (Civil Division)' },
   { code: 'EWCA Crim', division: undefined, jurisdiction: 'England and Wales', name: 'Court of Appeal (Criminal Division)' },
-  { code: 'EWHC', division: 'Ch', jurisdiction: 'England and Wales', name: 'High Court, Chancery Division' },
-  { code: 'EWHC', division: 'Fam', jurisdiction: 'England and Wales', name: 'High Court, Family Division' },
-  { code: 'EWHC', division: 'QB', jurisdiction: 'England and Wales', name: 'High Court, Queen’s Bench Division' },
+  { code: 'EWCOP', division: undefined, jurisdiction: 'England and Wales', name: 'Court of Protection' },
+  { code: 'EWFC', division: undefined, jurisdiction: 'England and Wales', name: 'Family Court' },
   { code: 'EWHC', division: 'Admin', jurisdiction: 'England and Wales', name: 'High Court, Administrative Court' },
   { code: 'EWHC', division: 'Admlty', jurisdiction: 'England and Wales', name: 'High Court, Admiralty Court' },
   { code: 'EWHC', division: 'Comm', jurisdiction: 'England and Wales', name: 'High Court, Commercial Court' },
+  { code: 'EWHC', division: 'Ch', jurisdiction: 'England and Wales', name: 'High Court, Chancery Division' },
+  { code: 'EWHC', division: 'Fam', jurisdiction: 'England and Wales', name: 'High Court, Family Division' },
+  { code: 'EWHC', division: 'KB', jurisdiction: 'England and Wales', name: 'High Court, King’s Bench Division' },
   { code: 'EWHC', division: 'Pat', jurisdiction: 'England and Wales', name: 'High Court, Patents Court' },
+  { code: 'EWHC', division: 'QB', jurisdiction: 'England and Wales', name: 'High Court, Queen’s Bench Division' },
   { code: 'EWHC', division: 'TCC', jurisdiction: 'England and Wales', name: 'High Court, Technology and Construction Court' },
   { code: 'CSIH', division: undefined, jurisdiction: 'Scotland', name: 'Court of Session, Inner House' },
   { code: 'CSOH', division: undefined, jurisdiction: 'Scotland', name: 'Court of Session, Outer House' },
   { code: 'HCJAC', division: undefined, jurisdiction: 'Scotland', name: 'Court of Criminal Appeal' },
   { code: 'HCJT', division: undefined, jurisdiction: 'Scotland', name: 'High Court of Justiciary (sitting as a trial court)' },
-  { code: 'NICA', division: undefined, jurisdiction: 'Northern Ireland', name: 'Court of Appeal in Northern Ireland' },
-  { code: 'NIQB', division: undefined, jurisdiction: 'Northern Ireland', name: 'High Court of Justice in Northern Ireland, Queen’s Bench Division' },
-  { code: 'NICC', division: undefined, jurisdiction: 'Northern Ireland', name: 'Crown Court for Northern Ireland' },
+  { code: 'SAC Civ', division: undefined, jurisdiction: 'Scotland', name: 'Sheriff Appeal Court (Civil)' },
+  { code: 'SAC Crim', division: undefined, jurisdiction: 'Scotland', name: 'Sheriff Appeal Court (Criminal)' },
+  { code: 'NICA', division: undefined, jurisdiction: 'Northern Ireland', name: 'Court of Appeal' },
+  { code: 'NIKB', division: undefined, jurisdiction: 'Northern Ireland', name: 'High Court of Justice, King’s Bench Division' },
+  { code: 'NIQB', division: undefined, jurisdiction: 'Northern Ireland', name: 'High Court of Justice, Queen’s Bench Division' },
+  { code: 'NIFam', division: undefined, jurisdiction: 'Northern Ireland', name: 'High Court of Justice, Family Division' },
+  { code: 'NICh', division: undefined, jurisdiction: 'Northern Ireland', name: 'High Court of Justice, Chancery Division' },
+  { code: 'NICC', division: undefined, jurisdiction: 'Northern Ireland', name: 'Crown Court' },
+  { code: 'NIMaster', division: undefined, jurisdiction: 'Northern Ireland', name: 'Masters’ Decisions' },
+  { code: 'CAT', division: undefined, jurisdiction: 'Tribunals', name: 'Competition Appeal Tribunal' },
   { code: 'UKEAT', division: undefined, jurisdiction: 'Tribunals', name: 'Employment Appeal Tribunal' },
-  { code: 'UKSIAC', division: undefined, jurisdiction: 'Tribunals', name: 'Special Immigration Appeals Commission' },
-  { code: 'UKUT', division: 'AAC', jurisdiction: 'Tribunals', name: 'Upper Tribunal (Administrative Appeals Chamber)' },
   { code: 'UKFTT', division: 'HESC', jurisdiction: 'Tribunals', name: 'First-tier Tribunal (Health, Education and Social Care Chamber)' },
   { code: 'UKFTT', division: 'SEC', jurisdiction: 'Tribunals', name: 'First-tier Tribunal (Social Entitlement Chamber)' },
   { code: 'UKFTT', division: 'WPAFCC', jurisdiction: 'Tribunals', name: 'First-tier Tribunal (War Pensions and Armed Forces Compensation Chamber)' },
+  { code: 'UKSIAC', division: undefined, jurisdiction: 'Tribunals', name: 'Special Immigration Appeals Commission' },
+  { code: 'UKUT', division: 'AAC', jurisdiction: 'Tribunals', name: 'Upper Tribunal (Administrative Appeals Chamber)' },
+  { code: 'UKUT', division: 'IAC', jurisdiction: 'Tribunals', name: 'Upper Tribunal (Immigration and Asylum Chamber)' },
+  { code: 'UKUT', division: 'LC', jurisdiction: 'Tribunals', name: 'Upper Tribunal (Lands Chamber)' },
+  { code: 'UKUT', division: 'TCC', jurisdiction: 'Tribunals', name: 'Upper Tribunal (Tax and Chancery Chamber)' },
 ];
 
-/** Every court code in §4.1, without divisions. */
+/** Every court code in §5.1, without divisions. */
 export const COURT_CODES: ReadonlySet<string> = new Set(
   NEUTRAL_CITATION_COURTS.map((court) => court.code),
 );
 
 /**
- * The divisions §4.1 lists for a code. Empty for a court that takes none, which
+ * The divisions §5.1 lists for a code. Empty for a court that takes none, which
  * is different from a code that is not in the table at all.
  */
 export const DIVISIONS_BY_CODE: ReadonlyMap<string, readonly string[]> = new Map(

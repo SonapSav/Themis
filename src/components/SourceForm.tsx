@@ -24,7 +24,7 @@ interface Section {
 /**
  * Split the flat field list into the groups the specs declare. Grouped fields
  * become a fieldset with a legend, so that repeated labels — a case has a Year
- * for the neutral citation and another for the law report — stay distinct for
+ * for the medium neutral citation and another for the law report — stay distinct for
  * anyone navigating by accessible name.
  */
 /*

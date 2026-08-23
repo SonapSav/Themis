@@ -37,7 +37,7 @@ const warning = (field: string, message: string, rule?: RuleSection): Validation
 const blank = (value: string | undefined): boolean => !value || value.trim() === '';
 
 /**
- * OSCOLA 4.2.1, in terms: "In OSCOLA, abbreviations do not have full stops."
+ * OSCOLA 5.2.1, in terms: "In OSCOLA, abbreviations do not have full stops."
  *
  * Flagged rather than stripped. `A.C.` is not rewritten to `AC`, because
  * silently editing what a student typed is how a tool stops being checkable —
@@ -52,19 +52,19 @@ function fullStopIssues(field: string, value: string | undefined): readonly Vali
     warning(
       field,
       `OSCOLA abbreviations take no full stops, so "${trimmed}" would normally be "${trimmed.replace(/\./g, '')}".`,
-      '4.2.1',
+      '5.2.1',
     ),
   ];
 }
 
 /**
- * OSCOLA 4.1 lists every court that issues a neutral citation, and 2.1.3 adds
- * that "neutral citations from the High Court do include the division in
- * brackets after the judgment number".
+ * OSCOLA 5.1 lists every court that issues a medium neutral citation, and
+ * 2.1.3 adds that they "should include the division in brackets after the
+ * judgment number" for the High Court.
  *
- * Every issue here is a warning. 4.1 is the 2012 list: courts created since,
- * and the Upper Tribunal chambers added later, are genuinely absent from it, so
- * an unrecognised code means "not in OSCOLA's table", never "wrong".
+ * Every issue here is a warning. 5.1 is the December 2025 list: a court created
+ * since is genuinely absent from it, so an unrecognised code means "not in
+ * OSCOLA's table", never "wrong".
  */
 function courtCodeIssues(field: string, neutral: NeutralCitation | undefined): readonly ValidationIssue[] {
   const code = neutral?.court?.trim();
@@ -79,8 +79,8 @@ function courtCodeIssues(field: string, neutral: NeutralCitation | undefined): r
         `${field}.court`,
         loose
           ? `Court codes are capitalised as the guide prints them: "${loose}", not "${code}".`
-          : `"${code}" is not in OSCOLA's list of neutral citation courts. Check it, or ignore this if the court postdates the 4th edition.`,
-        '4.1',
+          : `"${code}" is not in OSCOLA's list of medium neutral citation courts. Check it, or ignore this if the court postdates the 5th edition.`,
+        '5.1',
       ),
     );
     return issues;
@@ -100,12 +100,12 @@ function courtCodeIssues(field: string, neutral: NeutralCitation | undefined): r
       warning(
         `${field}.division`,
         `The guide lists ${divisions.join(', ')} for ${code}, not "${division}".`,
-        '4.1',
+        '5.1',
       ),
     );
   } else if (divisions.length === 0 && division) {
     issues.push(
-      warning(`${field}.division`, `${code} citations take no division in brackets.`, '4.1'),
+      warning(`${field}.division`, `${code} citations take no division in brackets.`, '5.1'),
     );
   }
   return issues;
@@ -177,7 +177,7 @@ function reportIssues(
 }
 
 /**
- * A neutral citation is a year, a court and a judgment number. Any one of them
+ * A medium neutral citation is a year, a court and a judgment number. Any one of them
  * missing renders a citation with a hole in it — `[2008] UKHL` or `[] UKHL 13`
  * — so each is an error rather than a preference.
  */
@@ -188,7 +188,7 @@ function neutralIssues(prefix: string, neutral: NeutralCitation | undefined): re
     issues.push(
       error(
         `${prefix}.year`,
-        'A neutral citation needs the year of judgment, in square brackets. Cases are numbered from one again each year, so the number alone does not identify a judgment.',
+        'A medium neutral citation needs the year of judgment, in square brackets. Cases are numbered from one again each year, so the number alone does not identify a judgment.',
         '2.1.3',
       ),
     );
@@ -197,7 +197,7 @@ function neutralIssues(prefix: string, neutral: NeutralCitation | undefined): re
     issues.push(
       error(
         `${prefix}.court`,
-        'A neutral citation needs the court code, e.g. "UKHL" or "EWCA Civ". It is the part that identifies the court, which is why no court is then given in brackets at the end.',
+        'A medium neutral citation needs the court code, e.g. "UKHL" or "EWCA Civ". It is the part that identifies the court, which is why no court is then given in brackets at the end.',
         '2.1.3',
       ),
     );
@@ -206,7 +206,7 @@ function neutralIssues(prefix: string, neutral: NeutralCitation | undefined): re
     issues.push(
       error(
         `${prefix}.number`,
-        'A neutral citation needs the judgment number — the judgment’s place in that court’s run for the year.',
+        'A medium neutral citation needs the judgment number — the judgment’s place in that court’s run for the year.',
         '2.1.3',
       ),
     );
@@ -246,7 +246,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           ),
         );
       }
-      // OSCOLA 2.1.4: an unreported case with no neutral citation is cited by
+      // OSCOLA 2.1.4: an unreported case with no medium neutral citation is cited by
       // its court and date of judgment instead of a report.
       const unreported = !source.neutral && !source.report;
       if (unreported) {
@@ -254,7 +254,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           issues.push(
             error(
               'report',
-              'A case needs a neutral citation, a law report, or — if it is unreported and has no neutral citation — the court and the date of judgment. A case name on its own is not a citation.',
+              'A case needs a medium neutral citation, a law report, or — if it is unreported and has no medium neutral citation — the court and the date of judgment. A case name on its own is not a citation.',
               '2.1.1',
             ),
           );
@@ -270,7 +270,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
       }
       issues.push(...reportIssues('report', source.report, '2.1.4'));
       issues.push(...neutralIssues('neutral', source.neutral));
-      // Neutral citations were introduced in 2001; a later case that has none is
+      // Medium neutral citations were introduced in 2001; a later case that has none is
       // usually an omission rather than a genuine absence.
       const year = Number(
         source.neutral?.year ?? source.report?.year ?? source.judgmentDate?.slice(0, 4),
@@ -279,7 +279,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           warning(
             'neutral',
-            'Cases from 2001 onwards normally carry a neutral citation, and it is cited first, before the report.',
+            'Cases from 2001 onwards normally carry a medium neutral citation, and it is cited first, before the report.',
             '2.1.3',
           ),
         );
@@ -305,7 +305,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           warning(
             'court',
-            'The neutral citation already identifies the court, so no court is given in brackets and this has been left out.',
+            'The medium neutral citation already identifies the court, so no court is given in brackets and this has been left out.',
             '2.1.5',
           ),
         );
@@ -315,13 +315,13 @@ export function validate(source: Source): readonly ValidationIssue[] {
           issues.push(
             error(
               'neutral2.number',
-              'A neutral citation needs the judgment number — the judgment’s place in that court’s run for the year.',
+              'A medium neutral citation needs the judgment number — the judgment’s place in that court’s run for the year.',
               '2.1.3',
             ),
           );
         }
       }
-      // 4.1 and 4.2.1: the court codes and the no-full-stop rule.
+      // 5.1 and 5.2.1: the court codes and the no-full-stop rule.
       issues.push(...courtCodeIssues('neutral', source.neutral));
       issues.push(...courtCodeIssues('neutral2', source.furtherNeutrals?.[0]));
       issues.push(...courtCodeIssues('history.neutral', source.history?.neutral));
@@ -336,7 +336,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           issues.push(
             error(
               'history.neutral.number',
-              'A neutral citation needs the judgment number — the judgment’s place in that court’s run for the year.',
+              'A medium neutral citation needs the judgment number — the judgment’s place in that court’s run for the year.',
               '2.1.3',
             ),
           );
@@ -365,7 +365,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           issues.push(
             warning(
               'history.court',
-              'The later neutral citation already identifies the court, so it has been left out.',
+              'The later medium neutral citation already identifies the court, so it has been left out.',
               '2.1.5',
             ),
           );
@@ -424,11 +424,11 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'authors',
             'A journal article needs its author. The citation opens with the author’s name, and the bibliography is ordered by it.',
-            '3.3.1',
+            '3.3',
           ),
         );
       }
-      // 3.3.2: an untitled case note carries the case name in the title's place,
+      // 3.4: an untitled case note carries the case name in the title's place,
       // so one of the two is required, not both.
       if (blank(source.title) && blank(source.caseName)) {
         issues.push(
@@ -437,7 +437,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
             source.isCaseNote
               ? 'A case note needs its own title, or — where it has none — the name of the case it discusses, which stands in the title’s place.'
               : 'A journal article needs its title, in single quotation marks and roman.',
-            source.isCaseNote ? '3.3.2' : '3.3.1',
+            source.isCaseNote ? '3.4' : '3.3',
           ),
         );
       }
@@ -446,7 +446,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           warning(
             'caseName',
             'A case note with its own title is cited as an ordinary article, so the case name has been left out.',
-            '3.3.2',
+            '3.4',
           ),
         );
       }
@@ -455,7 +455,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'journal',
             'A journal article needs the journal name, in full or abbreviated, e.g. "MLR". It is what tells a reader where the article was published.',
-            '3.3.1',
+            '3.3',
           ),
         );
       }
@@ -465,20 +465,20 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'year',
             'A journal article needs its year. It goes in square brackets where it identifies the volume, and round brackets where a volume number does.',
-            '3.3.1',
+            '3.3',
           ),
         );
       }
-      // 3.3.4: online journals "may lack some of the publication elements (for
-      // example, many do not include page numbers)"; 3.3.3 says to omit an
-      // unknown page from a forthcoming article. Neither is an error.
+      // 3.3: online journals "may lack some of the publication elements such as
+      // page numbers", and a forthcoming article omits volume and page where they
+      // are not yet known. Neither is an error.
       const pageOptional = !blank(source.url) || source.forthcoming === true;
       if (blank(source.firstPage) && !pageOptional) {
         issues.push(
           error(
             'firstPage',
             'A journal article needs its first page — where the article starts in the volume, not the page you are relying on.',
-            '3.3.1',
+            '3.3',
           ),
         );
       }
@@ -487,7 +487,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           warning(
             'volume',
             'No volume number, so the year will be cited in square brackets instead. Check the journal really has no volumes.',
-            '3.3.1',
+            '3.3',
           ),
         );
       }
@@ -498,7 +498,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
             error(
               'accessDate',
               'An online article needs the date you last accessed it, because the page may change or disappear after you cite it.',
-              '3.3.4',
+              '3.3',
             ),
           );
         }
@@ -520,7 +520,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'authors',
             'A book needs its author or editor. The citation opens with the name, and an editor is marked "(ed)" or "(eds)".',
-            source.authorRole === 'editor' ? '3.2.2' : '3.2.1',
+            source.authorRole === 'editor' ? '3.2.3' : '3.2.1',
           ),
         );
       }
@@ -549,7 +549,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
         issues.push(
           warning(
             'place',
-            'The 4th edition dropped the place of publication, so it will not appear in the citation.',
+            'The guide says the place of publication need not be given, so it will not appear in the citation.',
             '3.2.1',
           ),
         );
@@ -568,7 +568,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
     }
 
     case 'statutoryInstrument': {
-      // 2.5.2: the CPR, RSC and CCR are cited by name alone, so the year and
+      // 2.5.3: the CPR, RSC, CCR, CrPR and FPR are cited by name alone, so the year and
       // the number are not merely optional — they are not part of the citation.
       if (source.numbering === 'rulesOfCourt') {
         if (blank(source.name)) {
@@ -576,7 +576,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
             error(
               'name',
               'Give the rules, e.g. "CPR", "RSC", "CCR", or "6A PD" for a practice direction. The rules of court are cited by name and pinpoint alone.',
-              '2.5.2',
+              '2.5.3',
             ),
           );
         }
@@ -585,11 +585,11 @@ export function validate(source: Source): readonly ValidationIssue[] {
             warning(
               'siNumber',
               'The rules of court are cited without their year or SI number, so neither has been included.',
-              '2.5.2',
+              '2.5.3',
             ),
           );
         }
-        // 2.5.3: "in the case of the Civil Procedure Rules, omit the
+        // 2.5.2: "in the case of the Civil Procedure Rules, omit the
         // abbreviations 'r' and 'rr'". Stated for the CPR alone — the RSC and
         // CCR examples keep theirs, as in `RSC Ord 24, r 14A`.
         if (/^CPR\b/i.test(source.name.trim()) && /^rr?\b\.?/i.test(source.provision?.trim() ?? '')) {
@@ -597,7 +597,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
             warning(
               'provision',
               'CPR pinpoints omit "r" and "rr": write "5.2(1)(b)", not "r 5.2(1)(b)".',
-              '2.5.3',
+              '2.5.2',
             ),
           );
         }
@@ -649,7 +649,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'title',
             'EU legislation is cited by its full title, including the legislation number — "Council Regulation (EC) 1984/2003 concerning a system of statistical bottom trawl surveys".',
-            '2.6.1',
+            '4.4.1',
           ),
         );
       }
@@ -658,7 +658,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'ojYear',
             'Give the year of the Official Journal citation. The OJ reference is what points a reader at the published text: [year] OJ series issue/first page.',
-            '2.6.1',
+            '4.4.1',
           ),
         );
       }
@@ -667,7 +667,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'ojSeries',
             'Give the OJ series: L for legislation, C for information and notices.',
-            '2.6.1',
+            '4.4.1',
           ),
         );
       }
@@ -676,7 +676,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'ojIssue',
             'Give the OJ issue number, which follows the series letter.',
-            '2.6.1',
+            '4.4.1',
           ),
         );
       }
@@ -685,7 +685,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'ojFirstPage',
             'Give the first page of the OJ citation — where the instrument starts in that issue.',
-            '2.6.1',
+            '4.4.1',
           ),
         );
       }
@@ -698,7 +698,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'caseName',
             'An EU case needs its name. It follows the registration number, in italics, with no punctuation between the two.',
-            '2.6.2',
+            '4.4.2',
           ),
         );
       }
@@ -707,7 +707,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'caseNumber',
             'An EU case needs its registration number, e.g. "C-176/03". It comes first, in roman, before the name.',
-            '2.6.2',
+            '4.4.2',
           ),
         );
       } else if (/^\d+\/\d+/.test(source.caseNumber.trim())) {
@@ -715,20 +715,20 @@ export function validate(source: Source): readonly ValidationIssue[] {
           warning(
             'caseNumber',
             'Cases registered since 1989 carry a prefix: C- for the Court of Justice, T- for the General Court, F- for the Civil Service Tribunal. Only pre-1989 cases take none.',
-            '2.6.2',
+            '4.4.2',
           ),
         );
       }
-      issues.push(...reportIssues('report', source.report, '2.6.2'));
+      issues.push(...reportIssues('report', source.report, '4.4.2'));
       issues.push(...fullStopIssues('report.abbreviation', source.report?.abbreviation));
       issues.push(...fullStopIssues('court', source.court));
-      // 2.6.2: a case not yet reported gives the court and date instead.
+      // 4.4.2: a case not yet reported gives the court and date instead.
       if (!source.report && blank(source.court) && blank(source.judgmentDate)) {
         issues.push(
           warning(
             'report',
             'Cite the official ECR report where there is one — ECJ cases in volume one (ECR I-), General Court cases in volume two (ECR II-); otherwise the CMLR, or, if the case is not yet reported, the court and date of judgment.',
-            '2.6.2',
+            '4.4.2',
           ),
         );
       }
@@ -741,7 +741,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'authors',
             'A chapter needs its own author. The citation opens with the chapter’s author, and names the book’s editor after "in".',
-            '3.2.3',
+            '3.2.4',
           ),
         );
       }
@@ -750,7 +750,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'chapterTitle',
             'A chapter needs its title, in single quotation marks and roman — the book’s title is the italicised one.',
-            '3.2.3',
+            '3.2.4',
           ),
         );
       }
@@ -759,7 +759,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'editors',
             'A chapter needs the edited book’s editor, cited after "in" and marked "(ed)" or "(eds)".',
-            '3.2.3',
+            '3.2.4',
           ),
         );
       }
@@ -768,7 +768,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'bookTitle',
             'A chapter needs the title of the book it appears in, which is given in italics.',
-            '3.2.3',
+            '3.2.4',
           ),
         );
       }
@@ -777,13 +777,13 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'publisher',
             'A chapter needs the publisher of the book it appears in, not of the chapter.',
-            '3.2.3',
+            '3.2.4',
           ),
         );
       }
       if (blank(source.year)) {
         issues.push(
-          error('year', 'A chapter needs the year the book was published.', '3.2.3'),
+          error('year', 'A chapter needs the year the book was published.', '3.2.4'),
         );
       }
       break;
@@ -838,7 +838,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'title',
             'A web page needs its title, in single quotation marks and roman.',
-            '3.4.8',
+            '3.7.1',
           ),
         );
       }
@@ -847,7 +847,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           error(
             'url',
             'A web page needs its address, in angle brackets, since there is no volume or page to find it by.',
-            '3.4.8',
+            '3.7.1',
           ),
         );
       } else {
@@ -867,7 +867,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           warning(
             'authors',
             'No author, so the citation will begin with the title. Check the page really is unattributed — where no person is named, the organisation behind the site is often the author.',
-            '3.4.8',
+            '3.7.1',
           ),
         );
       }

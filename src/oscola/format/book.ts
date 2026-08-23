@@ -8,7 +8,7 @@ import type { BookSource } from '../../model/types';
  * The publication bracket: `(7th edn, Sweet & Maxwell 2007)`, or with an
  * original date, `(first published 1651, Penguin 1985)`.
  *
- * OSCOLA 4th edn does not include the place of publication, so `source.place`
+ * OSCOLA does not include the place of publication, so `source.place`
  * is deliberately not read here.
  */
 function publicationDetails(source: BookSource): string {
