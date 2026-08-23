@@ -294,7 +294,7 @@ and [Harvard quick guide](https://university.open.ac.uk/library/referencing-and-
 | **Where legal sources appear** | Footnotes only. In OU dual mode `formatSource` returns no bibliography entry for a legal source, and the preview says so. In OSCOLA mode they still get a table of cases / legislation entry. |
 | **Harvard in-text** | `(Bell, 2014)` or narrative `Bell (2014)`; with pages, `(Harris, 2015, p. 5)` and `(Clarke, 2001, pp. 98–99)`. Up to three authors are named; four or more give the first plus italic *et al.* — where OSCOLA uses "and others" above three. |
 | **Harvard initials** | `Bell, J.`, `Franklin, A.W.` — full stops, no spaces. OSCOLA writes the same author `Bell J`. |
-| **Place of publication** | Omitted, following Cite Them Right 12th edn and the OU's current law page. Their 2019 Harvard PDF still shows the 11th edn form (`Maidenhead: Open University Press`); the two disagree and the newer one wins. |
+| **Place of publication** | Omitted, following the OU's current law-modules page, whose worked example is `Bell, J. (2014) Doing your research project. Open University Press.` Their 2019 Harvard PDF still shows the older form (`Maidenhead: Open University Press`); the two disagree and the newer one wins. The modules use Cite Them Right **13th edn**, confirmed with the OU. |
 | **Web page titles** | Italic in Harvard (`Castles of Spain`), quoted in roman in OSCOLA. The same source renders differently by mode. |
 | **No author / no date** | An unattributed work is cited by its italicised title; a missing date gives `no date`, spelled out. An unattributed OU module item is cited to `The Open University`. |
 | **Word count** | In-text Harvard citations count towards an OU word limit; footnotes and the reference list do not. Noted on each preview panel. |
@@ -478,6 +478,10 @@ quieter one, and the existing tests caught it.
 ## Migrating to the 5th edition
 
 OSCOLA's 5th edition was published in December 2025 and renumbered heavily.
+The OU's own law-modules quick guide settles which edition applies: it says in
+terms that "this guidance is based on the 5th edition of OSCOLA". The same
+modules use Cite Them Right 13th edn on the Harvard side, confirmed with the OU.
+
 The hazard is not that the old numbers disappeared. It is that most of them
 still exist and now mean something else, so a stale reference sends a reader
 somewhere real and wrong — which is worse than sending them nowhere.

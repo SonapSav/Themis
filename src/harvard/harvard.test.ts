@@ -28,10 +28,10 @@ const bell = book({
 });
 
 // Examples are verbatim from the Open University's own referencing guides:
-// the law-modules quick guide (Cite Them Right 12th edn) and the Harvard
+// the law-modules quick guide (Cite Them Right 13th edn) and the Harvard
 // quick guide. Section references are to Cite Them Right via those guides.
 describe('Harvard reference list — Cite Them Right', () => {
-  it('formats a book without a place of publication (CTR 12th edn)', () => {
+  it('formats a book without a place of publication (CTR 13th edn)', () => {
     expect(ref(bell)).toBe('Bell, J. (2014) Doing your research project. Open University Press.');
   });
 

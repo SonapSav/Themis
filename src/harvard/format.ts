@@ -166,7 +166,8 @@ function availableAt(url: string, accessed: string | undefined): string {
 }
 
 function bookReference(source: BookSource): Part[] {
-  // Cite Them Right 12th edn omits the place of publication.
+  // Cite Them Right omits the place of publication; the OU's law-modules page
+  // shows the same, and its worked example is what this follows.
   return [
     ...opening(source),
     italic(source.title.trim()),

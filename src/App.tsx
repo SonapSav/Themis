@@ -208,7 +208,7 @@ export default function App() {
             <ScalesIcon className="mark" />
             Themis
           </h1>
-          <p>OSCOLA (5th edn) and Cite Them Right Harvard citations.</p>
+          <p>OSCOLA (5th edn) and Cite Them Right Harvard (13th edn) citations.</p>
         </div>
         <AppearanceControls appearance={appearance} onChange={setAppearance} />
       </header>

@@ -90,15 +90,24 @@ rather than guessing. You will see a warning in the Your lists panel.
 - [ ] Confirm the exact form, and whether the letter appears in both the in-text
       citation and the reference list
 
-### 3d. Which CTR edition
+### 3d. Which CTR edition — settled
 
-Themis follows the **12th edition**, which drops the place of publication:
+**Confirmed with the OU: the law modules use Cite Them Right 13th edition.**
+
+Themis drops the place of publication, which is what the OU's current
+law-modules quick guide shows:
 `Bell, J. (2014) Doing your research project. Open University Press.`
 
 The OU's own two pages disagree — their 2019 Harvard quick guide still shows the
-11th edition form with `Maidenhead:`. I followed the current law-modules page.
+older form with `Maidenhead:`. The law-modules page is the one followed, and it
+is also the page that settles the OSCOLA edition: it says in terms that "this
+guidance is based on the 5th edition of OSCOLA".
 
-- [ ] Confirm your modules expect the 12th edition
+Note what is and is not evidence here. The edition *number* comes from asking
+the OU. The *behaviour* comes from the law-modules page's own worked example,
+which shows no place of publication — the book itself has not been read, so no
+claim is made here about what the 13th edition says on any point the OU's page
+does not show.
 
 ### 3e. Five templates the OU guide names but never shows
 
