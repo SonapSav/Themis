@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { validate } from '../validate';
-import type { CaseSource, Source } from '../../model/types';
+import type { CaseSource, Source, StatutoryInstrumentSource } from '../../model/types';
 import { person } from './helpers';
 
 const fields = (source: Source, severity?: 'error' | 'warning') =>
@@ -172,5 +172,47 @@ describe('validation — other types', () => {
 
   it('warns when a non-"www" address has no scheme', () => {
     expect(fields(page('ejlt.org/article/view/17'), 'warning')).toContain('url');
+  });
+});
+
+describe('validation — statutory instruments (2.5)', () => {
+  const rules = (over: Partial<StatutoryInstrumentSource> = {}): StatutoryInstrumentSource => ({
+    id: 'si1',
+    type: 'statutoryInstrument',
+    name: 'CPR',
+    year: '',
+    siNumber: '',
+    numbering: 'rulesOfCourt',
+    ...over,
+  });
+
+  it('does not ask the rules of court for a year or an SI number (2.5.2)', () => {
+    expect(validate(rules())).toEqual([]);
+  });
+
+  it('says so when a year or SI number given for the rules of court is left out', () => {
+    expect(fields(rules({ year: '1998' }), 'warning')).toContain('siNumber');
+    expect(fields(rules({ siNumber: '1998/3132' }), 'warning')).toContain('siNumber');
+  });
+
+  it('warns that a CPR pinpoint omits "r" and "rr" (2.5.3)', () => {
+    expect(fields(rules({ provision: 'r 5.2(1)(b)' }), 'warning')).toContain('provision');
+    expect(fields(rules({ provision: '5.2(1)(b)' }), 'warning')).not.toContain('provision');
+  });
+
+  it('leaves the RSC and CCR their rule abbreviation', () => {
+    expect(validate(rules({ name: 'RSC', provision: 'Ord 24, r 14A' }))).toEqual([]);
+    expect(validate(rules({ name: 'CCR', provision: 'Ord 17, r 11' }))).toEqual([]);
+  });
+
+  it('names the SR & O number when one is missing', () => {
+    const source = rules({
+      name: 'Hollow-ware and Galvanising Welfare Order',
+      year: '1921',
+      numbering: 'srAndO',
+    });
+    expect(validate(source).map((issue) => issue.message)).toEqual([
+      'A statutory instrument needs its SR & O number, e.g. "2004/3166".',
+    ]);
   });
 });

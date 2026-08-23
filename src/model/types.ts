@@ -242,6 +242,19 @@ export interface WebsiteSource extends SourceBase {
   readonly shortTitle?: string;
 }
 
+/**
+ * How the instrument is numbered.
+ *
+ * OSCOLA 2.5.1 gives modern statutory instruments an SI number, and their
+ * predecessors — statutory rules and orders — an SR & O number in the same
+ * form. 2.5.2 lets the Civil Procedure Rules and their predecessors be cited
+ * "without reference to their SI number or year" at all.
+ *
+ * `undefined` means an ordinary SI. The default is left implicit so that a
+ * library exported before this field existed still round-trips unchanged.
+ */
+export type SiNumbering = 'srAndO' | 'rulesOfCourt';
+
 export interface StatutoryInstrumentSource extends SourceBase {
   readonly type: 'statutoryInstrument';
   /** Name and year, e.g. "Eggs and Chicks (England) Regulations 2009". */
@@ -249,6 +262,8 @@ export interface StatutoryInstrumentSource extends SourceBase {
   readonly year: string;
   /** The SI number after the year, e.g. "2009/2163". */
   readonly siNumber: string;
+  /** Omitted for an ordinary SI; see {@link SiNumbering}. */
+  readonly numbering?: SiNumbering;
   /** Provision, e.g. "reg 7(2)". */
   readonly provision?: string;
   /**

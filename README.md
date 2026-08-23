@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 338 tests
+npm test           # 353 tests
 npm run typecheck
 ```
 
@@ -299,6 +299,8 @@ Nothing in the suite is invented.
 | **What is italicised** | Book titles (§3.1.2) and case names in footnotes (§2.1.1). *Not* italicised: article titles and journal names, both roman (§3.3.1); Act short titles (§2.4.1); case names in a table of cases (§1.6.2). The website or blog name **is** italicised (§3.4.8) — the page's own title stays in roman inside quotation marks, as with newspapers (§3.4.9). |
 | **Terminal punctuation** | Footnotes close with a full stop; bibliography and table entries do not. |
 | **Acts** | §2.4.1: short title and year in roman, no comma before the year. §2.4.2: a provision follows a comma after the year, with a space and no full stop before the number (`Human Rights Act 1998, s 15(1)(b)`). Provisions are dropped from the table of legislation. |
+| **Statutory instruments** | §2.5.1: name, year, then the SI number after a comma (`Penalties for Disorderly Behaviour (Amendment of Minimum Age) Order 2004, SI 2004/3166`). A **Numbering** field switches the label to `SR & O` for the pre-1948 statutory rules and orders (`Hollow-ware and Galvanising Welfare Order 1921, SR & O 1921/2032`), which the same section cites “by their title and SR & O number”. |
+| **Rules of court** | §2.5.2: the CPR, RSC and CCR “may be cited without reference to their SI number or year”, so the third **Numbering** option drops both and leaves the name: `CPR 7`, `RSC Ord 24, r 14A`, `CCR Ord 17, r 11`, and practice directions numbered by the part they supplement (`6A PD 4.1`). §2.5.3: no comma before the pinpoint (`CPR 5.2(1)(b)`), and a CPR pinpoint written with `r` or `rr` raises a warning, because that section says to omit them. A year or SI number entered anyway is left out, and says so. Every other court rule is cited in full as a statutory instrument. |
 | **Judge attribution** | §2.1.7: the judge's name goes in brackets after the pinpoint — `[27] (Laws LJ)`, `547 (Potter J)` — and "per" is never used. Passages can be attributed individually, so §1.2.1's `ibid [34] (Lord Hope), [39] (Lord Scott), [43]–[47] (Lord Walker), [58]–[60] (Lord Neuberger)` renders as printed. A single judge attributes the whole pinpoint and is named once: `[42], [45] (Lord Woolf CJ)`. |
 | **Pinpoints** | Dropped from bibliography and table entries. In footnotes (§2.1.6): paragraphs are bracketed individually, with no preceding comma, whether single (`… 1 AC 1339 [14]`), a range (`[1]–[37]`) or a list (`[42], [45]`); pages take a comma after a report (`[1996] AC 155, 165`) but a space after a bracketed court (`[1990] QB 523 (QB) 530–31`) or a book's publication bracket (`(OUP 2009) 68`). Multiple pages are comma-separated (`(CA) 720, 723`). |
 | **Author names** | Given names and surname stored separately — no free-text name parse is reliable. Footnotes give names in full; bibliographies invert **every** author and reduce given names to initials with no stops or spaces. Corporate authors are never inverted. Evidence: §1.7 lists `—— and Honoré AM, Causation in the Law (2nd edn, OUP 1985)` under `Hart HLA`, i.e. `Hart HLA and Honoré AM` — the co-author inverts too. |
@@ -366,7 +368,6 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 - **Shortened footnotes for EU cases** — §1.1.1's "name given in the text" rule
   is stated for case names, and the guide shows no shortened form for a
   citation that leads with a registration number, so Thetis does not extrapolate.
-- **SR & O numbers** (§2.5.1) and **rules of court** (§2.5.2, `CPR 7`).
 
 ## Not yet supported
 

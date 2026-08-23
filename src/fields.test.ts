@@ -39,6 +39,14 @@ const sources: Record<string, Source> = {
     id: 's5', type: 'statutoryInstrument', name: 'Eggs and Chicks (England) Regulations',
     year: '2009', siNumber: '2009/2163', provision: 'reg 7(2)', shortForm: 'Eggs Regs',
   },
+  'a statutory rule and order': {
+    id: 's5a', type: 'statutoryInstrument', name: 'Hollow-ware and Galvanising Welfare Order',
+    year: '1921', siNumber: '1921/2032', numbering: 'srAndO',
+  },
+  'rules of court': {
+    id: 's5b', type: 'statutoryInstrument', name: 'CPR',
+    year: '', siNumber: '', numbering: 'rulesOfCourt', provision: '5.2(1)(b)',
+  },
   'EU legislation': {
     id: 's6', type: 'euLegislation', title: 'Consolidated Version of the Treaty on European Union',
     ojYear: '2008', ojSeries: 'C', ojIssue: '115', ojFirstPage: '13',

@@ -39,6 +39,56 @@ describe('statutory instruments (2.5)', () => {
       'Penalties for Disorderly Behaviour (Amendment of Minimum Age) Order 2004, SI 2004/3166',
     );
   });
+
+  it('cites the older statutory rules and orders by their SR & O number (2.5.1)', () => {
+    const hollowWare: StatutoryInstrumentSource = {
+      id: 'si3',
+      type: 'statutoryInstrument',
+      name: 'Hollow-ware and Galvanising Welfare Order',
+      year: '1921',
+      siNumber: '1921/2032',
+      numbering: 'srAndO',
+    };
+    expect(fn(hollowWare)).toBe('Hollow-ware and Galvanising Welfare Order 1921, SR & O 1921/2032.');
+    expect(bib(hollowWare)).toBe('Hollow-ware and Galvanising Welfare Order 1921, SR & O 1921/2032');
+  });
+});
+
+describe('rules of court (2.5.2)', () => {
+  const rules = (name: string, provision?: string): StatutoryInstrumentSource => ({
+    id: 'roc',
+    type: 'statutoryInstrument',
+    name,
+    year: '',
+    siNumber: '',
+    numbering: 'rulesOfCourt',
+    provision,
+  });
+
+  // 2.5.2: the CPR, RSC and CCR "may be cited without reference to their SI
+  // number or year". These four are the section's own examples.
+  it('cites the CPR without a year or SI number', () => {
+    expect(fn(rules('CPR', '7'))).toBe('CPR 7.');
+  });
+
+  it('keeps the RSC and CCR order and rule as typed', () => {
+    expect(fn(rules('RSC', 'Ord 24, r 14A'))).toBe('RSC Ord 24, r 14A.');
+    expect(fn(rules('CCR', 'Ord 17, r 11'))).toBe('CCR Ord 17, r 11.');
+  });
+
+  it('numbers a practice direction by the part it supplements', () => {
+    expect(fn(rules('6A PD', '4.1'))).toBe('6A PD 4.1.');
+    expect(fn(rules('7A PD', '8.2'))).toBe('7A PD 8.2.');
+  });
+
+  // 2.5.3: "do not insert a comma before the pinpoint".
+  it('takes no comma before a pinpoint', () => {
+    expect(fn(rules('CPR', '5.2(1)(b)'))).toBe('CPR 5.2(1)(b).');
+  });
+
+  it('lists the rules alone in the table of legislation', () => {
+    expect(bib(rules('CPR', '5.2(1)(b)'))).toBe('CPR');
+  });
 });
 
 describe('EU legislation (2.6.1)', () => {

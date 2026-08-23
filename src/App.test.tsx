@@ -884,6 +884,38 @@ describe('editing a saved source', () => {
   });
 });
 
+describe('statutory instruments', () => {
+  it('switches the number label to SR & O (2.5.1)', async () => {
+    const user = setup();
+    await chooseType(user, 'Statutory instrument');
+    await user.selectOptions(
+      screen.getByLabelText('Numbering'),
+      screen.getByRole('option', { name: /^SR & O/ }),
+    );
+    await user.type(screen.getByLabelText('Name'), 'Hollow-ware and Galvanising Welfare Order');
+    await user.type(screen.getByLabelText('Year'), '1921');
+    await user.type(screen.getByLabelText('SI number'), '1921/2032');
+
+    expect(citation('Footnote')).toBe(
+      'Hollow-ware and Galvanising Welfare Order 1921, SR & O 1921/2032.',
+    );
+  });
+
+  it('cites the rules of court by name and pinpoint alone (2.5.2)', async () => {
+    const user = setup();
+    await chooseType(user, 'Statutory instrument');
+    await user.selectOptions(
+      screen.getByLabelText('Numbering'),
+      screen.getByRole('option', { name: /^Rules of court/ }),
+    );
+    await user.type(screen.getByLabelText('Name'), 'CPR');
+    await user.type(screen.getByLabelText('Provision'), '5.2(1)(b)');
+
+    expect(citation('Footnote')).toBe('CPR 5.2(1)(b).');
+    expect(screen.getByRole('button', { name: 'Add to sources' })).toBeEnabled();
+  });
+});
+
 describe('unreported cases', () => {
   it('cites the court and date of judgment in place of a report (2.1.4)', async () => {
     const user = setup();

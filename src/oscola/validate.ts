@@ -140,12 +140,38 @@ export function validate(source: Source): readonly ValidationIssue[] {
     }
 
     case 'statutoryInstrument': {
+      // 2.5.2: the CPR, RSC and CCR are cited by name alone, so the year and
+      // the number are not merely optional — they are not part of the citation.
+      if (source.numbering === 'rulesOfCourt') {
+        if (blank(source.name)) {
+          issues.push(error('name', 'Give the rules, e.g. "CPR", "RSC", "CCR", or "6A PD" for a practice direction.'));
+        }
+        if (!blank(source.year) || !blank(source.siNumber)) {
+          issues.push(
+            warning(
+              'siNumber',
+              'The rules of court are cited without their year or SI number, so neither has been included.',
+            ),
+          );
+        }
+        // 2.5.3: "in the case of the Civil Procedure Rules, omit the
+        // abbreviations 'r' and 'rr'". Stated for the CPR alone — the RSC and
+        // CCR examples keep theirs, as in `RSC Ord 24, r 14A`.
+        if (/^CPR\b/i.test(source.name.trim()) && /^rr?\b\.?/i.test(source.provision?.trim() ?? '')) {
+          issues.push(
+            warning('provision', 'CPR pinpoints omit "r" and "rr": write "5.2(1)(b)", not "r 5.2(1)(b)".'),
+          );
+        }
+        break;
+      }
+
+      const label = source.numbering === 'srAndO' ? 'SR & O' : 'SI';
       if (blank(source.name)) issues.push(error('name', 'A statutory instrument needs its name.'));
       if (blank(source.year)) issues.push(error('year', 'A statutory instrument needs its year.'));
       if (blank(source.siNumber)) {
-        issues.push(error('siNumber', 'A statutory instrument needs its SI number, e.g. "2004/3166".'));
+        issues.push(error('siNumber', `A statutory instrument needs its ${label} number, e.g. "2004/3166".`));
       } else if (!/^\d{4}\/\d+$/.test(source.siNumber.trim())) {
-        issues.push(warning('siNumber', 'SI numbers take the form year/number, e.g. "2004/3166".'));
+        issues.push(warning('siNumber', `${label} numbers take the form year/number, e.g. "2004/3166".`));
       }
       break;
     }

@@ -98,10 +98,21 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'shortTitle', label: 'Short title', placeholder: 'Principles', hint: 'Used when you cite more than one work by this author.' },
   ],
   statutoryInstrument: [
-    { key: 'name', label: 'Name', placeholder: 'Eggs and Chicks (England) Regulations', hint: 'Without the year — it has its own field.' },
-    { key: 'year', label: 'Year', placeholder: '2009' },
-    { key: 'siNumber', label: 'SI number', placeholder: '2009/2163', hint: 'Year and serial number, printed after "SI".' },
-    { key: 'provision', label: 'Provision', placeholder: 'reg 7(2)', hint: 'Same abbreviations as for Acts, plus reg/regs, r/rr, art/arts.' },
+    {
+      key: 'numbering',
+      label: 'Numbering',
+      control: 'select',
+      options: [
+        { value: 'si', label: 'SI — Order 2004, SI 2004/3166' },
+        { value: 'srAndO', label: 'SR & O — Order 1921, SR & O 1921/2032' },
+        { value: 'rulesOfCourt', label: 'Rules of court — CPR 7' },
+      ],
+      hint: 'Statutory instruments were called statutory rules and orders before 1948. The CPR, RSC and CCR are cited without a year or number; cite every other court rule in full as a statutory instrument.',
+    },
+    { key: 'name', label: 'Name', placeholder: 'Eggs and Chicks (England) Regulations', hint: 'Without the year — it has its own field. For rules of court, the abbreviation alone: CPR, RSC, CCR, or "6A PD" for a practice direction.' },
+    { key: 'year', label: 'Year', placeholder: '2009', hint: 'Not cited for the rules of court.' },
+    { key: 'siNumber', label: 'SI number', placeholder: '2009/2163', hint: 'Year and serial number, printed after "SI" — or after "SR & O". Not cited for the rules of court.' },
+    { key: 'provision', label: 'Provision', placeholder: 'reg 7(2)', hint: 'Same abbreviations as for Acts, plus reg/regs, r/rr, art/arts. The rules of court take no comma before the pinpoint, and the CPR omits "r" and "rr": CPR 5.2(1)(b).' },
     { key: 'shortForm', label: 'Short form', placeholder: 'UTCCR 1999', hint: 'Abbreviation for repeat citations.' },
   ],
   euLegislation: [
@@ -183,7 +194,7 @@ export const AUTHOR_LISTS: Partial<Record<SourceType, readonly AuthorListSpec[]>
 export const DEFAULT_DRAFTS: Record<SourceType, Draft> = {
   case: { 'report.yearFormat': 'square', 'pinpoint.kind': 'paragraph' },
   act: {},
-  statutoryInstrument: {},
+  statutoryInstrument: { numbering: 'si' },
   euLegislation: { ojSeries: 'L' },
   euCase: { joined: '' },
   journalArticle: {},
@@ -303,6 +314,12 @@ export function buildSource(
         name: req(draft, 'name'),
         year: req(draft, 'year'),
         siNumber: req(draft, 'siNumber'),
+        // An ordinary SI leaves this undefined, so a library saved before the
+        // field existed round-trips through an edit unchanged.
+        numbering:
+          draft['numbering'] === 'srAndO' || draft['numbering'] === 'rulesOfCourt'
+            ? draft['numbering']
+            : undefined,
         provision: opt(draft, 'provision'),
         shortForm: opt(draft, 'shortForm'),
       };
@@ -476,6 +493,7 @@ export function toDraft(source: Source): DraftState {
       break;
 
     case 'statutoryInstrument':
+      draft['numbering'] = source.numbering ?? 'si';
       set(draft, 'name', source.name);
       set(draft, 'year', source.year);
       set(draft, 'siNumber', source.siNumber);

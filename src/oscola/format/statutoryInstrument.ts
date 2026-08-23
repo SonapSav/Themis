@@ -5,11 +5,21 @@ import type { StatutoryInstrumentSource } from '../../model/types';
  * OSCOLA 2.5.1: "give the name, year and (after a comma) the SI number".
  * `Penalties for Disorderly Behaviour (Amendment of Minimum Age) Order 2004,
  * SI 2004/3166`
+ *
+ * The same section cites the older statutory rules and orders "by their title
+ * and SR & O number": `Hollow-ware and Galvanising Welfare Order 1921, SR & O
+ * 1921/2032`. Only the label differs.
+ *
+ * 2.5.2: the CPR, RSC and CCR "may be cited without reference to their SI
+ * number or year", so the name stands alone — `CPR 7`.
  */
 function body(source: StatutoryInstrumentSource): string {
-  const title = [source.name.trim(), source.year.trim()].filter(Boolean).join(' ');
+  const name = source.name.trim();
+  if (source.numbering === 'rulesOfCourt') return name;
+  const title = [name, source.year.trim()].filter(Boolean).join(' ');
   const si = source.siNumber.trim();
-  return si ? `${title}, SI ${si}` : title;
+  const label = source.numbering === 'srAndO' ? 'SR & O' : 'SI';
+  return si ? `${title}, ${label} ${si}` : title;
 }
 
 export function formatStatutoryInstrumentFootnote(
@@ -17,13 +27,15 @@ export function formatStatutoryInstrumentFootnote(
   options: { announceShortForm?: boolean } = {},
 ): FormattedCitation {
   // 2.5.3: parts follow the same rules as parts of statutes, including 2.4.1's
-  // treatment of an announced short form.
+  // treatment of an announced short form. The one departure is the rules of
+  // court, which take "no comma before the pinpoint" — `CPR 5.2(1)(b)`.
   const provision = source.provision?.trim();
   const shortForm = options.announceShortForm ? source.shortForm?.trim() : undefined;
+  const spaced = Boolean(shortForm) || source.numbering === 'rulesOfCourt';
   return segments(
     body(source),
     shortForm && ` (${shortForm})`,
-    provision && (shortForm ? ` ${provision}` : `, ${provision}`),
+    provision && (spaced ? ` ${provision}` : `, ${provision}`),
     '.',
   );
 }
