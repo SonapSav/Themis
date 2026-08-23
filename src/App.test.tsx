@@ -995,7 +995,7 @@ describe('abbreviation and court-code checks', () => {
     await user.type(neutral.getByLabelText('Court'), 'EWHC');
     await user.type(neutral.getByLabelText('Judgment number'), '407');
 
-    expect(screen.getAllByText(/carry a division in brackets/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/carry the division in brackets/i).length).toBeGreaterThan(0);
   });
 
   it('names the right capitalisation for a miscased court code', async () => {
@@ -1242,7 +1242,7 @@ describe('unreported cases', () => {
       target: { value: '1990-11-08' },
     });
 
-    expect(screen.getAllByText(/unreported case needs the court/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/unreported case is cited by the court/i).length).toBeGreaterThan(0);
     expect(screen.getByRole('button', { name: 'Add to sources' })).toBeDisabled();
   });
 });

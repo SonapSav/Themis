@@ -434,6 +434,38 @@ The failure mode for a tool like this is a silent citation error a student does
 not catch, so the checks are deliberately noisy about the ambiguous cases rather
 than guessing.
 
+### Every check names its rule
+
+A check that only says a field is missing asks to be taken on trust. Each issue
+therefore carries the section of the guide it comes from, and the Checks panel
+prints it under the message — `OSCOLA 2.1.3 — Neutral citations`.
+
+`src/oscola/rules.ts` holds those sections with the guide's own headings, and
+`RuleSection` is a union of them, so an invented section number does not
+compile. Three tests hold the grounding up: every issue an empty form of every
+OSCOLA type raises must carry a section, every section cited must exist in the
+table, and OU module material must carry none — Cite Them Right governs it, not
+OSCOLA, and inventing an OSCOLA section for it would be worse than silence.
+
+Messages say what the element *does* as well as that it is absent, because the
+student who left a field blank usually did not know it was one thing rather than
+another. The first page of a report is the example that keeps coming up: it is
+where the case starts, not the page being relied on, and a citation is wrong in
+a way nothing downstream can catch if those are confused.
+
+Checks are grounded per element rather than per form. A part-filled case —
+`Corr v IBC Vehicles Ltd`, court `UKHL`, report series `AC` — used to raise two
+bare errors; it now raises four, because a neutral citation with no year and a
+report with no year are each incomplete in their own right, and each says which
+rule asks for the missing part.
+
+One check was written and then removed: a warning on every neutral citation
+with no law report, suggesting a report might have appeared since. 2.1.3 is
+explicit that an unreported judgment is cited by its neutral citation alone, so
+the warning fired on correct citations — `Re Guardian News and Media Ltd [2010]
+UKSC 1` among them. A panel that cries wolf on valid input is worse than a
+quieter one, and the existing tests caught it.
+
 ## Where the data comes from
 
 `src/oscola/courts.ts` is generated from OSCOLA §4.1's appendix, and how it was

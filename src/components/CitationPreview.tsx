@@ -9,6 +9,7 @@ import {
   type Source,
   type ValidationIssue,
 } from '../citations';
+import { ruleLabel } from '../oscola/rules';
 import { CopyButton } from './CopyButton';
 
 interface Props {
@@ -142,6 +143,9 @@ export function CitationPreview({ source, mode, issues }: Props) {
               <li key={i} className={issue.severity}>
                 <strong>{issue.severity === 'error' ? 'Missing' : 'Check'}</strong>{' '}
                 {issue.message}
+                {/* The rule is what makes a check checkable: a reader who
+                    disagrees can go and read the section it came from. */}
+                {issue.rule && <span className="rule">{ruleLabel(issue.rule)}</span>}
               </li>
             ))}
           </ul>

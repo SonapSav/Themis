@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { validate } from '../validate';
 import type { CaseSource, JournalArticleSource, Source, StatutoryInstrumentSource } from '../../model/types';
 import { person } from './helpers';
+import { RULES, ruleLabel } from '../rules';
+import { DEFAULT_DRAFTS, buildSource } from '../../fields';
+import type { SourceType } from '../../model/types';
 
 const messages = (source: Source) => validate(source).map((issue) => issue.message);
 
@@ -214,7 +217,7 @@ describe('validation — statutory instruments (2.5)', () => {
       numbering: 'srAndO',
     });
     expect(validate(source).map((issue) => issue.message)).toEqual([
-      'A statutory instrument needs its SR & O number, e.g. "2004/3166".',
+      'A statutory instrument needs its SR & O number, e.g. "2004/3166". Instruments are numbered in one run each year, so the number is what identifies this one.',
     ]);
   });
 });
@@ -360,7 +363,7 @@ describe('abbreviations take no full stops (4.2.1)', () => {
     const source: Source = { ...modernCase, neutral: undefined,
       report: { year: '1996', yearFormat: 'square', abbreviation: 'A.C.', firstPage: '155' }, court: 'HL' };
     expect(messages(source)).toContain(
-      'OSCOLA abbreviations take no full stops (4.2.1), so "A.C." would normally be "AC".',
+      'OSCOLA abbreviations take no full stops, so "A.C." would normally be "AC".',
     );
     // Flagged, never rewritten: the citation still renders what was typed.
     expect(fields(source, 'error')).toEqual([]);
@@ -396,7 +399,7 @@ describe('neutral citation court codes (4.1)', () => {
 
   it('names the right capitalisation rather than just rejecting', () => {
     expect(messages(withNeutral('ewhc', 'QB'))).toContain(
-      'Court codes are capitalised as in OSCOLA 4.1: "EWHC", not "ewhc".',
+      'Court codes are capitalised as the guide prints them: "EWHC", not "ewhc".',
     );
   });
 
@@ -415,13 +418,13 @@ describe('neutral citation court codes (4.1)', () => {
 
   it('rejects a division that is not listed for that court', () => {
     expect(messages(withNeutral('EWHC', 'Costs'))).toContain(
-      'OSCOLA 4.1 lists Ch, Fam, QB, Admin, Admlty, Comm, Pat, TCC for EWHC, not "Costs".',
+      'The guide lists Ch, Fam, QB, Admin, Admlty, Comm, Pat, TCC for EWHC, not "Costs".',
     );
   });
 
   it('says so when a division is given to a court that takes none', () => {
     expect(messages(withNeutral('UKSC', 'QB'))).toContain(
-      'UKSC citations take no division in brackets (4.1).',
+      'UKSC citations take no division in brackets.',
     );
   });
 
@@ -432,5 +435,105 @@ describe('neutral citation court codes (4.1)', () => {
     expect(
       fields({ ...modernCase, history: { disposition: 'affd', neutral: { year: '2007', court: 'EWHC', number: '721' } } }, 'warning'),
     ).toContain('history.neutral.division');
+  });
+});
+
+/**
+ * The checks are only worth trusting if they say where they come from. These
+ * assert the grounding itself rather than any one message, so a check added
+ * later cannot quietly arrive without a rule behind it.
+ */
+describe('every check names the rule it comes from', () => {
+  const OSCOLA_TYPES = (Object.keys(DEFAULT_DRAFTS) as SourceType[]).filter(
+    // OU module material is Cite Them Right's, not OSCOLA's, so it has no
+    // section to name — that exemption is asserted below rather than assumed.
+    (type) => type !== 'ouModuleMaterial',
+  );
+
+  it.each(OSCOLA_TYPES)('%s: every issue on an empty form cites a section', (type) => {
+    const empty = buildSource('t', type, DEFAULT_DRAFTS[type], [], []);
+    const issues = validate(empty);
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues.filter((issue) => !issue.rule)).toEqual([]);
+  });
+
+  it('cites only sections the guide actually has', () => {
+    for (const type of Object.keys(DEFAULT_DRAFTS) as SourceType[]) {
+      for (const issue of validate(buildSource('t', type, DEFAULT_DRAFTS[type], [], []))) {
+        if (issue.rule) expect(RULES).toHaveProperty(issue.rule);
+      }
+    }
+  });
+
+  it('leaves OU module material unattributed, because OSCOLA does not govern it', () => {
+    const empty = buildSource('t', 'ouModuleMaterial', DEFAULT_DRAFTS.ouModuleMaterial, [], []);
+    const issues = validate(empty);
+    expect(issues.length).toBeGreaterThan(0);
+    expect(issues.every((issue) => issue.rule === undefined)).toBe(true);
+  });
+
+  it('renders a section as the guide names it', () => {
+    expect(ruleLabel('2.1.3')).toBe('OSCOLA 2.1.3 — Neutral citations');
+  });
+});
+
+describe('the checks reach the types that had least (2.1.3, 2.4, 2.6.2)', () => {
+  it('names each part of a neutral citation that is missing (2.1.3)', () => {
+    const partial: CaseSource = {
+      ...modernCase,
+      neutral: { year: '', court: '', number: '13' },
+    };
+    expect(fields(partial, 'error')).toEqual(
+      expect.arrayContaining(['neutral.year', 'neutral.court']),
+    );
+    expect(validate(partial).every((issue) => issue.rule === '2.1.3' || issue.severity === 'warning')).toBe(true);
+  });
+
+  it('names each part of a law report that is missing (2.1.4)', () => {
+    const partial: CaseSource = {
+      ...modernCase,
+      neutral: undefined,
+      report: { year: '', yearFormat: 'square', abbreviation: '', firstPage: '' },
+    };
+    expect(fields(partial, 'error')).toEqual(
+      expect.arrayContaining(['report.year', 'report.abbreviation', 'report.firstPage']),
+    );
+  });
+
+  it('says what an Act is cited by, and grounds it in 2.4.1', () => {
+    const act: Source = { id: 'a1', type: 'act', shortTitle: '', year: '' };
+    const rules = validate(act).map((issue) => issue.rule);
+    expect(rules).toEqual(['2.4.1', '2.4.1']);
+    expect(messages(act).join(' ')).toMatch(/short title/i);
+  });
+
+  // 2.4.2: "a space but no full stop between the abbreviation and the initial
+  // number". The form adds the abbreviation, so typing it doubles it.
+  it('flags a section pinpoint that repeats the abbreviation (2.4.2)', () => {
+    const act = (provision: string): Source => ({
+      id: 'a1', type: 'act', shortTitle: 'Human Rights Act', year: '1998', provision,
+    });
+    expect(fields(act('s. 15'), 'warning')).toContain('provision');
+    expect(fields(act('section 15'), 'warning')).toContain('provision');
+    expect(validate(act('15')).filter((i) => i.field === 'provision')).toEqual([]);
+  });
+
+  // 2.6.2: cases registered since 1989 carry a C-, T- or F- prefix.
+  it('asks an unprefixed EU case number for its prefix (2.6.2)', () => {
+    const euCase = (caseNumber: string): Source => ({
+      id: 'e1', type: 'euCase', caseName: 'Vodafone', caseNumber,
+    });
+    expect(fields(euCase('176/03'), 'warning')).toContain('caseNumber');
+    expect(validate(euCase('C-176/03')).filter((i) => i.field === 'caseNumber')).toEqual([]);
+  });
+
+  it('checks an EU case report the same way as a UK one (2.6.2)', () => {
+    const partial: Source = {
+      id: 'e1', type: 'euCase', caseName: 'Vodafone', caseNumber: 'C-176/03',
+      report: { year: '2005', abbreviation: '', firstPage: '' },
+    };
+    expect(fields(partial, 'error')).toEqual(
+      expect.arrayContaining(['report.abbreviation', 'report.firstPage']),
+    );
   });
 });

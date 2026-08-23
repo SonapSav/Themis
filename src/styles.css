@@ -450,3 +450,12 @@ button.linklike:disabled { color: var(--muted); text-decoration: none; cursor: n
 .library-buttons { display: flex; align-items: baseline; gap: 0.5rem; white-space: nowrap; }
 .library li.editing { background: var(--editing); }
 .save .secondary { background: var(--field); color: var(--accent); }
+
+/* The OSCOLA section a check comes from, under the check itself. Quiet enough
+   to skip when you already know the rule, and there to follow when you do not. */
+.issues .rule {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
