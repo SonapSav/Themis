@@ -121,7 +121,9 @@ plain text rather than failing.
 - the footnote sequence as **real Word footnotes**, one per line. Selecting a
   footnote marker in Word and copying it carries the footnote across to another
   document and renumbers it, so the file works as a skeleton to lift citations
-  out of;
+  out of. **Confirmed in Word**, not just intended: this was the open question
+  over whether the export was a real workflow or a stopgap, and it is the reason
+  the Office add-in sits at the back of `ROADMAP.md` rather than the front;
 - the end-of-work lists as headed paragraphs with a hanging indent, italics
   intact.
 

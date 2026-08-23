@@ -16,7 +16,7 @@ For whoever picks this up next, including a future session of me.
 | --- | --- |
 | 1. Manual entry → correct footnote and bibliography entry | **Done**, ten source types, two schemes |
 | 2. Repeat citations: ibid, cross-references, renumbering | **Engine done**, hosted by a preview panel; no rich-text editor |
-| 3. Word output | **Partial** — rich-text copy and a `.docx` with real Word footnotes; no Office add-in |
+| 3. Word output | **Working end to end** — a `.docx` whose footnote markers copy into a student's own document and renumber, confirmed in Word on 23 August 2026; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
 412 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
@@ -108,7 +108,8 @@ Do not relitigate these without a reason. Each was settled deliberately.
 
 ## What to do next
 
-Roughly in the order I would take them.
+Roughly in the order I would take them. Item 3 used to lead this list; the Word
+export test moved it to the back — see below.
 
 ### 1. The remaining citation gaps — small each, listed in the README
 
@@ -142,21 +143,30 @@ neutral-citation court. The Cardiff Index to Legal Abbreviations is the standard
 reference. This is the main remaining defence against a citation that looks
 right and is not — but it is a data-gathering job before it is a coding one.
 
-### 3. The Office.js add-in — large, highest ceiling
+### 3. The Office.js add-in — demoted, and no longer the answer
 
-Insert citations as real Word footnotes at the cursor in the student's own
-document. The user's own brief calls this the key adoption feature, and OU
-students get Microsoft 365 free.
+**This was the plan's centrepiece, and it should not be built next.**
 
-**The citation logic is already done and host-agnostic.** `renderFootnotes`
-takes an ordered list and returns rendered footnotes; an add-in reads Word's
-footnote collection, maps it to that list, and writes the results back. The work
-is infrastructure, not citations: a manifest, HTTPS hosting, sideloading for
-development, and the Office.js API.
+The open question was whether the `.docx` export was a real workflow or a
+stopgap. On 23 August 2026 the user tested it in Word: selecting a footnote
+marker in the exported file, copying it, and pasting into their own document
+carries the footnote across and renumbers it. It works smoothly.
 
-Before starting, check `VERIFY.md` item 1. If copying footnote markers out of the
-exported `.docx` turns out to work well in practice, the add-in is less urgent
-than it looks. If it does not, it is the only real answer.
+That was the whole justification for exporting real Word footnotes rather than a
+plain list, and it holds. So a student already has a working path from Thetis
+into their essay, with no add-in, no manifest, no HTTPS host, and no sideloading.
+
+The add-in would still be nicer — citations inserted at the cursor rather than
+copied — but it is now a convenience over a working workflow, not a rescue from
+a broken one. It is a large infrastructure job (manifest, HTTPS hosting,
+sideloading, the Office.js API) whose citation logic is already done and
+host-agnostic: `renderFootnotes` takes an ordered list and returns rendered
+footnotes, and an add-in would read Word's footnote collection, map it to that
+list, and write the results back.
+
+Build it when there is nothing better to do, or when a real user asks for it.
+Not before the abbreviation lookup, which defends against wrong citations rather
+than saving keystrokes.
 
 ### Probably not: an in-browser rich-text editor
 

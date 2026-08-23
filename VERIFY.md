@@ -4,33 +4,38 @@ Everything Thetis does is covered by tests, but some things cannot be verified
 from this machine — no Word, no LibreOffice, no browser I can drive, and no
 access to Cite Them Right, which is paywalled. This is the list.
 
-Roughly in order of how much damage a wrong answer would do.
+Roughly in order of how much damage a wrong answer would do. Item 1 is answered
+and kept for the record, because what it settled redirected the roadmap.
 
 ---
 
-## 1. Does the Word file actually open?
+## 1. Does the Word file actually work? — **the decisive answer is yes**
 
-**Why I can't check:** there is no Word or LibreOffice on the Pi. I verified the
-`.docx` is a well-formed ZIP whose parts include `[Content_Types].xml`,
-`word/document.xml` and `word/footnotes.xml`, but "valid ZIP with the right
-parts" is not the same as "Word opens it without complaining".
+**Confirmed on 23 August 2026.** Selecting a footnote marker in the exported
+`.docx`, copying it, and pasting into your own document carries the footnote
+across and renumbers it. It copies smoothly.
 
-**How to check:** add a couple of sources, build a footnote sequence, click
-**Export to Word** in the Your lists panel, and open the file.
+That was the whole justification for exporting real Word footnotes rather than a
+plain list, and the whole question hanging over the Office add-in. The export is
+a real workflow, not a stopgap, so the add-in has been demoted in `ROADMAP.md`
+from the plan's centrepiece to a convenience for later.
 
-- [ ] Word opens it with no repair prompt
-- [ ] The footnotes are **real footnotes** — click in the footnote pane, or
-      turn on View → Draft → Show Notes. They should not be ordinary text.
+- [x] Word opens it, and footnote markers copy into your own essay **and
+      renumber** — the two that mattered
+
+**Still worth an eye, but no longer urgent.** These were not separately reported,
+and none of them can break the workflow above — they are presentation:
+
+- [ ] No repair prompt on opening (opening plainly worked, but a prompt you
+      clicked through would still be worth fixing)
 - [ ] Case names and book titles are *italic* in the footnotes
-- [ ] The lists (Table of cases, Bibliography, Reference list) have a hanging
-      indent and keep their italics
-- [ ] Selecting a footnote marker in the exported file, copying it, and pasting
-      into your own essay carries the footnote across **and renumbers it**
+- [ ] The case name is **not** italic in the Table of cases (1.6.2)
+- [ ] The lists have a hanging indent and keep their italics
 
-That last point is the whole justification for exporting real footnotes rather
-than a plain list. If it does not work smoothly in practice, say so — the honest
-conclusion would be that this export is a stopgap and the Office add-in is the
-real answer.
+A five-minute recipe with a known-correct expected output is in the session
+notes; the short version is two sources — `Corr v IBC Vehicles Ltd` and Burrows,
+*Remedies for Torts and Breach of Contract* — cited in the order 1, 1, 2, 1 so
+that footnote 2 is an `ibid` and footnote 4 a `Corr (n 1)` cross-citation.
 
 ---
 
