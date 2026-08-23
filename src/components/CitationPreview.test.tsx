@@ -2,10 +2,17 @@ import { describe, expect, it } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CitationPreview } from './CitationPreview';
-import type { ActSource, BookSource, CaseSource, CitationMode, Source } from '../citations';
+import { validate } from '../citations';
+import type {
+  ActSource, BookSource, CaseSource, CitationMode, Source, ValidationIssue,
+} from '../citations';
 
-const renderPreview = (source: Source | undefined, mode: CitationMode = 'oscola') =>
-  render(<CitationPreview source={source} mode={mode} issues={[]} />);
+const renderPreview = (
+  source: Source,
+  mode: CitationMode = 'oscola',
+  issues: readonly ValidationIssue[] = [],
+  empty = false,
+) => render(<CitationPreview source={source} mode={mode} issues={issues} empty={empty} />);
 
 const austin: CaseSource = {
   id: 'c1',
@@ -29,9 +36,16 @@ const block = (heading: string) =>
   screen.getByRole('heading', { name: heading }).closest('section') as HTMLElement;
 
 describe('CitationPreview', () => {
-  it('prompts for input when there is no source yet', () => {
-    renderPreview(undefined);
+  // The checks are what a reader most wants before they start typing: they
+  // read as a list of what a citation of this type needs collecting.
+  it('prompts for input, and still says what is missing, before anything is typed', () => {
+    const blank: CaseSource = { id: 'c0', type: 'case', caseName: '' };
+    renderPreview(blank, 'oscola', validate(blank), true);
     expect(screen.getByText(/Fill in the form/)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Checks' })).toBeInTheDocument();
+    expect(screen.getByText(/A case needs its name/)).toBeInTheDocument();
+    // No rendered citation, because there is nothing to render yet.
+    expect(screen.queryByRole('heading', { name: 'Footnote' })).not.toBeInTheDocument();
   });
 
   it('shows footnote, bibliography entry and named-in-text form for a case', () => {

@@ -13,9 +13,11 @@ import { ruleLabel } from '../oscola/rules';
 import { CopyButton } from './CopyButton';
 
 interface Props {
-  readonly source: Source | undefined;
+  readonly source: Source;
   readonly mode: CitationMode;
   readonly issues: readonly ValidationIssue[];
+  /** Nothing typed yet: the checks still show, the rendered citation does not. */
+  readonly empty: boolean;
 }
 
 function CitationBlock({
@@ -75,11 +77,42 @@ function NameInText({ source }: { source: Source }) {
   );
 }
 
-export function CitationPreview({ source, mode, issues }: Props) {
-  if (!source) {
+/**
+ * What the source is missing, and which rule asks for it.
+ *
+ * Shown from the first render rather than once something has been typed. An
+ * empty form is exactly when a reader most wants to know what a citation of
+ * this type needs, and the panel reads as a list of what to collect.
+ */
+function Checks({ issues }: { issues: readonly ValidationIssue[] }) {
+  const errors = issues.filter((i) => i.severity === 'error');
+  const warnings = issues.filter((i) => i.severity === 'warning');
+  if (errors.length === 0 && warnings.length === 0) return null;
+
+  return (
+    <section className="issues">
+      <h3>Checks</h3>
+      <ul>
+        {[...errors, ...warnings].map((issue, i) => (
+          <li key={i} className={issue.severity}>
+            <strong>{issue.severity === 'error' ? 'Missing' : 'Check'}</strong>{' '}
+            {issue.message}
+            {/* The rule is what makes a check checkable: a reader who
+                disagrees can go and read the section it came from. */}
+            {issue.rule && <span className="rule">{ruleLabel(issue.rule)}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function CitationPreview({ source, mode, issues, empty }: Props) {
+  if (empty) {
     return (
       <div className="preview empty-preview">
         <p>Fill in the form to see how this source is cited.</p>
+        <Checks issues={issues} />
       </div>
     );
   }
@@ -135,22 +168,7 @@ export function CitationPreview({ source, mode, issues }: Props) {
         </>
       )}
 
-      {(errors.length > 0 || warnings.length > 0) && (
-        <section className="issues">
-          <h3>Checks</h3>
-          <ul>
-            {[...errors, ...warnings].map((issue, i) => (
-              <li key={i} className={issue.severity}>
-                <strong>{issue.severity === 'error' ? 'Missing' : 'Check'}</strong>{' '}
-                {issue.message}
-                {/* The rule is what makes a check checkable: a reader who
-                    disagrees can go and read the section it came from. */}
-                {issue.rule && <span className="rule">{ruleLabel(issue.rule)}</span>}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <Checks issues={issues} />
 
       {errors.length === 0 && warnings.length === 0 && (
         <p className="ok">No problems found in the fields entered.</p>

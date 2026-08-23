@@ -91,11 +91,17 @@ export default function App() {
   const editors = editorsByType[type] ?? [];
   const empty = isDraftEmpty(draft, [...authors, ...editors]);
 
+  // Built and checked whatever the form holds, including nothing. A reader
+  // should be told what a citation of this type needs before they start
+  // typing, not after — and which types did that used to depend on whether
+  // their DEFAULT_DRAFTS happened to contain a value `isDraftEmpty` ignores,
+  // which is why EU legislation and statutory instruments checked from the
+  // first render and the other eight did not.
   const source = useMemo(
-    () => (empty ? undefined : buildSource('draft', type, draft, authors, editors)),
-    [empty, type, draft, authors, editors],
+    () => buildSource('draft', type, draft, authors, editors),
+    [type, draft, authors, editors],
   );
-  const issues = useMemo(() => (source ? validate(source) : []), [source]);
+  const issues = useMemo(() => validate(source), [source]);
 
   /** Empty the form for a type, abandoning any edit in progress. */
   const resetForm = (forType: SourceType) => {
@@ -140,7 +146,7 @@ export default function App() {
   };
 
   const saveSource = () => {
-    if (!source) return;
+    if (empty) return;
     if (editingId) {
       setSaved((current) =>
         current.map((item) => (item.id === editingId ? { ...source, id: editingId } : item)),
@@ -244,10 +250,10 @@ export default function App() {
         </div>
 
         <div className="column">
-          <CitationPreview source={source} mode={mode} issues={issues} />
+          <CitationPreview source={source} mode={mode} issues={issues} empty={empty} />
 
           <div className="save">
-            <button type="button" onClick={saveSource} disabled={!source || hasErrors}>
+            <button type="button" onClick={saveSource} disabled={empty || hasErrors}>
               {editingId ? 'Save changes' : 'Add to sources'}
             </button>
             {editingId && (
