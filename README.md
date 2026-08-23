@@ -273,6 +273,15 @@ moment the accent is the light half of the pair.
 OU module material has no OSCOLA equivalent, so it is hidden in OSCOLA mode and
 the OSCOLA formatter throws rather than inventing a form for it.
 
+It carries one field nothing else does: **Section cited**. The OU's quick guide
+asks that "in-text citations to your online module units should include the
+section number", and prints `The Open University (2023a, 5.1)`. The section
+takes no `p.` — an online unit is not paginated, so a page prefix would claim
+something the source does not have — and it appears in the in-text citation
+only, because the guide's reference-list template has no place for it. A page
+passed explicitly still wins, so a module item cited by page before the field
+existed does not change underneath it.
+
 ## The OU dual scheme
 
 Sourced from the OU Library's own public guidance, not from Cite Them Right
@@ -504,8 +513,11 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 **Cite Them Right**
 
 - **Same author, same year** — CTR distinguishes these with a letter after the
-  date (`2014a`, `2014b`), but the OU's public guidance does not show the form,
-  so Themis flags the clash and leaves the fix to the student.
+  date (`2014a`, `2014b`). The OU's law-module quick guide does show the form —
+  its in-text example is `The Open University (2023a, 5.1)` — so the warning
+  names it. Themis still does not assign the letters: they run in the order the
+  reference list is read, and handing them out silently would renumber a
+  finished essay the moment one more source was added.
 
 - **`(eds)` for several editors** — the OU guide prints only the singular
   `(ed.)`, so the plural is inferred. Worth checking against CTR itself.

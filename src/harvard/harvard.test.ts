@@ -103,6 +103,47 @@ describe('Harvard reference list — Cite Them Right', () => {
     );
   });
 
+  /**
+   * "In-text citations to your online module units should include the section
+   * number (e.g. The Open University (2023a, 5.1))" — the OU's quick guide to
+   * Cite Them Right for law modules. The letter after the year is the
+   * disambiguation the student adds; the section is what these assert.
+   */
+  describe('a module unit is cited to its section, not its page', () => {
+    const unit = (section?: string): OuModuleMaterialSource => ({
+      id: 'ou', type: 'ouModuleMaterial',
+      authors: [],
+      year: '2023',
+      itemTitle: 'Unit 4: Rules and regulations',
+      moduleCode: 'W376',
+      moduleTitle: 'Law for life',
+      url: 'https://learn2.open.ac.uk/mod/oucontent/view.php?id=XXXXXXXX',
+      accessDate: '2032-03-07',
+      section,
+    });
+
+    it('puts the section after the year, with no p. before it', () => {
+      expect(cite(unit('5.1'), { form: 'narrative' })).toBe('The Open University (2023, 5.1)');
+      expect(cite(unit('5.1'))).toBe('(The Open University, 2023, 5.1)');
+    });
+
+    it('leaves the citation alone where no section is cited', () => {
+      expect(cite(unit(), { form: 'narrative' })).toBe('The Open University (2023)');
+    });
+
+    // The guide's reference-list template has no place for it.
+    it('keeps the section out of the reference list entry', () => {
+      expect(ref(unit('5.1'))).toBe(ref(unit()));
+      expect(ref(unit('5.1'))).not.toContain('5.1');
+    });
+
+    // A page passed explicitly still wins, so anything citing a module item by
+    // page before the field existed does not change underneath it.
+    it('still honours an explicit page reference', () => {
+      expect(cite(unit('5.1'), { pages: '12' })).toBe('(The Open University, 2023, p. 12)');
+    });
+  });
+
   it('cites an edition later than the first', () => {
     expect(ref({ ...bell, edition: '3' })).toBe(
       'Bell, J. (2014) Doing your research project. 3rd edn. Open University Press.',

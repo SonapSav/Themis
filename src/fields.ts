@@ -243,6 +243,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'moduleTitle', label: 'Module title', placeholder: 'Criminal law and the courts' },
     { key: 'url', label: 'Address on the module website', placeholder: 'https://learn2.open.ac.uk/mod/oucontent/view.php?id=…' },
     { key: 'accessDate', label: 'Date accessed', control: 'date' },
+    { key: 'section', label: 'Section cited', placeholder: '5.1', hint: 'In-text only — a module unit is cited to a section, not a page.' },
   ],
   website: [
     { key: 'title', label: 'Page title', placeholder: 'Virtual Friend Fires Employee', hint: 'Single quotation marks are added automatically.' },
@@ -562,6 +563,7 @@ export function buildSource(
         moduleTitle: req(draft, 'moduleTitle'),
         url: req(draft, 'url'),
         accessDate: req(draft, 'accessDate'),
+        section: opt(draft, 'section'),
       };
       return source;
     }
@@ -769,6 +771,7 @@ export function toDraft(source: Source): DraftState {
       set(draft, 'moduleTitle', source.moduleTitle);
       set(draft, 'url', source.url);
       set(draft, 'accessDate', source.accessDate);
+      set(draft, 'section', source.section);
       break;
   }
 

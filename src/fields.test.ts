@@ -143,6 +143,7 @@ const sources: Record<string, Source> = {
     id: 's13', type: 'ouModuleMaterial', authors: [], year: '2025',
     itemTitle: 'Unit 4: Rules and regulations', moduleCode: 'W111',
     moduleTitle: 'Criminal law', url: 'https://learn2.open.ac.uk/x', accessDate: '2026-03-07',
+    section: '5.1',
   },
 };
 

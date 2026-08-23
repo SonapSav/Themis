@@ -424,6 +424,15 @@ export interface OuModuleMaterialSource extends SourceBase {
   /** VLE address. */
   readonly url: string;
   readonly accessDate: OscolaDate;
+  /**
+   * The section of the unit being cited, e.g. "5.1".
+   *
+   * In-text only. The OU's quick guide for law modules asks for it — "In-text
+   * citations to your online module units should include the section number
+   * (e.g. The Open University (2023a, 5.1))" — and its reference-list template
+   * has no place for it, so it is not part of the full reference.
+   */
+  readonly section?: string;
 }
 
 export type Source =

@@ -94,6 +94,27 @@ export interface InTextOptions {
 }
 
 /**
+ * What follows the year in an in-text citation.
+ *
+ * A page reference carries p. or pp.; a module unit's section number carries
+ * neither. The OU's guide prints `The Open University (2023a, 5.1)`, where 5.1
+ * is a section of the unit rather than a page of it — an online unit is not
+ * paginated, so a page prefix would claim something the source does not have.
+ *
+ * An explicit page passed by a caller still wins, so nothing that cited a
+ * module item by page before this field existed changes underneath it.
+ */
+function pinpointSuffix(source: HarvardSource, options: InTextOptions): string {
+  const pages = formatPages(options.pages);
+  if (pages) return `, ${pages}`;
+  if (source.type === 'ouModuleMaterial') {
+    const section = source.section?.trim();
+    if (section) return `, ${section}`;
+  }
+  return '';
+}
+
+/**
  * Cite Them Right Harvard in-text citation. Unlike OSCOLA — which forbids
  * in-text citations outright — Harvard puts author and date in the body of the
  * text, and these DO count towards an OU word limit.
@@ -106,8 +127,7 @@ export function formatInTextCitation(
   const name: Part[] =
     authors.length > 0 ? formatAuthorsInText(authors) : [italic(titleFor(source).trim())];
   const year = yearOf(source);
-  const pages = formatPages(options.pages);
-  const suffix = pages ? `, ${pages}` : '';
+  const suffix = pinpointSuffix(source, options);
 
   if (options.form === 'narrative') {
     return segments(...name, ` (${year}${suffix})`);
