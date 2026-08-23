@@ -516,12 +516,25 @@ Three changes were substantive rather than editorial.
   had no row for it and Themis used it as its example of a court the guide does
   not list.
 
-Known to have changed and **not** carried across yet: §2.1.5 now gives the
-court identifiers as `KBD`, `QBD`, `Ch D` and `Fam` where the 4th edition had
-`QB`, `Ch` and `F`; §2.5.3 adds the CrPR and FPR to the rules of court; and the
-5th edition has whole source types Themis has never had — assimilated EU law
-(§2.4.9), ebooks (§3.2.2), dictionaries (§3.2.8), book reviews (§3.5) and
-generative AI (§3.7.13).
+Two smaller changes are carried across too.
+
+- **The High Court identifiers gained a D.** §2.1.5 gives them as `KBD`, `QBD`,
+  `Ch D` and `Fam`, where the 4th edition had `QB`, `Ch` and `F`. All three old
+  forms are warned about rather than rewritten — and the warning is on the
+  bracketed court only, because the short forms are still exactly right as the
+  *division* inside a medium neutral citation, `[2006] EWHC 407 (QB)`.
+- **The CrPR and FPR joined the rules of court.** §2.5.3 cites them by name
+  alone like the CPR. The 5th edition dropped the 4th's sentence about omitting
+  "r" and "rr", so that check is now read off its examples instead: `CPR
+  5.2(1)(b)`, `CrPR 8.4` and `FPR 15.2` take a bare number, while `RSC Ord 24 r
+  14A` and `CCR Ord 17 r 11` keep theirs. Practice directions changed shape as
+  well, from the 4th edition's `6A PD` to `CPR PD 7`.
+
+Known to have changed and **not** carried across: the 5th edition has whole
+source types Themis has never had — assimilated EU law (§2.4.9), ebooks
+(§3.2.2), dictionaries (§3.2.8), book reviews (§3.5), podcasts (§3.7.2), theses
+(§3.7.6) and generative AI (§3.7.13). §4.4.2's Advocate General opinions are
+also unimplemented, as they were under the 4th edition.
 
 ## Where the data comes from
 

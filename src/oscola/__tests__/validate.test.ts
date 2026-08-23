@@ -484,6 +484,47 @@ describe('every check names the rule it comes from', () => {
   });
 });
 
+describe('what the 5th edition changed (2.1.5, 2.5.3)', () => {
+  // 2.1.5 gives the High Court divisions as KBD, QBD, Ch D and Fam. The 4th
+  // edition's QB, Ch and F are still plausible things to type.
+  it('names the new form of a superseded court identifier', () => {
+    const withCourt = (court: string): CaseSource => ({
+      ...modernCase, neutral: undefined,
+      report: { year: '1990', yearFormat: 'square', abbreviation: 'QB', firstPage: '523' },
+      court,
+    });
+    expect(messages(withCourt('QB')).join(' ')).toMatch(/gives this division as "QBD"/);
+    expect(messages(withCourt('Ch')).join(' ')).toMatch(/"Ch D"/);
+    expect(messages(withCourt('F')).join(' ')).toMatch(/"Fam"/);
+    expect(fields(withCourt('QBD'), 'warning')).not.toContain('court');
+    expect(fields(withCourt('HL'), 'warning')).not.toContain('court');
+  });
+
+  // The same three letters are still the right division inside a medium
+  // neutral citation, so the warning must not fire there.
+  it('leaves the division inside a medium neutral citation alone', () => {
+    const source: CaseSource = {
+      ...modernCase, neutral: { year: '2006', court: 'EWHC', number: '407', division: 'QB' },
+    };
+    expect(validate(source)).toEqual([]);
+  });
+
+  // 2.5.3 added the CrPR and FPR to the rules cited by name alone, and the
+  // 5th edition's examples give them a bare number: `CrPR 8.4`, `FPR 15.2`.
+  it('applies the bare-number pinpoint to the CrPR and FPR as well as the CPR', () => {
+    const rulesOf = (name: string, provision: string): StatutoryInstrumentSource => ({
+      id: 'si1', type: 'statutoryInstrument', numbering: 'rulesOfCourt',
+      name, year: '', siNumber: '', provision,
+    });
+    expect(fields(rulesOf('CrPR', 'r 8.4'), 'warning')).toContain('provision');
+    expect(fields(rulesOf('FPR', 'r 15.2'), 'warning')).toContain('provision');
+    expect(messages(rulesOf('CrPR', 'r 8.4')).join(' ')).toMatch(/CrPR pinpoints/);
+    // The RSC and CCR keep their "r", so neither is flagged.
+    expect(fields(rulesOf('RSC', 'Ord 24 r 14A'), 'warning')).not.toContain('provision');
+    expect(fields(rulesOf('CCR', 'Ord 17 r 11'), 'warning')).not.toContain('provision');
+  });
+});
+
 describe('the checks reach the types that had least (2.1.3, 2.4, 2.6.2)', () => {
   it('names each part of a neutral citation that is missing (2.1.3)', () => {
     const partial: CaseSource = {

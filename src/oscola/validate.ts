@@ -112,6 +112,34 @@ function courtCodeIssues(field: string, neutral: NeutralCitation | undefined): r
 }
 
 /**
+ * OSCOLA 2.1.5 gives the court identifiers as "'HL' for the House of Lords,
+ * 'PC' for the Privy Council, 'CA' for the Court of Appeal, and 'KBD', 'QBD',
+ * 'Ch D' and 'Fam' for the divisions of the High Court".
+ *
+ * The three High Court forms all changed in the 5th edition, and each old form
+ * is still a plausible thing to type — `(QB)` is what the 4th edition printed,
+ * and remains the right *division* inside a medium neutral citation. So this is
+ * a warning on the bracketed court alone, never on the division.
+ */
+const SUPERSEDED_COURTS: ReadonlyMap<string, string> = new Map([
+  ['QB', 'QBD'],
+  ['Ch', 'Ch D'],
+  ['F', 'Fam'],
+]);
+
+function courtIdentifierIssues(field: string, court: string | undefined): readonly ValidationIssue[] {
+  const now = SUPERSEDED_COURTS.get(court?.trim() ?? '');
+  if (!now) return [];
+  return [
+    warning(
+      field,
+      `The 5th edition gives this division as "${now}", not "${court!.trim()}". The shorter form is still right inside a medium neutral citation, e.g. "[2006] EWHC 407 (QB)".`,
+      '2.1.5',
+    ),
+  ];
+}
+
+/**
  * OSCOLA 3.1.4: include "http://" only where the address does not begin with
  * "www". The guide's own examples are <www.nakedlaw.com/2009/05/index.html>
  * and <http://ejlt.org/article/view/17>. The URL is never rewritten silently.
@@ -329,6 +357,9 @@ export function validate(source: Source): readonly ValidationIssue[] {
       issues.push(...fullStopIssues('court', source.court));
       issues.push(...fullStopIssues('history.report.abbreviation', source.history?.report?.abbreviation));
       issues.push(...fullStopIssues('history.court', source.history?.court));
+      // 2.1.5: the High Court identifiers gained a D in the 5th edition.
+      issues.push(...courtIdentifierIssues('court', source.court));
+      issues.push(...courtIdentifierIssues('history.court', source.history?.court));
       // 2.1.2 and 2.1.8: the clause after the primary citation.
       if (source.history) {
         const { disposition, subNom, caseName, neutral, report, court } = source.history;
@@ -575,7 +606,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
           issues.push(
             error(
               'name',
-              'Give the rules, e.g. "CPR", "RSC", "CCR", or "6A PD" for a practice direction. The rules of court are cited by name and pinpoint alone.',
+              'Give the rules — CPR, RSC, CCR, CrPR or FPR — or a practice direction as "CPR PD 7". They are cited by name and pinpoint alone, without their year or SI number.',
               '2.5.3',
             ),
           );
@@ -589,15 +620,19 @@ export function validate(source: Source): readonly ValidationIssue[] {
             ),
           );
         }
-        // 2.5.2: "in the case of the Civil Procedure Rules, omit the
-        // abbreviations 'r' and 'rr'". Stated for the CPR alone — the RSC and
-        // CCR examples keep theirs, as in `RSC Ord 24, r 14A`.
-        if (/^CPR\b/i.test(source.name.trim()) && /^rr?\b\.?/i.test(source.provision?.trim() ?? '')) {
+        // The 5th edition dropped the 4th's sentence about omitting "r" and
+        // "rr", so this is read off its examples instead: `CPR 5.2(1)(b)`,
+        // `CrPR 8.4` and `FPR 15.2` carry no abbreviation, while `RSC Ord 24 r
+        // 14A` and `CCR Ord 17 r 11` keep theirs.
+        if (
+          /^(CPR|CrPR|FPR)\b/i.test(source.name.trim()) &&
+          /^rr?\b\.?/i.test(source.provision?.trim() ?? '')
+        ) {
           issues.push(
             warning(
               'provision',
-              'CPR pinpoints omit "r" and "rr": write "5.2(1)(b)", not "r 5.2(1)(b)".',
-              '2.5.2',
+              `${source.name.trim().split(/\s+/)[0]} pinpoints are written as a bare number: "5.2(1)(b)", not "r 5.2(1)(b)". The RSC and CCR keep their "r".`,
+              '2.5.3',
             ),
           );
         }

@@ -180,13 +180,16 @@ describe('cases — pinpoints', () => {
   it('separates a page pinpoint from a bracketed court with a space (quick reference guide)', () => {
     const source = caseSource({
       caseName: 'R v Leeds County Court, ex p Morris',
-      report: { year: '1990', yearFormat: 'square', abbreviation: 'QB', firstPage: '523' },
-      court: 'QB',
+      report: { year: '1990', yearFormat: 'square', volume: '1', abbreviation: 'QB', firstPage: '523' },
+      court: 'QBD',
       pinpoint: { kind: 'page', value: '530–31' },
     });
 
+    // 5th edn §2.1.5, verbatim. The 4th edition printed the same case as
+    // `[1990] QB 523 (QB)`: the court identifier for the divisions of the High
+    // Court gained a D.
     expect(footnote(source)).toBe(
-      'R v Leeds County Court, ex p Morris [1990] QB 523 (QB) 530–31.',
+      'R v Leeds County Court, ex p Morris [1990] 1 QB 523 (QBD) 530–31.',
     );
   });
 
