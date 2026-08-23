@@ -1,4 +1,5 @@
-import type { Source } from '../model/types';
+import type { NeutralCitation, Source } from '../model/types';
+import { COURT_CODES, DIVISIONS_BY_CODE, codeByLooseMatch } from './courts';
 
 export type IssueSeverity = 'error' | 'warning';
 
@@ -22,6 +23,77 @@ const warning = (field: string, message: string): ValidationIssue => ({
 });
 
 const blank = (value: string | undefined): boolean => !value || value.trim() === '';
+
+/**
+ * OSCOLA 4.2.1, in terms: "In OSCOLA, abbreviations do not have full stops."
+ *
+ * Flagged rather than stripped. `A.C.` is not rewritten to `AC`, because
+ * silently editing what a student typed is how a tool stops being checkable —
+ * and because the same field legitimately carries `Lloyd's Rep` and
+ * `Cr App R (S)`, neither of which anyone should have to trust an autocorrect
+ * with.
+ */
+function fullStopIssues(field: string, value: string | undefined): readonly ValidationIssue[] {
+  const trimmed = value?.trim();
+  if (!trimmed || !trimmed.includes('.')) return [];
+  return [
+    warning(
+      field,
+      `OSCOLA abbreviations take no full stops (4.2.1), so "${trimmed}" would normally be "${trimmed.replace(/\./g, '')}".`,
+    ),
+  ];
+}
+
+/**
+ * OSCOLA 4.1 lists every court that issues a neutral citation, and 2.1.3 adds
+ * that "neutral citations from the High Court do include the division in
+ * brackets after the judgment number".
+ *
+ * Every issue here is a warning. 4.1 is the 2012 list: courts created since,
+ * and the Upper Tribunal chambers added later, are genuinely absent from it, so
+ * an unrecognised code means "not in OSCOLA's table", never "wrong".
+ */
+function courtCodeIssues(field: string, neutral: NeutralCitation | undefined): readonly ValidationIssue[] {
+  const code = neutral?.court?.trim();
+  if (!neutral || !code) return [];
+  const issues: ValidationIssue[] = [];
+  const division = neutral.division?.trim();
+
+  if (!COURT_CODES.has(code)) {
+    const loose = codeByLooseMatch(code);
+    issues.push(
+      warning(
+        `${field}.court`,
+        loose
+          ? `Court codes are capitalised as in OSCOLA 4.1: "${loose}", not "${code}".`
+          : `"${code}" is not in OSCOLA 4.1's list of neutral citation courts. Check it, or ignore this if the court postdates the 4th edition.`,
+      ),
+    );
+    return issues;
+  }
+
+  const divisions = DIVISIONS_BY_CODE.get(code) ?? [];
+  if (divisions.length > 0 && !division) {
+    issues.push(
+      warning(
+        `${field}.division`,
+        `${code} citations carry a division in brackets (2.1.3): ${divisions.join(', ')}.`,
+      ),
+    );
+  } else if (divisions.length > 0 && division && !divisions.includes(division)) {
+    issues.push(
+      warning(
+        `${field}.division`,
+        `OSCOLA 4.1 lists ${divisions.join(', ')} for ${code}, not "${division}".`,
+      ),
+    );
+  } else if (divisions.length === 0 && division) {
+    issues.push(
+      warning(`${field}.division`, `${code} citations take no division in brackets (4.1).`),
+    );
+  }
+  return issues;
+}
 
 /**
  * OSCOLA 3.1.4: include "http://" only where the address does not begin with
@@ -119,6 +191,14 @@ export function validate(source: Source): readonly ValidationIssue[] {
           issues.push(error('neutral2.number', 'A neutral citation needs a judgment number.'));
         }
       }
+      // 4.1 and 4.2.1: the court codes and the no-full-stop rule.
+      issues.push(...courtCodeIssues('neutral', source.neutral));
+      issues.push(...courtCodeIssues('neutral2', source.furtherNeutrals?.[0]));
+      issues.push(...courtCodeIssues('history.neutral', source.history?.neutral));
+      issues.push(...fullStopIssues('report.abbreviation', source.report?.abbreviation));
+      issues.push(...fullStopIssues('court', source.court));
+      issues.push(...fullStopIssues('history.report.abbreviation', source.history?.report?.abbreviation));
+      issues.push(...fullStopIssues('history.court', source.history?.court));
       // 2.1.2 and 2.1.8: the clause after the primary citation.
       if (source.history) {
         const { disposition, subNom, caseName, neutral, report, court } = source.history;
@@ -184,6 +264,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
         );
       }
       if (blank(source.journal)) issues.push(error('journal', 'A journal article needs the journal abbreviation, e.g. "MLR".'));
+      issues.push(...fullStopIssues('journal', source.journal));
       if (blank(source.year)) issues.push(error('year', 'A journal article needs a year.'));
       // 3.3.4: online journals "may lack some of the publication elements (for
       // example, many do not include page numbers)"; 3.3.3 says to omit an
@@ -282,6 +363,8 @@ export function validate(source: Source): readonly ValidationIssue[] {
       if (blank(source.caseNumber)) {
         issues.push(error('caseNumber', 'An EU case needs its registration number, e.g. "C-176/03".'));
       }
+      issues.push(...fullStopIssues('report.abbreviation', source.report?.abbreviation));
+      issues.push(...fullStopIssues('court', source.court));
       // 2.6.2: a case not yet reported gives the court and date instead.
       if (!source.report && blank(source.court) && blank(source.judgmentDate)) {
         issues.push(

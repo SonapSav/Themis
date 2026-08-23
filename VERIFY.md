@@ -194,6 +194,14 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
       `… [2006] EMLR 23 [12], affd [2007] EWCA Civ 721`. No example in the guide
       shows a pinpoint and a subsequent history together, and there is no way
       yet to pinpoint the *later* decision.
+- [ ] **How noisy the two new checks are in real use.** The no-full-stop rule
+      (§4.2.1) and the court-code table (§4.1) both warn rather than block, and
+      neither rewrites what you typed. §4.1 is the **2012** list, so a court
+      created since — `EWFC`, later Upper Tribunal chambers — will warn
+      correctly-but-unhelpfully. If that gets annoying in practice, say so: a
+      warning students learn to ignore is worse than no warning, and that
+      judgement decides whether the report-series list is worth extracting at
+      all.
 - [ ] **A CPR pinpoint written `r 5.2` warns rather than being corrected.**
       §2.5.3 says to omit `r` and `rr` for the CPR, but Thetis never silently
       rewrites what you typed. The warning is stated for the CPR only; the RSC

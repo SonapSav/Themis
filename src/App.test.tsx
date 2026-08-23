@@ -884,6 +884,45 @@ describe('editing a saved source', () => {
   });
 });
 
+describe('abbreviation and court-code checks', () => {
+  it('flags a report series written with full stops, without rewriting it (4.2.1)', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Case name'), 'Page v Smith');
+    const report = group(/^Law report$/);
+    await user.type(report.getByLabelText('Year'), '1996');
+    await user.type(report.getByLabelText('Report series'), 'A.C.');
+    await user.type(report.getByLabelText('First page'), '155');
+
+    expect(screen.getAllByText(/would normally be "AC"/i).length).toBeGreaterThan(0);
+    // Flagged, not corrected: the preview still shows what was typed.
+    expect(citation('Footnote')).toContain('[1996] A.C. 155');
+    // A warning never blocks adding the source.
+    expect(screen.getByRole('button', { name: 'Add to sources' })).toBeEnabled();
+  });
+
+  it('asks a High Court neutral citation for its division (4.1)', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Case name'), 'Bunt v Tilley');
+    const neutral = group(/^Neutral citation$/);
+    await user.type(neutral.getByLabelText('Year'), '2006');
+    await user.type(neutral.getByLabelText('Court'), 'EWHC');
+    await user.type(neutral.getByLabelText('Judgment number'), '407');
+
+    expect(screen.getAllByText(/carry a division in brackets/i).length).toBeGreaterThan(0);
+  });
+
+  it('names the right capitalisation for a miscased court code', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Case name'), 'Corr v IBC Vehicles Ltd');
+    const neutral = group(/^Neutral citation$/);
+    await user.type(neutral.getByLabelText('Year'), '2008');
+    await user.type(neutral.getByLabelText('Court'), 'ukhl');
+    await user.type(neutral.getByLabelText('Judgment number'), '13');
+
+    expect(screen.getAllByText(/"UKHL", not "ukhl"/).length).toBeGreaterThan(0);
+  });
+});
+
 describe('further neutral citations and later history', () => {
   it('lists a second neutral citation before the report (2.1.3)', async () => {
     const user = setup();

@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 412 tests
+npm test           # 429 tests
 npm run typecheck
 ```
 
@@ -319,9 +319,14 @@ Nothing in the suite is invented.
 | **URLs** | §3.1.4: `http://` is included only where the address does not begin with `www`. The guide's own example is `<www.nakedlaw.com/2009/05/index.html>`. Entering a redundant `http://www.` raises a warning; the URL is never rewritten silently. |
 | **Four or more authors** | Reduced to the first plus "and others", in both footnote and bibliography. |
 | **Editions** | First editions are not cited, so `1` renders nothing. Later editions render `7th edn`. |
+| **No full stops in abbreviations** | §4.2.1, in terms: "In OSCOLA, abbreviations do not have full stops." `A.C.` is flagged with what it would normally be — `AC` — and **never rewritten**, because the same field legitimately carries `Lloyd's Rep` and `Cr App R (S)`. Applied to report series, journal abbreviations and court codes. |
+| **Neutral citation courts** | §4.1's appendix is the table: 26 rows, 17 codes. An unlisted code warns *softly* — §4.1 is the 2012 list, so a court created since is genuinely absent rather than wrong. A miscased code is named rather than merely rejected (`"UKHL", not "ukhl"`). §2.1.3's rule that High Court citations carry a division is checked against the eight §4.1 lists for `EWHC`, and a division given to a court that takes none is flagged too. |
 | **Quotation marks** | Straight single quotes around article and web page titles. Titles are stored and emitted verbatim — §3.1.2 wants major words capitalised, but auto-capitalising would silently rewrite the student's source, so that is left to them. |
 
 ## Validation
+
+`src/oscola/courts.ts` holds §4.1's court table, generated from the guide's own
+appendix rather than typed from memory — see *Where the data comes from* below.
 
 `validate(source)` returns `error` issues (the citation cannot be correct as it
 stands) and `warning` issues (it will render, but departs from OSCOLA's
@@ -332,6 +337,35 @@ field and block adding the source; the panel lists both.
 The failure mode for a tool like this is a silent citation error a student does
 not catch, so the checks are deliberately noisy about the ambiguous cases rather
 than guessing.
+
+## Where the data comes from
+
+`src/oscola/courts.ts` is generated from OSCOLA §4.1's appendix, and how it was
+generated matters more than it looks.
+
+The appendix is a two-column table. Extracting it from the PDF's linear text
+stream **silently mis-pairs**: a court or report name that wraps to a second
+line shifts every pair after it. A first attempt at the neighbouring §4.2.1
+produced `Road Traffic Reports` against `RPC`, which reads perfectly plausibly
+and is wrong — the answer is `RTR`. Two of eight known-good anchors survived.
+
+That failure mode is worse here than anywhere else in the project. Every other
+rule is a formatter that is wrong only if the rule was misread. This table is
+used to tell a student their citation is wrong, so a bad row does not merely
+produce a bad citation — it overrides a correct one. **A wrong table is worse
+than no table.**
+
+So §4.1 is extracted by anchoring each row on the `[Year] CODE number` pattern
+rather than on column alignment, which is immune to wrapped names, and
+`courts.test.ts` asserts all 26 rows against a transcription of the printed
+guide. A regeneration that corrupts the table fails the suite.
+
+§4.2.1's report and journal abbreviations are **not** included for the same
+reason: they need positional extraction from the PDF's coordinates to be
+trustworthy, and until that exists an unrecognised report series is not flagged
+at all. §4.2.1 itself says the list is not exhaustive and points to the
+[Cardiff Index of Legal Abbreviations](http://www.legalabbrevs.cardiff.ac.uk),
+which is a searchable database rather than a list, so it cannot be bundled.
 
 ## Known gaps
 
@@ -373,6 +407,14 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
   (`(Ministry of Justice Research Series 1/09, 2009)`) has none. Validation
   currently treats a missing publisher as an error; such reports belong to
   §3.4, outside these five types.
+
+**Abbreviations**
+
+- **Report and journal series are not checked** against §4.2.1's list, only for
+  full stops. See *Where the data comes from*: the list needs positional PDF
+  extraction before it can be trusted, and a wrong entry would be worse than
+  none. §4.2.2–4.2.4 — historical works, books of authority, and case-name
+  abbreviations such as `AG` and `DPP` — are untouched for the same reason.
 
 **Cases**
 

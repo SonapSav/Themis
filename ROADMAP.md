@@ -19,7 +19,7 @@ For whoever picks this up next, including a future session of me.
 | 3. Word output | **Working end to end** — a `.docx` whose footnote markers copy into a student's own document and renumber, confirmed in Word on 23 August 2026; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-412 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+429 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -135,13 +135,27 @@ collapsible sections are worth a look before more are added.
 
 Each needs a field, a formatter branch, a verbatim test, and a README row.
 
-### 2. Abbreviation lookup — medium, high value against silent errors
+### 2. Abbreviation lookup — half done
 
-A table of law report and journal abbreviations, so the tool can warn on `A.C.`
-for `AC`, on an unknown report series, or on a court code that is not a real
-neutral-citation court. The Cardiff Index to Legal Abbreviations is the standard
-reference. This is the main remaining defence against a citation that looks
-right and is not — but it is a data-gathering job before it is a coding one.
+**Done:** the no-full-stop rule (§4.2.1 states it outright) and the neutral
+citation court codes (§4.1's appendix, 26 rows, generated and anchor-tested).
+Both are warnings; neither rewrites what the student typed.
+
+**Not done, and blocked on extraction:** the report and journal series list in
+§4.2.1, so an unknown series is not flagged. The blocker is not the coding, it
+is getting the table out of the PDF correctly — see the README's *Where the data
+comes from*. The linear text stream mis-pairs the two-column table silently, and
+a wrong row here overrides a correct citation rather than merely producing a bad
+one. Doing it properly means extracting with the PDF's x/y coordinates from the
+`Tm`/`Td` operators so column and row membership are known, then anchor-testing
+every row before shipping any of them.
+
+The Cardiff Index is **not** the answer for bundling: §4.2.1 positions it as the
+fallback for what OSCOLA does not list, and it is a searchable database rather
+than a downloadable list. Link to it; do not scrape it.
+
+Before doing more here, watch how noisy the two shipped checks are in real use.
+A warning students learn to ignore is worse than no warning.
 
 ### 3. The Office.js add-in — demoted, and no longer the answer
 

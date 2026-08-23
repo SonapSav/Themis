@@ -3,6 +3,8 @@ import { validate } from '../validate';
 import type { CaseSource, JournalArticleSource, Source, StatutoryInstrumentSource } from '../../model/types';
 import { person } from './helpers';
 
+const messages = (source: Source) => validate(source).map((issue) => issue.message);
+
 const fields = (source: Source, severity?: 'error' | 'warning') =>
   validate(source)
     .filter((issue) => !severity || issue.severity === severity)
@@ -350,5 +352,85 @@ describe('validation — later history (2.1.2, 2.1.8)', () => {
       furtherNeutrals: [{ year: '2003', court: 'EWCA Civ', number: '' }],
     };
     expect(fields(source, 'error')).toContain('neutral2.number');
+  });
+});
+
+describe('abbreviations take no full stops (4.2.1)', () => {
+  it('flags a report series written with stops, and says what it would be', () => {
+    const source: Source = { ...modernCase, neutral: undefined,
+      report: { year: '1996', yearFormat: 'square', abbreviation: 'A.C.', firstPage: '155' }, court: 'HL' };
+    expect(messages(source)).toContain(
+      'OSCOLA abbreviations take no full stops (4.2.1), so "A.C." would normally be "AC".',
+    );
+    // Flagged, never rewritten: the citation still renders what was typed.
+    expect(fields(source, 'error')).toEqual([]);
+  });
+
+  it('flags a journal abbreviation the same way', () => {
+    const source: Source = {
+      id: 'j1', type: 'journalArticle', authors: [person('Paul', 'Craig')],
+      title: 'Theory', year: '2005', volume: '72', journal: 'M.L.R.', firstPage: '440',
+    };
+    expect(fields(source, 'warning')).toContain('journal');
+  });
+
+  it('leaves an abbreviation that is already right alone', () => {
+    const source: Source = { ...modernCase, neutral: undefined,
+      report: { year: '1996', yearFormat: 'square', abbreviation: 'Cr App R (S)', firstPage: '155' }, court: 'HL' };
+    expect(fields(source, 'warning')).not.toContain('report.abbreviation');
+  });
+});
+
+describe('neutral citation court codes (4.1)', () => {
+  const withNeutral = (court: string, division?: string): Source => ({
+    ...modernCase,
+    neutral: { year: '2008', court, number: '13', division },
+  });
+
+  it('accepts every code the guide lists', () => {
+    expect(validate(withNeutral('UKSC'))).toEqual([]);
+    expect(validate(withNeutral('EWCA Civ'))).toEqual([]);
+    expect(validate(withNeutral('EWHC', 'QB'))).toEqual([]);
+    expect(validate(withNeutral('UKFTT', 'SEC'))).toEqual([]);
+  });
+
+  it('names the right capitalisation rather than just rejecting', () => {
+    expect(messages(withNeutral('ewhc', 'QB'))).toContain(
+      'Court codes are capitalised as in OSCOLA 4.1: "EWHC", not "ewhc".',
+    );
+  });
+
+  // 4.1 is the 2012 list, so "unknown" cannot mean "wrong".
+  it('warns softly about a code the 4th edition does not have', () => {
+    expect(fields(withNeutral('EWFC'), 'warning')).toContain('neutral.court');
+    expect(fields(withNeutral('EWFC'), 'error')).toEqual([]);
+    expect(messages(withNeutral('EWFC')).join(' ')).toMatch(/postdates the 4th edition/);
+  });
+
+  // 2.1.3: High Court neutral citations carry the division in brackets.
+  it('asks for a division where the court takes one', () => {
+    expect(fields(withNeutral('EWHC'), 'warning')).toContain('neutral.division');
+    expect(messages(withNeutral('EWHC')).join(' ')).toMatch(/Ch, Fam, QB, Admin/);
+  });
+
+  it('rejects a division that is not listed for that court', () => {
+    expect(messages(withNeutral('EWHC', 'Costs'))).toContain(
+      'OSCOLA 4.1 lists Ch, Fam, QB, Admin, Admlty, Comm, Pat, TCC for EWHC, not "Costs".',
+    );
+  });
+
+  it('says so when a division is given to a court that takes none', () => {
+    expect(messages(withNeutral('UKSC', 'QB'))).toContain(
+      'UKSC citations take no division in brackets (4.1).',
+    );
+  });
+
+  it('checks a further neutral citation and a later one too', () => {
+    expect(
+      fields({ ...modernCase, furtherNeutrals: [{ year: '2003', court: 'ewca civ', number: '70' }] }, 'warning'),
+    ).toContain('neutral2.court');
+    expect(
+      fields({ ...modernCase, history: { disposition: 'affd', neutral: { year: '2007', court: 'EWHC', number: '721' } } }, 'warning'),
+    ).toContain('history.neutral.division');
   });
 });
