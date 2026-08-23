@@ -1,25 +1,17 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Thetis">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" role="img" aria-label="Thetis">
   <title>Thetis</title>
+  <!--
+    "balance" from Google Material Symbols (Outlined), unmodified path.
+    Source: https://github.com/google/material-design-icons — Apache License 2.0.
+    Changed from the original: fill colours added below; the icon as published
+    declares no fill and would render black on a dark tab strip.
+  -->
   <style>
     /* Ink follows the app's accent, lightened where the tab strip is dark. */
-    .ink { stroke: #7a3b2e; fill: none; }
-    .solid { fill: #7a3b2e; }
+    .ink { fill: #7a3b2e; }
     @media (prefers-color-scheme: dark) {
-      .ink { stroke: #e0a08d; }
-      .solid { fill: #e0a08d; }
+      .ink { fill: #e0a08d; }
     }
   </style>
-  <g class="ink" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <!-- beam, post and foot -->
-    <path d="M6 11h20" />
-    <path d="M16 8.6v17.4" />
-    <path d="M10.5 26h11" />
-    <!-- hangers -->
-    <path d="M6 11v3" />
-    <path d="M26 11v3" />
-    <!-- pans -->
-    <path d="M2 14a4 3 0 0 0 8 0" />
-    <path d="M22 14a4 3 0 0 0 8 0" />
-  </g>
-  <circle class="solid" cx="16" cy="6.6" r="1.9" />
+  <path class="ink" d="M80-120v-80h360v-447q-26-9-45-28t-28-45H240l120 280q0 50-41 85t-99 35q-58 0-99-35t-41-85l120-280h-80v-80h247q12-35 43-57.5t70-22.5q39 0 70 22.5t43 57.5h247v80h-80l120 280q0 50-41 85t-99 35q-58 0-99-35t-41-85l120-280H593q-9 26-28 45t-45 28v447h360v80H80Zm585-320h150l-75-174-75 174Zm-520 0h150l-75-174-75 174Zm335-280q17 0 28.5-11.5T520-760q0-17-11.5-28.5T480-800q-17 0-28.5 11.5T440-760q0 17 11.5 28.5T480-720Z" />
 </svg>

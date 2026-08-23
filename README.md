@@ -429,3 +429,23 @@ git config core.hooksPath .githooks
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
+
+### Third-party assets
+
+The Thetis mark — the balance scale in the masthead and in the browser tab — is
+`balance` from [Google Material Symbols](https://github.com/google/material-design-icons),
+used under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
+
+The path is unmodified. Fill colours were added, because the icon as published
+declares none: it would render black, ignoring the app's accent and disappearing
+against a dark tab strip. That change is recorded in both files that carry it,
+`public/favicon.svg` and `src/components/ScalesIcon.tsx`.
+
+Google asks for attribution rather than requiring it — "We'd love attribution in
+your app's *about* screen, but it's not required" — and the upstream repository
+ships no `NOTICE` file. It is given here anyway, because the icon is
+redistributed as part of this repository.
+
+This is the only vendored asset. There is no icon font and no icon library; the
+single SVG path is copied in. Runtime dependencies are React and `docx`, nothing
+else.

@@ -102,7 +102,7 @@ Do not relitigate these without a reason. Each was settled deliberately.
 | OSCOLA sources **never** get an in-text citation | §1.1 rules them out explicitly. Harvard in-text is a different scheme, not an OSCOLA variant |
 | **localStorage only**, no backend | No auth, no hosting, no GDPR exposure. Durability solved by export/import instead of sync |
 | The store API is **synchronous** | Making it async today would push a loading state through the UI to serve a backend that does not exist |
-| A dependency for `.docx`, none for the favicon | OOXML must open cleanly in Word and cannot be checked here; an SVG icon is one file |
+| A dependency for `.docx`, none for the mark | OOXML must open cleanly in Word and cannot be checked here; the mark is one copied SVG path — Material Symbols' `balance`, Apache 2.0, attributed in the README — not an icon font or library |
 
 ---
 
