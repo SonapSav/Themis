@@ -131,7 +131,7 @@ describe('the mode switch', () => {
   it('offers both schemes, defaulting to the OU one', () => {
     setup();
     expect(screen.getByRole('button', { name: 'OSCOLA only' })).toHaveAttribute('aria-pressed', 'false');
-    expect(screen.getByRole('button', { name: 'OU Dual' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'OU dual' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText(/^Open University law modules:/)).toBeInTheDocument();
   });
 
@@ -548,7 +548,7 @@ describe('export and import', () => {
 
   it('adopts the scheme of a first import onto an empty library', async () => {
     const user = setup();
-    expect(screen.getByRole('button', { name: 'OU Dual' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'OU dual' })).toHaveAttribute('aria-pressed', 'true');
 
     await user.upload(importInput(), exportFile([smith], 'oscola'));
 
@@ -562,7 +562,7 @@ describe('export and import', () => {
     await user.upload(importInput(), exportFile([smith], 'oscola'));
 
     expect(await screen.findByRole('status')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'OU Dual' })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: 'OU dual' })).toHaveAttribute('aria-pressed', 'true');
   });
 
   it('keeps imported sources across a reload', async () => {

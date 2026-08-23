@@ -36,7 +36,7 @@ import {
 const MODES: ReadonlyArray<{ value: CitationMode; label: string; hint: string }> = [
   {
     value: 'oscola',
-    // "only" is what distinguishes it from OU Dual, which also uses OSCOLA —
+    // "only" is what distinguishes it from OU dual, which also uses OSCOLA —
     // for the legal half. The label has to carry that, because the two modes
     // are not OSCOLA versus something else.
     label: 'OSCOLA only',
@@ -44,7 +44,7 @@ const MODES: ReadonlyArray<{ value: CitationMode; label: string; hint: string }>
   },
   {
     value: 'ou-dual',
-    label: 'OU Dual',
+    label: 'OU dual',
     hint: 'Open University law modules: legal sources in OSCOLA footnotes; academic sources in CTR Harvard, cited in the text.',
   },
 ];
