@@ -375,3 +375,49 @@ Ten source types are modelled. Beyond them: command papers, theses, newspaper
 articles, international materials, and the rest of OSCOLA §3.4; the abbreviation
 lookup table that would catch `A.C.` for `AC`; and the Office add-in. The gaps
 inside the ten types are listed above.
+
+## Commit authorship
+
+Every commit in this repository carries two names — the human author, and
+whichever Claude model actually did the work:
+
+```
+Author:         Panos Vasilopoulos <sonap.sav@gmail.com>
+Co-authored-by: Claude Opus 5 (1M context) <noreply@anthropic.com>
+```
+
+Neither half depends on anyone remembering it.
+
+- The **author** is pinned per-repository in `.git/config`, so it holds
+  regardless of the machine's global git identity.
+- The **co-author trailer** is added by `.githooks/commit-msg`, which runs on
+  every commit however it is made — `git commit -m`, an editor session, an
+  amend, or a tool.
+
+**The model name has to stay accurate**, and nothing in the environment reports
+it: Claude Code exports a session id and a pid, but not the model. So the hook
+keeps it honest two ways. A trailer that already names Claude is never touched,
+because an agent knows which model it is and the hook does not — that is the
+normal path for a commit Claude makes. Otherwise the name comes from
+`claude.coauthor`, with the tracked `DEFAULT_COAUTHOR` in the hook as the
+fallback a fresh clone gets. On a model change, set both:
+
+```sh
+git config claude.coauthor 'Claude Opus 6 <noreply@anthropic.com>'
+```
+
+`Co-authored-by:` is the only spelling GitHub parses into a second author
+avatar; `Co-Author:` renders as ordinary message text and attributes nobody.
+
+The hook is tracked in `.githooks/` rather than left in `.git/hooks`, which git
+never versions, so it travels with a clone. `core.hooksPath` is what activates
+it, and `npm install` sets that through the `prepare` script. To wire it up by
+hand:
+
+```sh
+git config core.hooksPath .githooks
+```
+
+## Licence
+
+MIT — see [LICENSE](LICENSE).

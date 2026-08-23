@@ -1,0 +1,75 @@
+#!/bin/sh
+#
+# Enforce this repository's commit authorship standard:
+#
+#   Author:         Panos Vasilopoulos <sonap.sav@gmail.com>
+#   Co-authored-by: <the Claude model that actually did the work>
+#
+# Every commit carries a co-author trailer, whoever ran `git commit`. The author
+# identity itself is pinned in .git/config; this hook guarantees the trailer,
+# because that is the half a human typing `git commit -m "..."` will forget.
+#
+# THE MODEL NAME MUST TRACK THE MODEL IN USE.
+#
+# Nothing in the environment reports it — Claude Code exports a session id and a
+# pid, but no model — so the name cannot be detected and has to be configured.
+# Two things keep it honest:
+#
+#   1. A trailer already naming Claude is never touched. An agent that knows
+#      which model it is writes its own accurate trailer, and this hook defers
+#      to it. That is the normal path for a commit made by Claude.
+#
+#   2. Otherwise the name comes from `git config claude.coauthor`, falling back
+#      to DEFAULT_COAUTHOR below. On a model change, update the config:
+#
+#          git config claude.coauthor 'Claude Opus 6 <noreply@anthropic.com>'
+#
+#      and the tracked default here, so a fresh clone starts out right too.
+#
+# `Co-authored-by:` is the exact spelling GitHub parses to attribute a second
+# author. `Co-Author:` renders as ordinary message text and attributes nobody,
+# so the spelling below is load-bearing — do not "tidy" it.
+#
+# Tracked in the repo rather than hidden in .git/hooks, which git never
+# versions. A fresh clone activates it with one command:
+#
+#     git config core.hooksPath .githooks
+#
+set -eu
+
+MSG_FILE="$1"
+
+DEFAULT_COAUTHOR='Claude Opus 5 (1M context) <noreply@anthropic.com>'
+COAUTHOR=$(git config --get claude.coauthor || printf '%s' "$DEFAULT_COAUTHOR")
+TRAILER="Co-authored-by: $COAUTHOR"
+
+# Already attributed, in any spelling or casing. Left exactly as written: the
+# committer knew which model it was, and this hook does not.
+if grep -qiE '^[[:space:]]*co-authored-by:[[:space:]]*Claude' "$MSG_FILE"; then
+  exit 0
+fi
+
+# The message as git will see it: comments stripped, blank lines dropped.
+# An empty result means an aborted commit (an emptied editor, or a quit), which
+# git rejects on its own. Appending would turn that abort into a commit whose
+# entire message is a trailer.
+BODY=$(grep -vE '^[[:space:]]*(#|$)' "$MSG_FILE" || true)
+if [ -z "$BODY" ]; then
+  exit 0
+fi
+
+# Trailers belong together in one block at the end. Insert a blank line first
+# unless the message already ends in a trailer of its own — `Signed-off-by:`,
+# an earlier `Co-authored-by:`, and so on.
+#
+# A one-line message is always a subject, never a trailer, even when it reads
+# like one: this repo's own subjects take the form `Thetis: OSCOLA citations`.
+# Without that guard the trailer would be glued onto the subject line.
+LAST_LINE=$(printf '%s\n' "$BODY" | tail -n 1)
+LINE_COUNT=$(printf '%s\n' "$BODY" | wc -l)
+
+if [ "$LINE_COUNT" -gt 1 ] && printf '%s\n' "$LAST_LINE" | grep -qE '^[A-Za-z][A-Za-z-]*:[[:space:]]'; then
+  printf '%s\n' "$TRAILER" >> "$MSG_FILE"
+else
+  printf '\n%s\n' "$TRAILER" >> "$MSG_FILE"
+fi
