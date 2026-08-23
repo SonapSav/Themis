@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { buildSource, toDraft } from './fields';
+import { DEFAULT_DRAFTS, FIELDS, OPTIONAL_GROUPS, buildSource, toDraft } from './fields';
+import { validate } from './oscola/validate';
+import type { SourceType } from './model/types';
 import type { Source } from './model/types';
 
 const person = (given: string, surname: string) =>
@@ -166,5 +168,44 @@ describe('loading a source back into the form', () => {
   it('restores the select defaults a blank form would use', () => {
     const { draft } = toDraft(sources['a round-bracket case with a court']!);
     expect(draft['report.yearFormat']).toBe('round');
+  });
+});
+
+/**
+ * The rule the folded groups are meant to follow: a reader sees everything a
+ * citation of that type cannot be saved without, and opts in to the rest.
+ *
+ * Asserted rather than described, because it is the kind of rule that decays —
+ * the next field added to a folded group might be one the validator insists on,
+ * and nothing else would notice.
+ */
+describe('nothing required is folded away', () => {
+  const types = Object.keys(FIELDS) as SourceType[];
+
+  /** Fields inside a folded group. A group runs until the next one begins. */
+  const foldedKeys = (type: SourceType): ReadonlySet<string> => {
+    const keys = new Set<string>();
+    let group: string | undefined;
+    for (const field of FIELDS[type]) {
+      if (field.group) group = field.group;
+      if (group && OPTIONAL_GROUPS.has(group)) keys.add(field.key);
+    }
+    return keys;
+  };
+
+  for (const type of types) {
+    it(`${type}: every field an empty form errors on is visible`, () => {
+      const empty = buildSource('x', type, { ...DEFAULT_DRAFTS[type] }, [], []);
+      const required = validate(empty)
+        .filter((issue) => issue.severity === 'error')
+        .map((issue) => issue.field);
+      const folded = foldedKeys(type);
+      expect(required.filter((key) => folded.has(key))).toEqual([]);
+    });
+  }
+
+  it('checks something — an empty form really does report errors', () => {
+    const empty = buildSource('x', 'case', { ...DEFAULT_DRAFTS.case }, [], []);
+    expect(validate(empty).some((issue) => issue.severity === 'error')).toBe(true);
   });
 });

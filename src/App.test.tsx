@@ -23,7 +23,7 @@ async function addPageVSmith(user: ReturnType<typeof setup>) {
   await user.type(report.getByLabelText('Year'), '1996');
   await user.type(report.getByLabelText('Report series'), 'AC');
   await user.type(report.getByLabelText('First page'), '155');
-  await user.type(group(/Other/).getByLabelText('Court'), 'HL');
+  await user.type(group(/^Court and date$/).getByLabelText('Court'), 'HL');
   await user.click(screen.getByRole('button', { name: 'Add to sources' }));
 }
 
@@ -100,7 +100,7 @@ describe('citing a case', () => {
     await user.type(neutral.getByLabelText('Year'), '2010');
     await user.type(neutral.getByLabelText('Court'), 'UKSC');
     await user.type(neutral.getByLabelText('Judgment number'), '1');
-    await user.type(group(/Other/).getByLabelText('Court'), 'SC');
+    await user.type(group(/^Court and date$/).getByLabelText('Court'), 'SC');
 
     expect(citation('Footnote')).toBe('Re Guardian News and Media Ltd [2010] UKSC 1.');
     expect(
@@ -116,7 +116,7 @@ describe('citing a case', () => {
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
-    await user.type(group(/Other/).getByLabelText('Court'), 'HL');
+    await user.type(group(/^Court and date$/).getByLabelText('Court'), 'HL');
 
     // Legal sources get no end entry in OU dual mode, so switch to OSCOLA.
     await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
@@ -298,7 +298,7 @@ describe('validation and the session list', () => {
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
-    await user.type(group(/Other/).getByLabelText('Court'), 'HL');
+    await user.type(group(/^Court and date$/).getByLabelText('Court'), 'HL');
 
     expect(add()).toBeEnabled();
   });
@@ -321,7 +321,7 @@ describe('validation and the session list', () => {
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
-    await user.type(group(/Other/).getByLabelText('Court'), 'HL');
+    await user.type(group(/^Court and date$/).getByLabelText('Court'), 'HL');
 
     await user.click(screen.getByRole('button', { name: 'Add to sources' }));
 
@@ -587,7 +587,8 @@ describe('judge attribution', () => {
     await user.type(report.getByLabelText('Report series'), 'Env LR');
     await user.type(report.getByLabelText('First page'), '6');
 
-    const other = group(/Other/);
+    await openGroup(user, 'Pinpoint and short name');
+    const other = group(/^Pinpoint and short name$/);
     await user.type(other.getByLabelText('Pinpoint'), '27');
     await user.type(other.getByLabelText('Judge'), 'Laws LJ');
 
@@ -604,7 +605,8 @@ describe('judge attribution', () => {
     await user.type(neutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(neutral.getByLabelText('Judgment number'), '1117');
 
-    const other = group(/Other/);
+    await openGroup(user, 'Pinpoint and short name');
+    const other = group(/^Pinpoint and short name$/);
     await user.type(other.getByLabelText('Pinpoint'), '42, 45');
     await user.type(other.getByLabelText('Judge'), 'Lord Woolf CJ');
 
@@ -820,7 +822,7 @@ describe('editing a saved source', () => {
 
     expect(screen.getByLabelText('Case name')).toHaveValue('Page v Smith');
     expect(group(/^Law report$/).getByLabelText('First page')).toHaveValue('155');
-    expect(group(/Other/).getByLabelText('Court')).toHaveValue('HL');
+    expect(group(/^Court and date$/).getByLabelText('Court')).toHaveValue('HL');
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument();
   });
 
@@ -1111,8 +1113,9 @@ describe('multi-volume books (3.2.1)', () => {
     const user = setup();
     await fillVonBar(user);
     await user.selectOptions(group(/Multi-volume/).getByLabelText('Volume position'), 'vary');
-    await user.selectOptions(group(/Other/).getByLabelText('Pinpoint type'), 'paragraph');
-    await user.type(group(/Other/).getByLabelText('Pinpoint'), '76');
+    await openGroup(user, 'Pinpoint and short title');
+    await user.selectOptions(group(/^Pinpoint and short title$/).getByLabelText('Pinpoint type'), 'paragraph');
+    await user.type(group(/^Pinpoint and short title$/).getByLabelText('Pinpoint'), '76');
 
     expect(citation('Footnote')).toBe(
       'Christian von Bar, The Common European Law of Torts, vol 2 (CH Beck 2000) para 76.',
@@ -1122,7 +1125,8 @@ describe('multi-volume books (3.2.1)', () => {
   it('leaves the volume after them by default, with a comma before the pinpoint', async () => {
     const user = setup();
     await fillVonBar(user);
-    await user.type(group(/Other/).getByLabelText('Pinpoint'), '317');
+    await openGroup(user, 'Pinpoint and short title');
+    await user.type(group(/^Pinpoint and short title$/).getByLabelText('Pinpoint'), '317');
 
     expect(citation('Footnote')).toBe(
       'Christian von Bar, The Common European Law of Torts (CH Beck 2000) vol 2, 317.',
@@ -1220,7 +1224,7 @@ describe('unreported cases', () => {
   it('cites the court and date of judgment in place of a report (2.1.4)', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Stubbs v Sayer');
-    const other = group(/Other/);
+    const other = group(/^Court and date$/);
     await user.type(other.getByLabelText('Court'), 'CA');
     fireEvent.change(other.getByLabelText('Date of judgment'), {
       target: { value: '1990-11-08' },
@@ -1233,7 +1237,7 @@ describe('unreported cases', () => {
   it('asks for the court when only a date is given', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Stubbs v Sayer');
-    fireEvent.change(group(/Other/).getByLabelText('Date of judgment'), {
+    fireEvent.change(group(/^Court and date$/).getByLabelText('Date of judgment'), {
       target: { value: '1990-11-08' },
     });
 

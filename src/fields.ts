@@ -60,6 +60,12 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'report.volume', label: 'Volume', placeholder: '1' },
     { key: 'report.abbreviation', label: 'Report series', placeholder: 'AC' },
     { key: 'report.firstPage', label: 'First page', placeholder: '884' },
+    { key: 'court', label: 'Court', placeholder: 'HL', group: 'Court and date', hint: 'Not cited where there is a neutral citation, nor for cases decided before 1865.' },
+    { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Only for an unreported case with no neutral citation: this date and the court are cited in place of a report (2.1.4).' },
+    { key: 'pinpoint.kind', label: 'Pinpoint type', control: 'select', group: 'Pinpoint and short name', options: PINPOINT_KIND },
+    { key: 'pinpoint.value', label: 'Pinpoint', placeholder: '14', hint: 'Paragraph numbers are bracketed automatically. Ranges: 1-37. Lists: 42, 45. Each footnote in the sequence can carry its own pinpoint instead.' },
+    { key: 'pinpoint.judge', label: 'Judge', placeholder: 'Laws LJ', hint: 'Added in brackets after the pinpoint (2.1.7). Surname and judicial office, no honorifics and no "per".' },
+    { key: 'shortName', label: 'Short name', placeholder: 'Austin', hint: 'Used when the case is cited again. Derived from the first party if left blank.' },
     { key: 'neutral2.year', label: 'Year', placeholder: '2003', group: 'Second neutral citation', hint: 'Only where one report holds more than one judgment (2.1.3). Listed after the first, oldest first.' },
     { key: 'neutral2.court', label: 'Court', placeholder: 'EWCA Civ' },
     { key: 'neutral2.number', label: 'Judgment number', placeholder: '70' },
@@ -97,12 +103,6 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'history.report.abbreviation', label: 'Report series', placeholder: 'QB' },
     { key: 'history.report.firstPage', label: 'First page', placeholder: '502' },
     { key: 'history.court', label: 'Court', placeholder: 'HL', hint: 'Not cited where the later neutral citation already identifies it.' },
-    { key: 'court', label: 'Court', placeholder: 'HL', group: 'Other', hint: 'Not cited where there is a neutral citation, nor for cases decided before 1865.' },
-    { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Only for an unreported case with no neutral citation: the court and this date are cited in place of a report.' },
-    { key: 'shortName', label: 'Short name', placeholder: 'Austin', hint: 'Used when the case is cited again. Derived from the first party if left blank.' },
-    { key: 'pinpoint.kind', label: 'Pinpoint type', control: 'select', options: PINPOINT_KIND },
-    { key: 'pinpoint.value', label: 'Pinpoint', placeholder: '14', hint: 'Paragraph numbers are bracketed automatically. Ranges: 1-37. Lists: 42, 45.' },
-    { key: 'pinpoint.judge', label: 'Judge', placeholder: 'Laws LJ', hint: 'Added in brackets after the pinpoint. Surname and judicial office, no honorifics and no "per".' },
   ],
   act: [
     { key: 'shortTitle', label: 'Short title', placeholder: 'Human Rights Act', hint: 'Without the year — it has its own field.' },
@@ -117,7 +117,8 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'issue', label: 'Issue', placeholder: '3', hint: 'Only where pagination restarts each issue.' },
     { key: 'journal', label: 'Journal abbreviation', placeholder: 'MLR' },
     { key: 'firstPage', label: 'First page', placeholder: '554', hint: 'Online journals often have none, and a forthcoming article may not have one yet.' },
-    { key: 'pinpoint.value', label: 'Pinpoint page', placeholder: '560' },
+    { key: 'pinpoint.value', label: 'Pinpoint page', placeholder: '560', group: 'Pinpoint and short title', hint: 'Follows a comma after the first page (3.3.1). Each footnote in the sequence can carry its own pinpoint instead.' },
+    { key: 'shortTitle', label: 'Short title', placeholder: 'Testing Fidelity to Legal Values', hint: 'Used when you cite more than one work by this author.' },
     {
       key: 'isCaseNote',
       label: 'Case note',
@@ -142,7 +143,6 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     },
     { key: 'url', label: 'Web address', placeholder: 'http://ejlt.org/article/view/17', hint: 'Only for an article published electronically. Printed in angled brackets, after any pinpoint.' },
     { key: 'accessDate', label: 'Date accessed', control: 'date', hint: 'The date you last read the article online.' },
-    { key: 'shortTitle', label: 'Short title', placeholder: 'Testing Fidelity to Legal Values', hint: 'Used when you cite more than one work by this author.', group: 'Other' },
   ],
   book: [
     {
@@ -156,10 +156,10 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     },
     { key: 'title', label: 'Title', placeholder: 'Goff and Jones: The Law of Restitution', hint: 'Italicised automatically.' },
     { key: 'edition', label: 'Edition', placeholder: '7', hint: 'A bare numeral. First editions are not cited, so leave blank or enter 1.' },
-    { key: 'firstPublished', label: 'First published', placeholder: '1651', hint: 'Reprints and translations only.' },
-    { key: 'additionalInfo', label: 'Additional information', placeholder: 'John Gardner ed', hint: 'Editor or translator of an authored work, series, or other clarifying detail. Sits before the edition.' },
     { key: 'publisher', label: 'Publisher', placeholder: 'Sweet & Maxwell' },
     { key: 'year', label: 'Year', placeholder: '2007' },
+    { key: 'firstPublished', label: 'First published', placeholder: '1651', group: 'Reprints and translations', hint: 'Year of original publication, for a reprint or a translation.' },
+    { key: 'additionalInfo', label: 'Additional information', placeholder: 'John Gardner ed', hint: 'Editor or translator of an authored work, series, or other clarifying detail. Sits before the edition.' },
     { key: 'place', label: 'Place of publication', placeholder: 'London', hint: 'Recorded but not cited: OSCOLA 4th edn dropped the place of publication.' },
     { key: 'volume', label: 'Volume', placeholder: '2', group: 'Multi-volume works', hint: 'A bare numeral; "vol" is added for you. Only for a work published in more than one volume.' },
     {
@@ -172,7 +172,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
       ],
       hint: 'The volume normally follows the publication details. It precedes them, after a comma, where the volumes were published separately so their details differ.',
     },
-    { key: 'pinpoint.kind', label: 'Pinpoint type', control: 'select', group: 'Other', options: PINPOINT_KIND },
+    { key: 'pinpoint.kind', label: 'Pinpoint type', control: 'select', group: 'Pinpoint and short title', options: PINPOINT_KIND },
     { key: 'pinpoint.value', label: 'Pinpoint', placeholder: '317', hint: 'Page numbers stand alone, without "p". Paragraphs are labelled "para" — pinpoint to paragraphs where the work numbers them. Type "paras" yourself for several.' },
     { key: 'shortTitle', label: 'Short title', placeholder: 'Principles', hint: 'Used when you cite more than one work by this author.' },
   ],
@@ -207,7 +207,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     },
     { key: 'ojIssue', label: 'Issue', placeholder: '115' },
     { key: 'ojFirstPage', label: 'First page', placeholder: '13' },
-    { key: 'pinpoint', label: 'Pinpoint', placeholder: 'art 5', group: 'Other' },
+    { key: 'pinpoint', label: 'Pinpoint', placeholder: 'art 5', group: 'Pinpoint and short form' },
     { key: 'shortForm', label: 'Short form', placeholder: 'Working Time Directive', hint: 'Announced in brackets on the first citation, then used alone.' },
   ],
   euCase: [
@@ -223,7 +223,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'report.year', label: 'Year', placeholder: '2005', group: 'Report' },
     { key: 'report.abbreviation', label: 'Report series', placeholder: 'ECR', hint: 'Prefer the official ECR; otherwise CMLR.' },
     { key: 'report.firstPage', label: 'First page', placeholder: 'I–7879', hint: 'Include the volume prefix: I– for the Court of Justice, II– for the General Court.' },
-    { key: 'court', label: 'Court', placeholder: 'CFI', group: 'Other', hint: 'Only where the case is not yet reported.' },
+    { key: 'court', label: 'Court', placeholder: 'CFI', group: 'Court, date and pinpoint', hint: 'Only where the case is not yet reported.' },
     { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Cited with the court where the case is not yet reported.' },
     { key: 'pinpoint', label: 'Pinpoint', placeholder: 'paras 47–48' },
   ],
@@ -284,6 +284,9 @@ export const AUTHOR_LISTS: Partial<Record<SourceType, readonly AuthorListSpec[]>
  * invisible behind a closed heading.
  */
 export const OPTIONAL_GROUPS: ReadonlySet<string> = new Set([
+  'Pinpoint and short name',
+  'Pinpoint and short title',
+  'Reprints and translations',
   'Second neutral citation',
   'Later history',
   'Later neutral citation',

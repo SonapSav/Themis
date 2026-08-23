@@ -19,7 +19,7 @@ For whoever picks this up next, including a future session of me.
 | 3. Word output | **Working end to end** — a `.docx` whose footnote markers copy into a student's own document and renumber, confirmed in Word on 23 August 2026; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-433 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+444 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -129,11 +129,14 @@ form is settled — see `VERIFY.md` §3e. Module materials would settle them fas
 than more reading of the public pages, and until then this is blocked rather
 than merely unstarted.
 
-The case form carries 33 fields, most of them blank for any given case. The six
-situational groups now start folded — see the README's *The form folds away what
-most sources do not need*. That buys room for the fields a future gap needs, but
-it is a presentation fix, not a licence: a type whose form needs a seventh group
-is probably a type that wants splitting.
+The case form carries 33 fields, of which nine are visible. The rule is in the
+README: a reader sees everything a citation cannot be saved without and opts in
+to the rest, and `fields.test.ts` asserts it per type rather than trusting it.
+Adding a field to a folded group that the validator insists on will fail the
+suite.
+
+That buys room for the fields a future gap needs, but it is not a licence: a
+type needing a fourth folded group is probably a type that wants splitting.
 
 Each needs a field, a formatter branch, a verbatim test, and a README row.
 

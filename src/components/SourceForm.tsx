@@ -27,6 +27,13 @@ interface Section {
  * for the neutral citation and another for the law report — stay distinct for
  * anyone navigating by accessible name.
  */
+/*
+ * A group runs from the field that names it until a field names a different
+ * one: there is no way to *end* a group and return to ungrouped fields. That is
+ * why every ungrouped field of a type has to come first, and why the case form
+ * once carried a group called "Other" — a bucket that existed only so the
+ * fields after a group had somewhere to go.
+ */
 function toSections(fields: readonly FieldSpec[]): Section[] {
   const sections: Section[] = [];
   let current: { title?: string; fields: FieldSpec[] } | undefined;

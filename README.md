@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 433 tests
+npm test           # 444 tests
 npm run typecheck
 ```
 
@@ -327,12 +327,36 @@ Nothing in the suite is invented.
 
 There is no conditional logic in the form: every field of a type is rendered,
 because whether a case has a later history is not something the form can work
-out. But the case form reached 33 fields, which buries the six that nearly every
-citation actually needs, so the situational groups start folded:
+out. But the case form reached 33 fields, which buries the ones nearly every
+citation actually needs. So the rule is:
 
-`Second neutral citation`, `Later history`, `Later neutral citation`,
-`Later law report`, `Multi-volume works`, and the journal article's
-`Case note, forthcoming, online`.
+> **A reader sees everything a citation of that type cannot be saved without,
+> and opts in to the rest.**
+
+That is asserted, not just described — `fields.test.ts` builds an empty form for
+every source type, asks `validate` what it errors on, and fails if any of those
+fields sits inside a folded group. The rule cannot decay quietly as fields are
+added.
+
+Folded on the case form: `Pinpoint and short name`, `Second neutral citation`,
+`Later history`, `Later neutral citation`, `Later law report`. On the book:
+`Reprints and translations`, `Multi-volume works`, `Pinpoint and short title`.
+On the journal article: `Pinpoint and short title`, `Case note, forthcoming,
+online`.
+
+**Folding is only applied to the three forms big enough to need it** — case
+(33 fields), book and journal article (13 each). Below about ten fields a click
+costs more than the clutter saves, and OU module material is required end to
+end, so there is nothing to fold. Nine fields on the case form are visible where
+thirty-three were.
+
+There is no group called "Other" any more. It had collected two of the
+most-used fields on the case form (`Court`, `Pinpoint`) alongside three of the
+rarest, because `toSections` can start a group but never end one — so every
+field after a group needed *some* name to escape it. Each group now maps to one
+thing the formatter emits: `Court and date` is the single bracket
+`courtBracket()` produces, `(HL)` or `(CA, 8 November 1990)`; `Pinpoint and
+short name` is the pinpoint and the judge §2.1.7 attaches to it.
 
 Three rules keep that from hiding anything:
 
