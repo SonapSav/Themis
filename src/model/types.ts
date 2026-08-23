@@ -131,11 +131,44 @@ export interface LawReport {
   readonly firstPage: string;
 }
 
+/**
+ * What follows the primary citation of a case.
+ *
+ * OSCOLA 2.1.2 covers the same case reported under significantly different
+ * names — the alternative name is introduced by `sub nom`, in roman — and the
+ * same case renamed at a later stage of its history. 2.1.8 indicates that
+ * history by abbreviating "affirmed" to `affd` and "reversed" to `revd`, which
+ * "refer to the decision in the primary citation". The two combine:
+ *
+ *   … [1993] QB 507, sub nom AB v South West Water Services Ltd [1993] 2 WLR 507 (CA)
+ *   … [1992] 1 WLR 291 (CA), affd sub nom South Yorkshire Transport Ltd v … (HL)
+ *   … [2006] EMLR 23, affd [2007] EWCA Civ 721, [2008] QB 502
+ */
+export interface CaseHistory {
+  /** 2.1.8: `affd` for affirmed, `revd` for reversed. */
+  readonly disposition?: 'affd' | 'revd';
+  /** 2.1.2: introduce the alternative name with `sub nom`. */
+  readonly subNom?: boolean;
+  /** The case name at this stage, where it differs. Italicised as usual. */
+  readonly caseName?: string;
+  readonly neutral?: NeutralCitation;
+  readonly report?: LawReport;
+  /** Dropped where there is a neutral citation, as for the primary (2.1.3). */
+  readonly court?: string;
+}
+
 export interface CaseSource extends SourceBase {
   readonly type: 'case';
   /** Full case name including the parties and "v", e.g. "Corr v IBC Vehicles Ltd". */
   readonly caseName: string;
   readonly neutral?: NeutralCitation;
+  /**
+   * OSCOLA 2.1.3: "If a single report includes more than one judgment and
+   * therefore more than one neutral citation, list the neutral citations in
+   * chronological order, starting with the oldest, and separate them with a
+   * comma." These follow `neutral`, which is the oldest.
+   */
+  readonly furtherNeutrals?: readonly NeutralCitation[];
   readonly report?: LawReport;
   /**
    * Court abbreviation in round brackets, e.g. "HL". Given only where the court
@@ -155,6 +188,8 @@ export interface CaseSource extends SourceBase {
    * judicial review, where the individual's name is used.
    */
   readonly shortName?: string;
+  /** OSCOLA 2.1.2 and 2.1.8: what follows the primary citation. */
+  readonly history?: CaseHistory;
 }
 
 export interface ActSource extends SourceBase {

@@ -302,3 +302,53 @@ describe('validation — book volumes (3.2.1)', () => {
     expect(fields({ ...base, volumesVary: true }, 'error')).toEqual([]);
   });
 });
+
+describe('validation — later history (2.1.2, 2.1.8)', () => {
+  const base: CaseSource = {
+    id: 'c1', type: 'case', caseName: 'Roberts v Gable',
+    neutral: { year: '2006', court: 'EWHC', number: '1025', division: 'QB' },
+  };
+
+  it('accepts a disposition with a citation to point at', () => {
+    expect(
+      validate({
+        ...base,
+        history: {
+          disposition: 'affd',
+          neutral: { year: '2007', court: 'EWCA Civ', number: '721' },
+        },
+      }),
+    ).toEqual([]);
+  });
+
+  it('says "affd" alone points at nothing', () => {
+    expect(fields({ ...base, history: { disposition: 'affd' } }, 'warning')).toContain('history.report');
+  });
+
+  it('asks for the name that "sub nom" introduces', () => {
+    const source: Source = {
+      ...base,
+      history: {
+        subNom: true,
+        report: { year: '1993', yearFormat: 'square', volume: '2', abbreviation: 'WLR', firstPage: '507' },
+      },
+    };
+    expect(fields(source, 'warning')).toContain('history.caseName');
+  });
+
+  it('drops a later court that its neutral citation already identifies', () => {
+    const source: Source = {
+      ...base,
+      history: { disposition: 'affd', neutral: { year: '2007', court: 'EWCA Civ', number: '721' }, court: 'CA' },
+    };
+    expect(fields(source, 'warning')).toContain('history.court');
+  });
+
+  it('requires a judgment number on a further neutral citation (2.1.3)', () => {
+    const source: Source = {
+      ...base,
+      furtherNeutrals: [{ year: '2003', court: 'EWCA Civ', number: '' }],
+    };
+    expect(fields(source, 'error')).toContain('neutral2.number');
+  });
+});

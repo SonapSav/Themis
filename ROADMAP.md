@@ -19,7 +19,7 @@ For whoever picks this up next, including a future session of me.
 | 3. Word output | **Partial** — rich-text copy and a `.docx` with real Word footnotes; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-393 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+412 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -117,13 +117,20 @@ Every one is a wall a student can hit: "I cannot cite this source."
 **Done so far:** SR & O numbers and rules of court (§2.5.1–2.5.2), a `numbering`
 field on the statutory instrument; case notes, forthcoming articles and online
 journals (§3.3.2–3.3.4), five fields on the journal article; book volumes and
-paragraph pinpoints (§3.2.1).
+paragraph pinpoints (§3.2.1); `sub nom`, subsequent history and more than one
+neutral citation (§2.1.2, §2.1.3, §2.1.8).
 
-**Cheapest of what is left:** `sub nom` and subsequent history (§2.1.2, §2.1.8),
-multiple neutral citations (§2.1.3). On the Harvard side: forum messages,
-newspaper articles, secondary referencing, book volumes, and the `doi:` the OU's
-journal template allows — each templated in the OU guide but printed without a
-worked example, so each needs the form settled before it is coded.
+**That clears the OSCOLA side of the list.** What remains is all Harvard: forum
+messages, newspaper articles, secondary referencing, book volumes, and the
+`doi:` the OU's journal template allows. Each is templated in the OU guide but
+printed **without a worked example**, so none can be coded honestly until the
+form is settled — see `VERIFY.md` §3e. Module materials would settle them faster
+than more reading of the public pages, and until then this is blocked rather
+than merely unstarted.
+
+One thing the case form has now outgrown: it carries 31 fields, most of them
+blank for any given case. The groups keep it navigable, but conditional or
+collapsible sections are worth a look before more are added.
 
 Each needs a field, a formatter branch, a verbatim test, and a README row.
 

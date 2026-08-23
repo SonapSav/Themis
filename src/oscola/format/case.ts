@@ -1,7 +1,7 @@
 import { italic, join, segments, type FormattedCitation, type Part } from '../../model/segments';
 import { renderPinpoint } from '../../model/pinpoints';
 import { formatDayMonthYear } from '../../model/dates';
-import type { CaseSource, LawReport, NeutralCitation, Pinpoint } from '../../model/types';
+import type { CaseHistory, CaseSource, LawReport, NeutralCitation, Pinpoint } from '../../model/types';
 
 /** `[2008] UKHL 13`, or `[2006] EWHC 407 (QB)` where a division is given. */
 function formatNeutral(neutral: NeutralCitation): string {
@@ -64,9 +64,51 @@ function courtBracket(source: CaseSource): string {
   return court ? ` (${court})` : '';
 }
 
+/**
+ * OSCOLA 2.1.3: where one report holds more than one judgment, the neutral
+ * citations are listed "in chronological order, starting with the oldest, and
+ * separate[d] with a comma". `neutral` is the oldest; the rest follow it.
+ */
+function allNeutrals(source: CaseSource): readonly NeutralCitation[] {
+  return [source.neutral, ...(source.furtherNeutrals ?? [])].filter(
+    (neutral): neutral is NeutralCitation => Boolean(neutral),
+  );
+}
+
+/**
+ * What follows the primary citation: `, affd`, `, sub nom …`, or both
+ * (2.1.2, 2.1.8). The alternative name is styled like the primary — italic in
+ * a footnote, roman in a table of cases — while `sub nom` itself stays roman.
+ *
+ * As for the primary citation, the court is dropped where a neutral citation
+ * already identifies it (2.1.3).
+ */
+function historyParts(history: CaseHistory | undefined, nameStyle: NameStyle): Part[] {
+  if (!history) return [];
+  const citations = join(', ', [
+    history.neutral && formatNeutral(history.neutral),
+    history.report && formatReport(history.report),
+  ]);
+  const name = history.caseName?.trim();
+  const lead = [history.disposition, history.subNom && 'sub nom'].filter(Boolean).join(' ');
+  if (!lead && !name && citations.length === 0) return [];
+
+  const court = history.neutral ? undefined : history.court?.trim();
+  return [
+    ', ',
+    lead && `${lead} `,
+    // 1.1.1 omits the name the text already gave; the name at another stage is
+    // a different name, so it is kept whatever the primary's style.
+    name && (nameStyle === 'roman' ? name : italic(name)),
+    name && citations.length > 0 && ' ',
+    citations,
+    court && ` (${court})`,
+  ];
+}
+
 function body(source: CaseSource, nameStyle: NameStyle): Part[] {
   const citations = join(', ', [
-    source.neutral && formatNeutral(source.neutral),
+    ...allNeutrals(source).map(formatNeutral),
     source.report && formatReport(source.report),
   ]);
   const name = source.caseName.trim();
@@ -83,7 +125,11 @@ export function formatCaseFootnote(source: CaseSource): FormattedCitation {
   return segments(
     // Case names are italicised in footnotes (OSCOLA 2.1.1).
     ...body(source, 'italic'),
+    // The pinpoint belongs to the primary citation, so it comes before the
+    // subsequent history rather than after it. The guide shows no example of
+    // the two together; README and VERIFY record the call.
     source.pinpoint && formatPinpoint(source.pinpoint, Boolean(emittedCourt(source))),
+    ...historyParts(source.history, 'italic'),
     '.',
   );
 }
@@ -94,7 +140,7 @@ export function formatCaseFootnote(source: CaseSource): FormattedCitation {
  * because case names are not italicised in a table of cases.
  */
 export function formatCaseBibliography(source: CaseSource): FormattedCitation {
-  return segments(...body(source, 'roman'));
+  return segments(...body(source, 'roman'), ...historyParts(source.history, 'roman'));
 }
 
 /**
@@ -108,6 +154,7 @@ export function formatCaseFootnoteNamedInText(source: CaseSource): FormattedCita
   return segments(
     ...body(source, 'omitted'),
     source.pinpoint && formatPinpoint(source.pinpoint, Boolean(emittedCourt(source))),
+    ...historyParts(source.history, 'italic'),
     '.',
   );
 }

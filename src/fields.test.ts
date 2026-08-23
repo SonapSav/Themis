@@ -27,6 +27,34 @@ const sources: Record<string, Source> = {
     report: { year: '1999', yearFormat: 'round', volume: '49', abbreviation: 'BMLR', firstPage: '1' },
     court: 'HL',
   },
+  'a case with two neutral citations': {
+    id: 's1a', type: 'case', caseName: 'Masterman-Lister v Brutton & Co (Nos 1 and 2)',
+    neutral: { year: '2002', court: 'EWCA Civ', number: '1889' },
+    furtherNeutrals: [{ year: '2003', court: 'EWCA Civ', number: '70' }],
+    report: { year: '2003', yearFormat: 'square', volume: '1', abbreviation: 'WLR', firstPage: '1511' },
+  },
+  'a case affirmed under another name': {
+    id: 's1b', type: 'case',
+    caseName: 'R v Monopolies and Mergers Commission, ex p South Yorkshire Transport Ltd',
+    report: { year: '1992', yearFormat: 'square', volume: '1', abbreviation: 'WLR', firstPage: '291' },
+    court: 'CA',
+    history: {
+      disposition: 'affd', subNom: true,
+      caseName: 'South Yorkshire Transport Ltd v Monopolies and Mergers Commission',
+      report: { year: '1993', yearFormat: 'square', volume: '1', abbreviation: 'WLR', firstPage: '23' },
+      court: 'HL',
+    },
+  },
+  'a case affirmed on appeal with a neutral citation': {
+    id: 's1c', type: 'case', caseName: 'Roberts v Gable',
+    neutral: { year: '2006', court: 'EWHC', number: '1025', division: 'QB' },
+    report: { year: '2006', yearFormat: 'square', abbreviation: 'EMLR', firstPage: '23' },
+    history: {
+      disposition: 'affd',
+      neutral: { year: '2007', court: 'EWCA Civ', number: '721' },
+      report: { year: '2008', yearFormat: 'square', abbreviation: 'QB', firstPage: '502' },
+    },
+  },
   'an unreported case': {
     id: 's3', type: 'case', caseName: 'Stubbs v Sayer',
     court: 'CA', judgmentDate: '1990-11-08',

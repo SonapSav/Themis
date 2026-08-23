@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 393 tests
+npm test           # 412 tests
 npm run typecheck
 ```
 
@@ -297,6 +297,9 @@ Nothing in the suite is invented.
 | **Court in brackets** | §2.1.3 and §2.1.5: the court is **not** cited where there is a neutral citation, because the neutral citation identifies the court, nor for cases decided before 1865. A court entered alongside a neutral citation is dropped from the output and a warning says so. Where it is cited, it follows the first page and precedes any pinpoint. |
 | **Table of cases** | §1.6.2: case names are **not** italicised in a table of cases, though they are in footnotes (§2.1.1). The two formatters differ accordingly. |
 | **Neutral citations** | Modelled separately from the law report and cited first: `Corr v IBC Vehicles Ltd [2008] UKHL 13, [2008] 1 AC 884`. The two carry independent years, because they differ (`[2004] EWCA Civ 1031, [2005] QB 410`). |
+| **More than one neutral citation** | §2.1.3: where one report holds more than one judgment, the neutral citations are listed "in chronological order, starting with the oldest, and separate[d] with a comma", before the report — `Masterman-Lister v Brutton & Co (Nos 1 and 2) [2002] EWCA Civ 1889, [2003] EWCA Civ 70, [2003] 1 WLR 1511`. |
+| **`sub nom`** | §2.1.2: where the same case is reported under significantly different names, the report using the alternative name is introduced by `sub nom`, **in roman** while both case names stay italic — `Gibbons v South West Water Services Ltd [1993] QB 507, sub nom AB v South West Water Services Ltd [1993] 2 WLR 507 (CA)`. The same applies to a name changed at a later stage. |
+| **Subsequent history** | §2.1.8: `affd` and `revd` abbreviate "affirmed" and "reversed", and "refer to the decision in the primary citation" — `Roberts v Gable [2006] EWHC 1025 (QB), [2006] EMLR 23, affd [2007] EWCA Civ 721, [2008] QB 502`. They combine with `sub nom`, as §2.1.2's own `affd sub nom` example shows. §2.1.3's rule applies again to the later citation: a court entered alongside a later neutral citation is dropped. |
 | **Journal year brackets** | Inferred, unlike cases. §3.3.1: square "if it identifies the volume", round "if there is a separate volume number". An issue number goes in brackets immediately after the volume, and only where pagination restarts each issue. |
 | **Case notes** | §3.3.2: a case note with its own title is cited as an ordinary article. One without a title puts the case name, **italicised**, where the title would go, and closes with `(note)`: `Andrew Ashworth, 'R (Singh) v Chief Constable of the West Midlands Police' [2006] Crim LR 441 (note)`. Where the text identifies the case, the name is dropped from the citation and the comma after the author goes with it — `Andrew Ashworth [2006] Crim LR 441 (note)` — which the preview offers as the name-in-text form. The section also says the case belongs in the table of cases even when not separately cited, so the panel says so. |
 | **Forthcoming articles** | §3.3.3: cited as published articles, closing with `(forthcoming)`. "If volume and/or page numbers are not yet known, simply omit that information", so neither a missing volume nor a missing page is flagged on a forthcoming article. |
@@ -371,8 +374,13 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 
 **Cases**
 
-- **Multiple neutral citations** for one report (§2.1.3, `Masterman-Lister`).
-- **`sub nom`, subsequent history (`affd`, `revd`)** (§2.1.2, §2.1.8).
+- **A third neutral citation.** §2.1.3 says "more than one" without a limit, and
+  the model holds any number, but the form offers one further citation beyond the
+  first — the guide's own example has two, and a repeatable group is UI work
+  rather than a citation rule. An imported library keeps what it holds.
+- **A pinpoint alongside subsequent history.** Thetis attaches the pinpoint to
+  the primary citation, before the `affd` clause, because that is the decision
+  the pinpoint refers to. The guide shows no example of the two together.
 - **EU case numbers** are passed through as typed. OSCOLA prints them with an
   en dash (`C–176/03`); Thetis does not silently convert a hyphen, because the
   official EU form uses a hyphen and guessing either way would be wrong.

@@ -114,6 +114,42 @@ export function validate(source: Source): readonly ValidationIssue[] {
           ),
         );
       }
+      for (const further of source.furtherNeutrals ?? []) {
+        if (blank(further.number)) {
+          issues.push(error('neutral2.number', 'A neutral citation needs a judgment number.'));
+        }
+      }
+      // 2.1.2 and 2.1.8: the clause after the primary citation.
+      if (source.history) {
+        const { disposition, subNom, caseName, neutral, report, court } = source.history;
+        if (neutral && blank(neutral.number)) {
+          issues.push(error('history.neutral.number', 'A neutral citation needs a judgment number.'));
+        }
+        if ((disposition || subNom) && !neutral && !report) {
+          issues.push(
+            warning(
+              'history.report',
+              'Give the citation the later stage is reported at — "affd" and "sub nom" introduce a citation rather than standing alone.',
+            ),
+          );
+        }
+        if (subNom && blank(caseName)) {
+          issues.push(
+            warning(
+              'history.caseName',
+              '"Sub nom" introduces the name the case is reported under, so give that name.',
+            ),
+          );
+        }
+        if (neutral && !blank(court)) {
+          issues.push(
+            warning(
+              'history.court',
+              'The later neutral citation already identifies the court, so it has been left out.',
+            ),
+          );
+        }
+      }
       break;
     }
 

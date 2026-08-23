@@ -19,7 +19,7 @@ const setup = () => {
 /** Enter the smallest valid case, so there is something to save. */
 async function addPageVSmith(user: ReturnType<typeof setup>) {
   await user.type(screen.getByLabelText('Case name'), 'Page v Smith');
-  const report = group(/Law report/);
+  const report = group(/^Law report$/);
   await user.type(report.getByLabelText('Year'), '1996');
   await user.type(report.getByLabelText('Report series'), 'AC');
   await user.type(report.getByLabelText('First page'), '155');
@@ -63,12 +63,12 @@ describe('citing a case', () => {
     const user = setup();
 
     await user.type(screen.getByLabelText('Case name'), 'Corr v IBC Vehicles Ltd');
-    const neutral = group(/Neutral citation/);
+    const neutral = group(/^Neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2008');
     await user.type(neutral.getByLabelText('Court'), 'UKHL');
     await user.type(neutral.getByLabelText('Judgment number'), '13');
 
-    const report = group(/Law report/);
+    const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '2008');
     await user.type(report.getByLabelText('Volume'), '1');
     await user.type(report.getByLabelText('Report series'), 'AC');
@@ -84,7 +84,7 @@ describe('citing a case', () => {
     const user = setup();
 
     await user.type(screen.getByLabelText('Case name'), 'Re Guardian News and Media Ltd');
-    const neutral = group(/Neutral citation/);
+    const neutral = group(/^Neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2010');
     await user.type(neutral.getByLabelText('Court'), 'UKSC');
     await user.type(neutral.getByLabelText('Judgment number'), '1');
@@ -100,7 +100,7 @@ describe('citing a case', () => {
     const user = setup();
 
     await user.type(screen.getByLabelText('Case name'), 'Page v Smith');
-    const report = group(/Law report/);
+    const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
@@ -163,7 +163,7 @@ describe('the mode switch', () => {
   it('tells the reader legal sources have no end-of-essay entry under the OU scheme', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Page v Smith');
-    const report = group(/Law report/);
+    const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
@@ -282,7 +282,7 @@ describe('validation and the session list', () => {
     expect(add()).toBeDisabled();
     expect(screen.getAllByText(/needs a neutral citation, a law report/i).length).toBeGreaterThan(0);
 
-    const report = group(/Law report/);
+    const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
@@ -305,7 +305,7 @@ describe('validation and the session list', () => {
   it('adds a valid source to the session list and clears the form', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Page v Smith');
-    const report = group(/Law report/);
+    const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '1996');
     await user.type(report.getByLabelText('Report series'), 'AC');
     await user.type(report.getByLabelText('First page'), '155');
@@ -566,11 +566,11 @@ describe('judge attribution', () => {
   it('adds the judge in brackets after the pinpoint (2.1.7)', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Arscott v The Coal Authority');
-    const neutral = group(/Neutral citation/);
+    const neutral = group(/^Neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2004');
     await user.type(neutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(neutral.getByLabelText('Judgment number'), '892');
-    const report = group(/Law report/);
+    const report = group(/^Law report$/);
     await user.type(report.getByLabelText('Year'), '2005');
     await user.type(report.getByLabelText('Report series'), 'Env LR');
     await user.type(report.getByLabelText('First page'), '6');
@@ -587,7 +587,7 @@ describe('judge attribution', () => {
   it('names one judge once across several passages', async () => {
     const user = setup();
     await user.type(screen.getByLabelText('Case name'), 'Callery v Gray');
-    const neutral = group(/Neutral citation/);
+    const neutral = group(/^Neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2001');
     await user.type(neutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(neutral.getByLabelText('Judgment number'), '1117');
@@ -606,7 +606,7 @@ describe('the footnote sequence', () => {
   /** Add a second, distinct case so ordering can be exercised. */
   async function addBuntVTilley(user: ReturnType<typeof setup>) {
     await user.type(screen.getByLabelText('Case name'), 'Bunt v Tilley');
-    const neutral = group(/Neutral citation/);
+    const neutral = group(/^Neutral citation$/);
     await user.type(neutral.getByLabelText('Year'), '2006');
     await user.type(neutral.getByLabelText('Court'), 'EWHC');
     await user.type(neutral.getByLabelText('Judgment number'), '407');
@@ -807,7 +807,7 @@ describe('editing a saved source', () => {
     await user.click(sourceList().getByRole('button', { name: /^Edit/ }));
 
     expect(screen.getByLabelText('Case name')).toHaveValue('Page v Smith');
-    expect(group(/Law report/).getByLabelText('First page')).toHaveValue('155');
+    expect(group(/^Law report$/).getByLabelText('First page')).toHaveValue('155');
     expect(group(/Other/).getByLabelText('Court')).toHaveValue('HL');
     expect(screen.getByRole('button', { name: 'Save changes' })).toBeInTheDocument();
   });
@@ -817,8 +817,8 @@ describe('editing a saved source', () => {
     await addPageVSmith(user);
     await user.click(sourceList().getByRole('button', { name: /^Edit/ }));
 
-    await user.clear(group(/Law report/).getByLabelText('First page'));
-    await user.type(group(/Law report/).getByLabelText('First page'), '165');
+    await user.clear(group(/^Law report$/).getByLabelText('First page'));
+    await user.type(group(/^Law report$/).getByLabelText('First page'), '165');
     await user.click(screen.getByRole('button', { name: 'Save changes' }));
 
     expect(screen.getByRole('heading', { name: /Your sources \(1\)/ })).toBeInTheDocument();
@@ -881,6 +881,85 @@ describe('editing a saved source', () => {
 
     expect(screen.getByRole('heading', { name: /Your sources \(0\)/ })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Add to sources' })).toBeInTheDocument();
+  });
+});
+
+describe('further neutral citations and later history', () => {
+  it('lists a second neutral citation before the report (2.1.3)', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Case name'), 'Masterman-Lister v Brutton & Co (Nos 1 and 2)');
+    const first = group(/^Neutral citation$/);
+    await user.type(first.getByLabelText('Year'), '2002');
+    await user.type(first.getByLabelText('Court'), 'EWCA Civ');
+    await user.type(first.getByLabelText('Judgment number'), '1889');
+    const second = group(/^Second neutral citation$/);
+    await user.type(second.getByLabelText('Year'), '2003');
+    await user.type(second.getByLabelText('Court'), 'EWCA Civ');
+    await user.type(second.getByLabelText('Judgment number'), '70');
+    const report = group(/^Law report$/);
+    await user.type(report.getByLabelText('Year'), '2003');
+    await user.type(report.getByLabelText('Volume'), '1');
+    await user.type(report.getByLabelText('Report series'), 'WLR');
+    await user.type(report.getByLabelText('First page'), '1511');
+
+    expect(citation('Footnote')).toBe(
+      'Masterman-Lister v Brutton & Co (Nos 1 and 2) [2002] EWCA Civ 1889, [2003] EWCA Civ 70, [2003] 1 WLR 1511.',
+    );
+  });
+
+  it('adds "sub nom" and the alternative name (2.1.2)', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Case name'), 'Gibbons v South West Water Services Ltd');
+    const report = group(/^Law report$/);
+    await user.type(report.getByLabelText('Year'), '1993');
+    await user.type(report.getByLabelText('Report series'), 'QB');
+    await user.type(report.getByLabelText('First page'), '507');
+
+    const history = group(/^Later history$/);
+    await user.selectOptions(history.getByLabelText('Reported under another name'), 'yes');
+    await user.type(history.getByLabelText('Name at that stage'), 'AB v South West Water Services Ltd');
+    const later = group(/^Later law report$/);
+    await user.type(later.getByLabelText('Year'), '1993');
+    await user.type(later.getByLabelText('Volume'), '2');
+    await user.type(later.getByLabelText('Report series'), 'WLR');
+    await user.type(later.getByLabelText('First page'), '507');
+    await user.type(later.getByLabelText('Court'), 'CA');
+
+    expect(citation('Footnote')).toBe(
+      'Gibbons v South West Water Services Ltd [1993] QB 507, sub nom AB v South West Water Services Ltd [1993] 2 WLR 507 (CA).',
+    );
+    expect(italics('Footnote')).toEqual([
+      'Gibbons v South West Water Services Ltd',
+      'AB v South West Water Services Ltd',
+    ]);
+  });
+
+  it('marks a decision affirmed on appeal (2.1.8)', async () => {
+    const user = setup();
+    await user.type(screen.getByLabelText('Case name'), 'Roberts v Gable');
+    const neutral = group(/^Neutral citation$/);
+    await user.type(neutral.getByLabelText('Year'), '2006');
+    await user.type(neutral.getByLabelText('Court'), 'EWHC');
+    await user.type(neutral.getByLabelText('Judgment number'), '1025');
+    await user.type(neutral.getByLabelText('Division'), 'QB');
+    const report = group(/^Law report$/);
+    await user.type(report.getByLabelText('Year'), '2006');
+    await user.type(report.getByLabelText('Report series'), 'EMLR');
+    await user.type(report.getByLabelText('First page'), '23');
+
+    await user.selectOptions(group(/^Later history$/).getByLabelText('Later outcome'), 'affd');
+    const laterNeutral = group(/^Later neutral citation$/);
+    await user.type(laterNeutral.getByLabelText('Year'), '2007');
+    await user.type(laterNeutral.getByLabelText('Court'), 'EWCA Civ');
+    await user.type(laterNeutral.getByLabelText('Judgment number'), '721');
+    const laterReport = group(/^Later law report$/);
+    await user.type(laterReport.getByLabelText('Year'), '2008');
+    await user.type(laterReport.getByLabelText('Report series'), 'QB');
+    await user.type(laterReport.getByLabelText('First page'), '502');
+
+    expect(citation('Footnote')).toBe(
+      'Roberts v Gable [2006] EWHC 1025 (QB), [2006] EMLR 23, affd [2007] EWCA Civ 721, [2008] QB 502.',
+    );
   });
 });
 

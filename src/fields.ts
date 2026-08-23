@@ -2,7 +2,10 @@ import type {
   Author,
   BookChapterSource,
   BookSource,
+  CaseHistory,
   CaseSource,
+  LawReport,
+  NeutralCitation,
   EuCaseSource,
   EuLegislationSource,
   JournalArticleSource,
@@ -28,6 +31,12 @@ export interface FieldSpec {
   readonly group?: string;
 }
 
+/** OSCOLA 2.1.1's two forms, shared by the primary report and any later one. */
+const YEAR_FORMAT = [
+  { value: 'square', label: 'Square — [2008] 1 AC 884' },
+  { value: 'round', label: 'Round — (1965) 109 SJ 175' },
+];
+
 const PINPOINT_KIND = [
   { value: 'paragraph', label: 'Paragraph' },
   { value: 'page', label: 'Page' },
@@ -45,15 +54,49 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
       key: 'report.yearFormat',
       label: 'Year brackets',
       control: 'select',
-      options: [
-        { value: 'square', label: 'Square — [2008] 1 AC 884' },
-        { value: 'round', label: 'Round — (1965) 109 SJ 175' },
-      ],
+      options: YEAR_FORMAT,
       hint: 'Square where the year identifies the volume; round where the volume is numbered independently of the year.',
     },
     { key: 'report.volume', label: 'Volume', placeholder: '1' },
     { key: 'report.abbreviation', label: 'Report series', placeholder: 'AC' },
     { key: 'report.firstPage', label: 'First page', placeholder: '884' },
+    { key: 'neutral2.year', label: 'Year', placeholder: '2003', group: 'Second neutral citation', hint: 'Only where one report holds more than one judgment (2.1.3). Listed after the first, oldest first.' },
+    { key: 'neutral2.court', label: 'Court', placeholder: 'EWCA Civ' },
+    { key: 'neutral2.number', label: 'Judgment number', placeholder: '70' },
+    { key: 'neutral2.division', label: 'Division', placeholder: 'QB' },
+    {
+      key: 'history.disposition',
+      label: 'Later outcome',
+      control: 'select',
+      group: 'Later history',
+      options: [
+        { value: '', label: 'None' },
+        { value: 'affd', label: 'Affirmed — affd' },
+        { value: 'revd', label: 'Reversed — revd' },
+      ],
+      hint: 'What happened to the decision in the citation above (2.1.8).',
+    },
+    {
+      key: 'history.subNom',
+      label: 'Reported under another name',
+      control: 'select',
+      options: [
+        { value: '', label: 'No' },
+        { value: 'yes', label: 'Yes — adds sub nom' },
+      ],
+      hint: 'For a report using a significantly different name, or a name changed at a later stage (2.1.2).',
+    },
+    { key: 'history.caseName', label: 'Name at that stage', placeholder: 'AB v South West Water Services Ltd', hint: 'Italicised. Leave blank where the name is unchanged.' },
+    { key: 'history.neutral.year', label: 'Year', placeholder: '2007', group: 'Later neutral citation' },
+    { key: 'history.neutral.court', label: 'Court', placeholder: 'EWCA Civ' },
+    { key: 'history.neutral.number', label: 'Judgment number', placeholder: '721' },
+    { key: 'history.neutral.division', label: 'Division', placeholder: 'QB' },
+    { key: 'history.report.year', label: 'Year', placeholder: '2008', group: 'Later law report' },
+    { key: 'history.report.yearFormat', label: 'Year brackets', control: 'select', options: YEAR_FORMAT },
+    { key: 'history.report.volume', label: 'Volume', placeholder: '1' },
+    { key: 'history.report.abbreviation', label: 'Report series', placeholder: 'QB' },
+    { key: 'history.report.firstPage', label: 'First page', placeholder: '502' },
+    { key: 'history.court', label: 'Court', placeholder: 'HL', hint: 'Not cited where the later neutral citation already identifies it.' },
     { key: 'court', label: 'Court', placeholder: 'HL', group: 'Other', hint: 'Not cited where there is a neutral citation, nor for cases decided before 1865.' },
     { key: 'judgmentDate', label: 'Date of judgment', control: 'date', hint: 'Only for an unreported case with no neutral citation: the court and this date are cited in place of a report.' },
     { key: 'shortName', label: 'Short name', placeholder: 'Austin', hint: 'Used when the case is cited again. Derived from the first party if left blank.' },
@@ -228,7 +271,7 @@ export const AUTHOR_LISTS: Partial<Record<SourceType, readonly AuthorListSpec[]>
 };
 
 export const DEFAULT_DRAFTS: Record<SourceType, Draft> = {
-  case: { 'report.yearFormat': 'square', 'pinpoint.kind': 'paragraph' },
+  case: { 'report.yearFormat': 'square', 'history.report.yearFormat': 'square', 'pinpoint.kind': 'paragraph' },
   act: {},
   statutoryInstrument: { numbering: 'si' },
   euLegislation: { ojSeries: 'L' },
@@ -247,6 +290,54 @@ const opt = (draft: Draft, key: string): string | undefined => {
 const req = (draft: Draft, key: string): string => draft[key]?.trim() ?? '';
 
 /**
+ * A neutral citation under a dotted prefix, or undefined where the form's
+ * group was left empty. The court and number are what make one real; a stray
+ * year alone does not.
+ */
+function buildNeutral(draft: Draft, prefix: string): NeutralCitation | undefined {
+  const court = opt(draft, `${prefix}.court`);
+  const number = opt(draft, `${prefix}.number`);
+  if (!court && !number) return undefined;
+  return {
+    year: req(draft, `${prefix}.year`),
+    court: court ?? '',
+    number: number ?? '',
+    division: opt(draft, `${prefix}.division`),
+  };
+}
+
+/** A law report under a dotted prefix, on the same principle. */
+function buildReport(draft: Draft, prefix: string): LawReport | undefined {
+  const abbreviation = opt(draft, `${prefix}.abbreviation`);
+  const firstPage = opt(draft, `${prefix}.firstPage`);
+  if (!abbreviation && !firstPage) return undefined;
+  return {
+    year: req(draft, `${prefix}.year`),
+    yearFormat: draft[`${prefix}.yearFormat`] === 'round' ? 'round' : 'square',
+    volume: opt(draft, `${prefix}.volume`),
+    abbreviation: abbreviation ?? '',
+    firstPage: firstPage ?? '',
+  };
+}
+
+/**
+ * OSCOLA 2.1.2 and 2.1.8's clause after the primary citation. Undefined unless
+ * something was actually entered, so an untouched form round-trips clean.
+ */
+function buildHistory(draft: Draft): CaseHistory | undefined {
+  const disposition = draft['history.disposition'];
+  const history: CaseHistory = {
+    disposition: disposition === 'affd' || disposition === 'revd' ? disposition : undefined,
+    subNom: draft['history.subNom'] ? true : undefined,
+    caseName: opt(draft, 'history.caseName'),
+    neutral: buildNeutral(draft, 'history.neutral'),
+    report: buildReport(draft, 'history.report'),
+    court: opt(draft, 'history.court'),
+  };
+  return Object.values(history).some(Boolean) ? history : undefined;
+}
+
+/**
  * Fold the flat draft back into a typed source. Empty optional fields become
  * `undefined` so the formatters can drop whole clauses — a blank law report
  * must not render as `[] `.
@@ -262,6 +353,8 @@ export function buildSource(
     case 'case': {
       const hasNeutral = Boolean(opt(draft, 'neutral.court') || opt(draft, 'neutral.number'));
       const hasReport = Boolean(opt(draft, 'report.abbreviation') || opt(draft, 'report.firstPage'));
+      const history = buildHistory(draft);
+      const second = buildNeutral(draft, 'neutral2');
       const source: CaseSource = {
         id,
         type: 'case',
@@ -283,9 +376,11 @@ export function buildSource(
               firstPage: req(draft, 'report.firstPage'),
             }
           : undefined,
+        furtherNeutrals: second ? [second] : undefined,
         court: opt(draft, 'court'),
         judgmentDate: opt(draft, 'judgmentDate'),
         shortName: opt(draft, 'shortName'),
+        history,
         pinpoint: pinpointFrom(
           draft['pinpoint.kind'] === 'page' ? 'page' : 'paragraph',
           opt(draft, 'pinpoint.value'),
@@ -503,6 +598,23 @@ function setPinpoint(draft: Draft, pinpoint: Pinpoint | undefined, withKind: boo
   set(draft, 'pinpoint.judge', references[references.length - 1]?.judge);
 }
 
+/** The inverse of `buildNeutral`. */
+function setNeutral(draft: Draft, prefix: string, neutral: NeutralCitation): void {
+  set(draft, `${prefix}.year`, neutral.year);
+  set(draft, `${prefix}.court`, neutral.court);
+  set(draft, `${prefix}.number`, neutral.number);
+  set(draft, `${prefix}.division`, neutral.division);
+}
+
+/** The inverse of `buildReport`. */
+function setReport(draft: Draft, prefix: string, report: LawReport): void {
+  set(draft, `${prefix}.year`, report.year);
+  draft[`${prefix}.yearFormat`] = report.yearFormat;
+  set(draft, `${prefix}.volume`, report.volume);
+  set(draft, `${prefix}.abbreviation`, report.abbreviation);
+  set(draft, `${prefix}.firstPage`, report.firstPage);
+}
+
 /**
  * The inverse of `buildSource`: unfold a saved source back into the flat draft
  * the form edits. Round-tripping is lossless, which the tests assert per type.
@@ -518,18 +630,19 @@ export function toDraft(source: Source): DraftState {
       set(draft, 'court', source.court);
       set(draft, 'judgmentDate', source.judgmentDate);
       set(draft, 'shortName', source.shortName);
-      if (source.neutral) {
-        set(draft, 'neutral.year', source.neutral.year);
-        set(draft, 'neutral.court', source.neutral.court);
-        set(draft, 'neutral.number', source.neutral.number);
-        set(draft, 'neutral.division', source.neutral.division);
-      }
-      if (source.report) {
-        set(draft, 'report.year', source.report.year);
-        draft['report.yearFormat'] = source.report.yearFormat;
-        set(draft, 'report.volume', source.report.volume);
-        set(draft, 'report.abbreviation', source.report.abbreviation);
-        set(draft, 'report.firstPage', source.report.firstPage);
+      if (source.neutral) setNeutral(draft, 'neutral', source.neutral);
+      if (source.report) setReport(draft, 'report', source.report);
+      // The form offers one further neutral citation; the model holds any
+      // number, so an imported library with more keeps them and shows the
+      // second. See the README's gap list.
+      if (source.furtherNeutrals?.[0]) setNeutral(draft, 'neutral2', source.furtherNeutrals[0]);
+      if (source.history) {
+        draft['history.disposition'] = source.history.disposition ?? '';
+        draft['history.subNom'] = source.history.subNom ? 'yes' : '';
+        set(draft, 'history.caseName', source.history.caseName);
+        set(draft, 'history.court', source.history.court);
+        if (source.history.neutral) setNeutral(draft, 'history.neutral', source.history.neutral);
+        if (source.history.report) setReport(draft, 'history.report', source.history.report);
       }
       setPinpoint(draft, source.pinpoint, true);
       break;

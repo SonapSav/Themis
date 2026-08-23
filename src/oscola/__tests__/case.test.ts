@@ -296,3 +296,125 @@ describe('cases — markup', () => {
     ]);
   });
 });
+
+// Every citation asserted below is verbatim from OSCOLA 4th edn.
+describe('more than one neutral citation (2.1.3)', () => {
+  // "If a single report includes more than one judgment and therefore more than
+  // one neutral citation, list the neutral citations in chronological order,
+  // starting with the oldest, and separate them with a comma."
+  const mastermanLister: CaseSource = {
+    id: 'c1',
+    type: 'case',
+    caseName: 'Masterman-Lister v Brutton & Co (Nos 1 and 2)',
+    neutral: { year: '2002', court: 'EWCA Civ', number: '1889' },
+    furtherNeutrals: [{ year: '2003', court: 'EWCA Civ', number: '70' }],
+    report: { year: '2003', yearFormat: 'square', volume: '1', abbreviation: 'WLR', firstPage: '1511' },
+  };
+
+  it('lists them oldest first, separated by commas, before the report', () => {
+    expect(footnote(mastermanLister)).toBe(
+      'Masterman-Lister v Brutton & Co (Nos 1 and 2) [2002] EWCA Civ 1889, [2003] EWCA Civ 70, [2003] 1 WLR 1511.',
+    );
+  });
+
+  it('italicises only the case name', () => {
+    expect(
+      formatFootnote(mastermanLister)
+        .filter((segment) => segment.style === 'italic')
+        .map((segment) => segment.text),
+    ).toEqual(['Masterman-Lister v Brutton & Co (Nos 1 and 2)']);
+  });
+});
+
+describe('variations in the name of a case (2.1.2)', () => {
+  // "the report or reports using the alternative name of the case should be
+  // introduced by the phrase 'sub nom' in roman".
+  it('introduces an alternative name with sub nom', () => {
+    const gibbons: CaseSource = {
+      id: 'c2',
+      type: 'case',
+      caseName: 'Gibbons v South West Water Services Ltd',
+      report: { year: '1993', yearFormat: 'square', abbreviation: 'QB', firstPage: '507' },
+      history: {
+        subNom: true,
+        caseName: 'AB v South West Water Services Ltd',
+        report: { year: '1993', yearFormat: 'square', volume: '2', abbreviation: 'WLR', firstPage: '507' },
+        court: 'CA',
+      },
+    };
+    expect(footnote(gibbons)).toBe(
+      'Gibbons v South West Water Services Ltd [1993] QB 507, sub nom AB v South West Water Services Ltd [1993] 2 WLR 507 (CA).',
+    );
+    // "sub nom" is roman; both case names are italic.
+    expect(
+      formatFootnote(gibbons)
+        .filter((segment) => segment.style === 'italic')
+        .map((segment) => segment.text),
+    ).toEqual(['Gibbons v South West Water Services Ltd', 'AB v South West Water Services Ltd']);
+  });
+
+  // "where a case appears under a different name at different stages in its
+  // history … the name of the case at the second stage cited should be
+  // introduced by 'sub nom'".
+  it('combines a disposition with sub nom', () => {
+    const southYorkshire: CaseSource = {
+      id: 'c3',
+      type: 'case',
+      caseName: 'R v Monopolies and Mergers Commission, ex p South Yorkshire Transport Ltd',
+      report: { year: '1992', yearFormat: 'square', volume: '1', abbreviation: 'WLR', firstPage: '291' },
+      court: 'CA',
+      history: {
+        disposition: 'affd',
+        subNom: true,
+        caseName: 'South Yorkshire Transport Ltd v Monopolies and Mergers Commission',
+        report: { year: '1993', yearFormat: 'square', volume: '1', abbreviation: 'WLR', firstPage: '23' },
+        court: 'HL',
+      },
+    };
+    expect(footnote(southYorkshire)).toBe(
+      'R v Monopolies and Mergers Commission, ex p South Yorkshire Transport Ltd [1992] 1 WLR 291 (CA), ' +
+        'affd sub nom South Yorkshire Transport Ltd v Monopolies and Mergers Commission [1993] 1 WLR 23 (HL).',
+    );
+  });
+});
+
+describe('subsequent history of a case (2.1.8)', () => {
+  // "The subsequent history of a case may be indicated after the primary
+  // citation by abbreviating 'affirmed' to 'affd' and 'reversed' to 'revd'."
+  const roberts: CaseSource = {
+    id: 'c4',
+    type: 'case',
+    caseName: 'Roberts v Gable',
+    neutral: { year: '2006', court: 'EWHC', number: '1025', division: 'QB' },
+    report: { year: '2006', yearFormat: 'square', abbreviation: 'EMLR', firstPage: '23' },
+    history: {
+      disposition: 'affd',
+      neutral: { year: '2007', court: 'EWCA Civ', number: '721' },
+      report: { year: '2008', yearFormat: 'square', abbreviation: 'QB', firstPage: '502' },
+    },
+  };
+
+  it('follows the primary citation with affd and the later citation', () => {
+    expect(footnote(roberts)).toBe(
+      'Roberts v Gable [2006] EWHC 1025 (QB), [2006] EMLR 23, affd [2007] EWCA Civ 721, [2008] QB 502.',
+    );
+  });
+
+  it('abbreviates a reversal to revd', () => {
+    expect(footnote({ ...roberts, history: { ...roberts.history, disposition: 'revd' } })).toBe(
+      'Roberts v Gable [2006] EWHC 1025 (QB), [2006] EMLR 23, revd [2007] EWCA Civ 721, [2008] QB 502.',
+    );
+  });
+
+  it('drops the later court where its neutral citation identifies it (2.1.3)', () => {
+    const withCourt = { ...roberts, history: { ...roberts.history, court: 'CA' } };
+    expect(footnote(withCourt)).toBe(footnote(roberts));
+  });
+
+  it('carries the history into the table of cases, with names in roman (1.6.2)', () => {
+    expect(bibliography(roberts)).toBe(
+      'Roberts v Gable [2006] EWHC 1025 (QB), [2006] EMLR 23, affd [2007] EWCA Civ 721, [2008] QB 502',
+    );
+    expect(formatBibliography(roberts).every((segment) => segment.style === 'plain')).toBe(true);
+  });
+});

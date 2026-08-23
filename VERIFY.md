@@ -183,6 +183,12 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
       following that journal's own citation advice rather than a rule. Thetis
       gives it §3.3.1's square brackets, `[2004]`. If a journal's own guidance
       says otherwise, follow the journal.
+- [ ] **A pinpoint sits before an `affd` clause, not after it.** §2.1.8 says
+      `affd` and `revd` "refer to the decision in the primary citation", so
+      Thetis attaches the pinpoint to that primary citation:
+      `… [2006] EMLR 23 [12], affd [2007] EWCA Civ 721`. No example in the guide
+      shows a pinpoint and a subsequent history together, and there is no way
+      yet to pinpoint the *later* decision.
 - [ ] **A CPR pinpoint written `r 5.2` warns rather than being corrected.**
       §2.5.3 says to omit `r` and `rr` for the CPR, but Thetis never silently
       rewrites what you typed. The warning is stated for the CPR only; the RSC
@@ -201,7 +207,7 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
 - [ ] **LAN access.** `http://harmony.local:5173/` and
       `http://192.168.0.63:5173/` both answer to `curl`, but I have not loaded
       them in a browser from another machine.
-- [ ] **The tests take about 105 seconds**, nearly all of it the DOM tests
+- [ ] **The tests take about two minutes**, nearly all of it the DOM tests
       typing character by character. `npx vitest run src/oscola src/harvard
       src/document` runs just the engines in about two seconds if you want a
       fast loop.
