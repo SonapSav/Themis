@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 429 tests
+npm test           # 433 tests
 npm run typecheck
 ```
 
@@ -322,6 +322,37 @@ Nothing in the suite is invented.
 | **No full stops in abbreviations** | §4.2.1, in terms: "In OSCOLA, abbreviations do not have full stops." `A.C.` is flagged with what it would normally be — `AC` — and **never rewritten**, because the same field legitimately carries `Lloyd's Rep` and `Cr App R (S)`. Applied to report series, journal abbreviations and court codes. |
 | **Neutral citation courts** | §4.1's appendix is the table: 26 rows, 17 codes. An unlisted code warns *softly* — §4.1 is the 2012 list, so a court created since is genuinely absent rather than wrong. A miscased code is named rather than merely rejected (`"UKHL", not "ukhl"`). §2.1.3's rule that High Court citations carry a division is checked against the eight §4.1 lists for `EWHC`, and a division given to a court that takes none is flagged too. |
 | **Quotation marks** | Straight single quotes around article and web page titles. Titles are stored and emitted verbatim — §3.1.2 wants major words capitalised, but auto-capitalising would silently rewrite the student's source, so that is left to them. |
+
+## The form folds away what most sources do not need
+
+There is no conditional logic in the form: every field of a type is rendered,
+because whether a case has a later history is not something the form can work
+out. But the case form reached 33 fields, which buries the six that nearly every
+citation actually needs, so the situational groups start folded:
+
+`Second neutral citation`, `Later history`, `Later neutral citation`,
+`Later law report`, `Multi-volume works`, and the journal article's
+`Case note, forthcoming, online`.
+
+Three rules keep that from hiding anything:
+
+- **A folded group opens by itself when it holds something** — editing a saved
+  source with a volume opens the volume group, so nothing is silently invisible
+  to someone correcting it.
+- **It also opens when it holds a validation issue**, so a warning does not
+  appear from nowhere behind a closed heading. Folding it back is still your
+  call, and the Checks panel lists every issue whatever the form is showing.
+- **Your choice is remembered** until the source type changes. Someone entering
+  one multi-volume book is probably entering another, so the group does not
+  snap shut after each one.
+
+The toggle is a real `<button aria-expanded>` inside the `<legend>`, so the
+fieldset still takes its accessible name from the legend, the control is
+reachable by keyboard, and its state is announced. Folded fields are **removed
+from the DOM** rather than hidden, so nothing invisible stays focusable — and a
+component test that fills one has to open it first, exactly as a person does.
+That is why the eight tests touching these groups gained an `openGroup` call
+rather than a workaround.
 
 ## Validation
 

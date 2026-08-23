@@ -41,6 +41,18 @@ function italics(heading: string): string[] {
 
 const group = (name: string | RegExp) => within(screen.getByRole('group', { name }));
 
+/**
+ * Ensure a group is open before filling it in, exactly as a reader does. The
+ * fields of a folded group are not in the DOM, so this is not ceremony.
+ *
+ * It checks before clicking rather than clicking blindly: a group holding a
+ * validation issue opens itself, and a blind click would fold it shut again.
+ */
+const openGroup = async (user: ReturnType<typeof userEvent.setup>, name: string) => {
+  const toggle = screen.getByRole('button', { name });
+  if (toggle.getAttribute('aria-expanded') === 'false') await user.click(toggle);
+};
+
 /** Scoped to the form's own select: the library's type filter lists the same names. */
 const chooseType = (user: ReturnType<typeof userEvent.setup>, label: string) => {
   const select = screen.getByLabelText('Source type');
@@ -884,6 +896,78 @@ describe('editing a saved source', () => {
   });
 });
 
+describe('folding away the situational fields', () => {
+  it('starts the situational groups folded and the core ones open', () => {
+    setup();
+    // Every case needs these; almost none needs a later history.
+    expect(screen.getByRole('group', { name: /^Neutral citation$/ })).toBeInTheDocument();
+    expect(screen.getByLabelText('Case name')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Later history' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+    // Folded fields are out of the DOM, not merely hidden.
+    expect(screen.queryByLabelText('Name at that stage')).not.toBeInTheDocument();
+  });
+
+  it('opens on request and says so', async () => {
+    const user = setup();
+    await openGroup(user, 'Later history');
+    expect(screen.getByRole('button', { name: 'Later history' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(screen.getByLabelText('Name at that stage')).toBeInTheDocument();
+  });
+
+  it('folds back up again', async () => {
+    const user = setup();
+    await openGroup(user, 'Later history');
+    await user.click(screen.getByRole('button', { name: 'Later history' }));
+    expect(screen.queryByLabelText('Name at that stage')).not.toBeInTheDocument();
+  });
+
+  it('opens a group that holds something when a saved source is edited', async () => {
+    const user = setup();
+    await chooseType(user, 'Book');
+    const authors = group('Authors or editors');
+    await user.click(authors.getByRole('button', { name: 'Add author' }));
+    await user.type(authors.getByLabelText('Surname'), 'von Bar');
+    await user.type(screen.getByLabelText('Title'), 'The Common European Law of Torts');
+    await user.type(screen.getByLabelText('Publisher'), 'CH Beck');
+    await user.type(screen.getByLabelText('Year'), '2000');
+    await openGroup(user, 'Multi-volume works');
+    await user.type(group(/Multi-volume/).getByLabelText('Volume'), '2');
+    await user.click(screen.getByRole('button', { name: 'Add to sources' }));
+
+    // The form clears, but the group stays open: someone entering one
+    // multi-volume book is likely entering another, and snapping shut under
+    // them would be worse than an empty open group.
+    expect(screen.getByRole('button', { name: 'Multi-volume works' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+
+    // Switching type and back drops that preference, so the group is folded
+    // again — which is what makes the next assertion mean anything.
+    await chooseType(user, 'Case');
+    await chooseType(user, 'Book');
+    expect(screen.getByRole('button', { name: 'Multi-volume works' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+
+    await user.click(screen.getByRole('button', { name: /^Edit/ }));
+    // Loading a source with a volume opens the group holding it, so the field
+    // is not silently hidden from someone editing.
+    expect(screen.getByRole('button', { name: 'Multi-volume works' })).toHaveAttribute(
+      'aria-expanded',
+      'true',
+    );
+    expect(group(/Multi-volume/).getByLabelText('Volume')).toHaveValue('2');
+  });
+});
+
 describe('abbreviation and court-code checks', () => {
   it('flags a report series written with full stops, without rewriting it (4.2.1)', async () => {
     const user = setup();
@@ -931,6 +1015,7 @@ describe('further neutral citations and later history', () => {
     await user.type(first.getByLabelText('Year'), '2002');
     await user.type(first.getByLabelText('Court'), 'EWCA Civ');
     await user.type(first.getByLabelText('Judgment number'), '1889');
+    await openGroup(user, 'Second neutral citation');
     const second = group(/^Second neutral citation$/);
     await user.type(second.getByLabelText('Year'), '2003');
     await user.type(second.getByLabelText('Court'), 'EWCA Civ');
@@ -954,9 +1039,11 @@ describe('further neutral citations and later history', () => {
     await user.type(report.getByLabelText('Report series'), 'QB');
     await user.type(report.getByLabelText('First page'), '507');
 
+    await openGroup(user, 'Later history');
     const history = group(/^Later history$/);
     await user.selectOptions(history.getByLabelText('Reported under another name'), 'yes');
     await user.type(history.getByLabelText('Name at that stage'), 'AB v South West Water Services Ltd');
+    await openGroup(user, 'Later law report');
     const later = group(/^Later law report$/);
     await user.type(later.getByLabelText('Year'), '1993');
     await user.type(later.getByLabelText('Volume'), '2');
@@ -986,11 +1073,14 @@ describe('further neutral citations and later history', () => {
     await user.type(report.getByLabelText('Report series'), 'EMLR');
     await user.type(report.getByLabelText('First page'), '23');
 
+    await openGroup(user, 'Later history');
     await user.selectOptions(group(/^Later history$/).getByLabelText('Later outcome'), 'affd');
+    await openGroup(user, 'Later neutral citation');
     const laterNeutral = group(/^Later neutral citation$/);
     await user.type(laterNeutral.getByLabelText('Year'), '2007');
     await user.type(laterNeutral.getByLabelText('Court'), 'EWCA Civ');
     await user.type(laterNeutral.getByLabelText('Judgment number'), '721');
+    await openGroup(user, 'Later law report');
     const laterReport = group(/^Later law report$/);
     await user.type(laterReport.getByLabelText('Year'), '2008');
     await user.type(laterReport.getByLabelText('Report series'), 'QB');
@@ -1013,6 +1103,7 @@ describe('multi-volume books (3.2.1)', () => {
     await user.type(screen.getByLabelText('Title'), 'The Common European Law of Torts');
     await user.type(screen.getByLabelText('Publisher'), 'CH Beck');
     await user.type(screen.getByLabelText('Year'), '2000');
+    await openGroup(user, 'Multi-volume works');
     await user.type(group(/Multi-volume/).getByLabelText('Volume'), '2');
   };
 
@@ -1059,6 +1150,7 @@ describe('journal articles online, forthcoming and as case notes', () => {
     await fillArticle(user, 'Free Access');
     await user.type(screen.getByLabelText('Volume'), '1');
     await user.type(screen.getByLabelText('Issue'), '1');
+    await openGroup(user, 'Case note, forthcoming, online');
     await user.type(screen.getByLabelText('Web address'), 'http://ejlt.org/article/view/17');
     fireEvent.change(screen.getByLabelText('Date accessed'), { target: { value: '2010-07-27' } });
 
@@ -1071,6 +1163,7 @@ describe('journal articles online, forthcoming and as case notes', () => {
   it('closes a forthcoming article with (forthcoming) (3.3.3)', async () => {
     const user = setup();
     await fillArticle(user, 'Free Access');
+    await openGroup(user, 'Case note, forthcoming, online');
     await user.selectOptions(screen.getByLabelText('Forthcoming'), 'yes');
 
     expect(citation('Footnote')).toBe("Graham Greenleaf, 'Free Access' [2010] EJLT (forthcoming).");
@@ -1079,6 +1172,7 @@ describe('journal articles online, forthcoming and as case notes', () => {
   it('italicises the case name of an untitled case note (3.3.2)', async () => {
     const user = setup();
     await fillArticle(user, '');
+    await openGroup(user, 'Case note, forthcoming, online');
     await user.selectOptions(screen.getByLabelText('Case note'), 'yes');
     await user.type(screen.getByLabelText('Case discussed'), 'R (Singh) v Chief Constable');
     await user.type(screen.getByLabelText('First page'), '441');

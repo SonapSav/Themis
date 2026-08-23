@@ -208,7 +208,9 @@ export function validate(source: Source): readonly ValidationIssue[] {
         if ((disposition || subNom) && !neutral && !report) {
           issues.push(
             warning(
-              'history.report',
+              // A real field key, so the message lands on a field and can open
+              // the folded group it belongs to, not only in the Checks panel.
+              'history.report.abbreviation',
               'Give the citation the later stage is reported at — "affd" and "sub nom" introduce a citation rather than standing alone.',
             ),
           );

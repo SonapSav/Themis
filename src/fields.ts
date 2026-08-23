@@ -270,6 +270,28 @@ export const AUTHOR_LISTS: Partial<Record<SourceType, readonly AuthorListSpec[]>
   ouModuleMaterial: [{ key: 'authors', label: 'Authors (leave empty to cite The Open University)' }],
 };
 
+/**
+ * Groups that stay folded away until they are wanted.
+ *
+ * Every field of every type is rendered at once — there is no conditional
+ * logic, because whether a case has a later history is not something the form
+ * can infer. But most of these are blank for most sources, and the case form
+ * had grown to 33 fields, which buries the six that nearly every citation
+ * needs.
+ *
+ * A folded group opens on request, and opens by itself when it holds something:
+ * a saved source being edited, or a validation issue that would otherwise be
+ * invisible behind a closed heading.
+ */
+export const OPTIONAL_GROUPS: ReadonlySet<string> = new Set([
+  'Second neutral citation',
+  'Later history',
+  'Later neutral citation',
+  'Later law report',
+  'Multi-volume works',
+  'Case note, forthcoming, online',
+]);
+
 export const DEFAULT_DRAFTS: Record<SourceType, Draft> = {
   case: { 'report.yearFormat': 'square', 'history.report.yearFormat': 'square', 'pinpoint.kind': 'paragraph' },
   act: {},

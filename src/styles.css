@@ -91,6 +91,29 @@ fieldset.group legend {
   padding: 0 0.4rem;
 }
 
+/* A group that folds away. The legend holds the toggle, so the fieldset keeps
+   taking its accessible name from it. */
+fieldset.group.optional { padding-bottom: 0; }
+fieldset.group.optional:has(.disclosure[aria-expanded='true']) { padding-bottom: 0.25rem; }
+fieldset.group legend .disclosure {
+  font: inherit;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 700;
+  background: none;
+  border: 0;
+  padding: 0.1rem 0.2rem;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+fieldset.group legend .disclosure:hover { color: var(--accent); }
+fieldset.group legend .chevron { font-size: 0.7em; line-height: 1; }
+
 /* ---- Authors ---- */
 
 .authors { border: 1px solid var(--line); border-radius: var(--radius); padding: 0.75rem 1rem 1rem; margin: 0 0 1.25rem; }

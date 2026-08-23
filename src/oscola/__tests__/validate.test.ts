@@ -324,7 +324,7 @@ describe('validation — later history (2.1.2, 2.1.8)', () => {
   });
 
   it('says "affd" alone points at nothing', () => {
-    expect(fields({ ...base, history: { disposition: 'affd' } }, 'warning')).toContain('history.report');
+    expect(fields({ ...base, history: { disposition: 'affd' } }, 'warning')).toContain('history.report.abbreviation');
   });
 
   it('asks for the name that "sub nom" introduces', () => {

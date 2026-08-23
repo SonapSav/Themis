@@ -19,7 +19,7 @@ For whoever picks this up next, including a future session of me.
 | 3. Word output | **Working end to end** — a `.docx` whose footnote markers copy into a student's own document and renumber, confirmed in Word on 23 August 2026; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-429 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+433 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -129,9 +129,11 @@ form is settled — see `VERIFY.md` §3e. Module materials would settle them fas
 than more reading of the public pages, and until then this is blocked rather
 than merely unstarted.
 
-One thing the case form has now outgrown: it carries 33 fields, most of them
-blank for any given case. The groups keep it navigable, but conditional or
-collapsible sections are worth a look before more are added.
+The case form carries 33 fields, most of them blank for any given case. The six
+situational groups now start folded — see the README's *The form folds away what
+most sources do not need*. That buys room for the fields a future gap needs, but
+it is a presentation fix, not a licence: a type whose form needs a seventh group
+is probably a type that wants splitting.
 
 Each needs a field, a formatter branch, a verbatim test, and a README row.
 
