@@ -66,8 +66,8 @@ describe('the masthead', () => {
   it('shows the mark without it intruding on the heading name', () => {
     const { container } = render(<App />);
     expect(container.querySelector('h1 svg.mark')).toBeInTheDocument();
-    // The mark is decorative, so the heading still reads as just "Thetis".
-    expect(screen.getByRole('heading', { level: 1 })).toHaveAccessibleName('Thetis');
+    // The mark is decorative, so the heading still reads as just "Themis".
+    expect(screen.getByRole('heading', { level: 1 })).toHaveAccessibleName('Themis');
   });
 });
 
@@ -437,8 +437,8 @@ describe('the assembled lists', () => {
 describe('export and import', () => {
   const exportFile = (sources: unknown[], mode = 'oscola') =>
     new File(
-      [JSON.stringify({ format: 'thetis-library', version: 1, mode, sources })],
-      'thetis-sources.json',
+      [JSON.stringify({ format: 'themis-library', version: 1, mode, sources })],
+      'themis-sources.json',
       { type: 'application/json' },
     );
 
@@ -465,13 +465,13 @@ describe('export and import', () => {
 
   it('writes out the library as a dated JSON file', async () => {
     // jsdom implements neither object URLs nor anchor-triggered downloads.
-    const createObjectURL = vi.fn((_blob: Blob) => 'blob:thetis');
+    const createObjectURL = vi.fn((_blob: Blob) => 'blob:themis');
     Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true });
     Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
     const click = vi
       .spyOn(HTMLAnchorElement.prototype, 'click')
       .mockImplementation(function (this: HTMLAnchorElement) {
-        expect(this.download).toMatch(/^thetis-sources-\d{4}-\d{2}-\d{2}\.json$/);
+        expect(this.download).toMatch(/^themis-sources-\d{4}-\d{2}-\d{2}\.json$/);
       });
 
     const user = setup();
@@ -481,7 +481,7 @@ describe('export and import', () => {
     expect(click).toHaveBeenCalledOnce();
     const blob = createObjectURL.mock.calls[0]![0];
     expect(JSON.parse(await blob.text())).toMatchObject({
-      format: 'thetis-library',
+      format: 'themis-library',
       sources: [{ caseName: 'Page v Smith' }],
     });
     expect(screen.getByRole('status')).toHaveTextContent('Exported 1 source.');
@@ -525,13 +525,13 @@ describe('export and import', () => {
     );
   });
 
-  it('explains a file that is not a Thetis export', async () => {
+  it('explains a file that is not a Themis export', async () => {
     const user = setup();
     const wrong = new File(['{"hello":"world"}'], 'other.json', { type: 'application/json' });
     await user.upload(importInput(), wrong);
 
     expect(await screen.findByRole('status')).toHaveTextContent(
-      'That does not look like a Thetis export.',
+      'That does not look like a Themis export.',
     );
     expect(screen.getByRole('heading', { name: /Your sources \(0\)/ })).toBeInTheDocument();
   });
@@ -760,7 +760,7 @@ describe('Word export', () => {
   afterEach(() => vi.restoreAllMocks());
 
   it('writes a dated .docx holding the footnotes and the lists', async () => {
-    const createObjectURL = vi.fn((_blob: Blob) => 'blob:thetis');
+    const createObjectURL = vi.fn((_blob: Blob) => 'blob:themis');
     Object.defineProperty(URL, 'createObjectURL', { value: createObjectURL, configurable: true });
     Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true });
     let downloadName = '';
@@ -779,7 +779,7 @@ describe('Word export', () => {
 
     // Packing is asynchronous, so wait for the finished message, not the first one.
     expect(await lists.findByText('Exported your lists.')).toBeInTheDocument();
-    expect(downloadName).toMatch(/^thetis-citations-\d{4}-\d{2}-\d{2}\.docx$/);
+    expect(downloadName).toMatch(/^themis-citations-\d{4}-\d{2}-\d{2}\.docx$/);
 
     // A real Word file: a zip whose parts include the footnote store.
     const blob = createObjectURL.mock.calls[0]![0];

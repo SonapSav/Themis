@@ -11,7 +11,7 @@ import type { CitationMode, Source } from '../model/types';
 import type { LibraryState } from './library';
 import { SOURCE_TYPE_LABELS } from '../model/types';
 
-export const EXPORT_FORMAT = 'thetis-library';
+export const EXPORT_FORMAT = 'themis-library';
 export const EXPORT_VERSION = 1;
 
 export interface ExportFile {
@@ -37,9 +37,9 @@ export function toExportJson(state: LibraryState, now: Date): string {
   return `${JSON.stringify(file, null, 2)}\n`;
 }
 
-/** `thetis-sources-2026-08-22.json` — dated, so successive backups sit together. */
+/** `themis-sources-2026-08-22.json` — dated, so successive backups sit together. */
 export function exportFilename(now: Date): string {
-  return `thetis-sources-${now.toISOString().slice(0, 10)}.json`;
+  return `themis-sources-${now.toISOString().slice(0, 10)}.json`;
 }
 
 // ---------------------------------------------------------------------------
@@ -69,12 +69,12 @@ export function parseImport(text: string): ImportOutcome {
 
   const file = parsed as Partial<ExportFile>;
   if (file?.format !== EXPORT_FORMAT) {
-    return { ok: false, error: 'That does not look like a Thetis export.' };
+    return { ok: false, error: 'That does not look like a Themis export.' };
   }
   if (file.version !== EXPORT_VERSION) {
     return {
       ok: false,
-      error: `That export was written by a different version of Thetis (${String(file.version)}).`,
+      error: `That export was written by a different version of Themis (${String(file.version)}).`,
     };
   }
   if (!Array.isArray(file.sources)) {

@@ -48,7 +48,7 @@ describe('planning the document', () => {
   });
 
   it('dates the filename', () => {
-    expect(docxFilename(new Date('2026-08-22T00:00:00Z'))).toBe('thetis-citations-2026-08-22.docx');
+    expect(docxFilename(new Date('2026-08-22T00:00:00Z'))).toBe('themis-citations-2026-08-22.docx');
   });
 });
 

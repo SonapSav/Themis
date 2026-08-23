@@ -187,7 +187,7 @@ function sortedEntries(sources: readonly Source[], key: (s: Source) => string): 
 /**
  * Cite Them Right distinguishes several works by one author in the same year
  * with a letter after the date. The Open University's public guidance does not
- * show that form, so Thetis flags the clash rather than guessing at it.
+ * show that form, so Themis flags the clash rather than guessing at it.
  */
 function harvardWarnings(sources: readonly Source[]): string[] {
   const seen = new Map<string, number>();

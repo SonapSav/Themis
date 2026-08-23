@@ -254,7 +254,7 @@ describe('online journals (3.3.4)', () => {
       accessDate: '2009-11-18',
     });
     // The guide prints this example's year bare, as `2004 Duke L & Tech Rev`,
-    // following the journal's own citation advice (3.3.4). Thetis does not
+    // following the journal's own citation advice (3.3.4). Themis does not
     // model a bare year, so the year takes the square brackets 3.3.1 gives a
     // journal with no volume.
     expect(footnote(boyle)).toBe(

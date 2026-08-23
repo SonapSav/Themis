@@ -1,11 +1,11 @@
 {
-  "name": "thetis",
+  "name": "themis",
   "private": true,
   "version": "0.1.0",
   "author": "Panos Vasilopoulos <sonap.sav@gmail.com>",
   "license": "MIT",
   "type": "module",
-  "description": "Thetis — an OSCOLA legal citation manager",
+  "description": "Themis — an OSCOLA legal citation manager",
   "scripts": {
     "prepare": "git config core.hooksPath .githooks || true",
     "dev": "vite",

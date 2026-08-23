@@ -152,7 +152,7 @@ describe('OU dual mode', () => {
   });
 
   // Cite Them Right distinguishes these with a letter after the date, but the
-  // OU's public guidance does not show that form, so Thetis flags rather than guesses.
+  // OU's public guidance does not show that form, so Themis flags rather than guesses.
   it('warns when two sources share an author and year', () => {
     const other = book('b2', {
       authors: [person('J', 'Bell')], title: 'Another book',

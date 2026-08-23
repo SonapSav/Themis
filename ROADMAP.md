@@ -177,7 +177,7 @@ marker in the exported file, copying it, and pasting into their own document
 carries the footnote across and renumbers it. It works smoothly.
 
 That was the whole justification for exporting real Word footnotes rather than a
-plain list, and it holds. So a student already has a working path from Thetis
+plain list, and it holds. So a student already has a working path from Themis
 into their essay, with no add-in, no manifest, no HTTPS host, and no sideloading.
 
 The add-in would still be nicer — citations inserted at the cursor rather than

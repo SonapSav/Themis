@@ -206,7 +206,7 @@ export default function App() {
         <div>
           <h1>
             <ScalesIcon className="mark" />
-            Thetis
+            Themis
           </h1>
           <p>OSCOLA (4th edn) and Cite Them Right Harvard citations.</p>
         </div>

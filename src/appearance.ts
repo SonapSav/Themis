@@ -1,5 +1,5 @@
 /**
- * How Thetis looks: a theme and a typeface, both the reader's choice.
+ * How Themis looks: a theme and a typeface, both the reader's choice.
  *
  * Neither touches a citation, and that is the point of keeping them here rather
  * than anywhere near `src/oscola` or `src/harvard`. This module decides *which*

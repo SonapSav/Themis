@@ -12,7 +12,7 @@ interface Props {
 }
 
 /**
- * The two things a reader can change about how Thetis looks. They sit in the
+ * The two things a reader can change about how Themis looks. They sit in the
  * masthead rather than behind a settings page: there are two of them, and a
  * page of its own for two selects is a page nobody finds.
  */

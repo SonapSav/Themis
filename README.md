@@ -1,4 +1,4 @@
-# Thetis
+# Themis
 
 A citation manager for UK law students, in two schemes:
 
@@ -189,7 +189,7 @@ an empty result offers a way back rather than an empty panel.
 
 ## Persistence
 
-The library is kept in `localStorage` under `thetis.library`, versioned, and
+The library is kept in `localStorage` under `themis.library`, versioned, and
 never leaves the browser — there is no backend. Every access is guarded: a
 private window, blocked site data or a full quota degrades to an in-memory
 session rather than an error, and a corrupted entry costs that one source
@@ -200,7 +200,7 @@ tracking prevention deletes script-writable storage after seven days without
 interaction with the site; clearing site data or changing browser loses it
 outright. An OU module runs nine months. So:
 
-- **Export** writes `thetis-sources-YYYY-MM-DD.json` — a dated, self-describing
+- **Export** writes `themis-sources-YYYY-MM-DD.json` — a dated, self-describing
   file the student keeps. It is also how a library moves between machines,
   with no server involved.
 - **Import adds; it never replaces.** A mistaken import cannot destroy existing
@@ -224,7 +224,7 @@ Two selects in the masthead, and neither touches a citation.
 **Theme** is Light, Dark, or *Match my system*, which is the default: someone
 who wants a dark screen has usually already said so once, to their operating
 system. That choice is watched rather than read once, so a laptop set to switch
-at dusk switches Thetis with it, without a reload.
+at dusk switches Themis with it, without a reload.
 
 **Typeface** is Georgia, Times New Roman, Arial or Verdana. Nothing is
 downloaded — every one is a face the machine already has, so the choice costs no
@@ -247,7 +247,7 @@ are asserted rather than trusted, because either would fail silently:
 
 The choice is applied in `main.tsx` **before the first paint**, not in an effect
 after it, so a dark reader is never shown a white page for a frame. It is stored
-under its own key, `thetis.appearance`, apart from the library: clearing your
+under its own key, `themis.appearance`, apart from the library: clearing your
 sources is about sources, and is not a factory reset.
 
 Dark mode also forced two colours into the open that had been literal `#fff` —
@@ -295,7 +295,7 @@ and [Harvard quick guide](https://university.open.ac.uk/library/referencing-and-
 §1.1 is explicit: *"OSCOLA is a footnote style: all citations appear in
 footnotes. OSCOLA does not use endnotes or in-text citations, such as
 '(Brown, 2007)'."* A Harvard-style inline form is therefore not a missing
-feature but a prohibited one, and Thetis will never emit one for a source it is
+feature but a prohibited one, and Themis will never emit one for a source it is
 formatting in OSCOLA. Harvard in-text citations appear only for academic
 sources in OU dual mode, which is a different scheme, not an OSCOLA variant.
 
@@ -309,7 +309,7 @@ which `nameInTextForm(source)` returns and the preview shows as a third panel:
 | Book, article, website | §1.1.3: a secondary source is always cited in a footnote. | Nothing changes; the panel says so. |
 
 Deciding *which* form a given footnote needs depends on what the sentence says,
-so Thetis shows both and leaves the choice to the writer. Shortened repeat
+so Themis shows both and leaves the choice to the writer. Shortened repeat
 citations — `ibid`, `Austin (n 1)` — are Phase 2.
 
 ## Output is styled segments, not a markup string
@@ -473,13 +473,13 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 
 - **Same author, same year** — CTR distinguishes these with a letter after the
   date (`2014a`, `2014b`), but the OU's public guidance does not show the form,
-  so Thetis flags the clash and leaves the fix to the student.
+  so Themis flags the clash and leaves the fix to the student.
 
 - **`(eds)` for several editors** — the OU guide prints only the singular
   `(ed.)`, so the plural is inferred. Worth checking against CTR itself.
 - **The corporate-author full stop** — the OU template prints
   `The Open University. (Year)`, its own example prints
-  `The Open University (2025)`. Thetis follows the example.
+  `The Open University (2025)`. Themis follows the example.
 - **Harvard book volumes** are named in the OU's book template — "Series and
   volume number if relevant" — but it prints no worked example, so the form is
   not fixed and is not guessed at. A volume shows in an OSCOLA footnote and not
@@ -518,15 +518,15 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
   the model holds any number, but the form offers one further citation beyond the
   first — the guide's own example has two, and a repeatable group is UI work
   rather than a citation rule. An imported library keeps what it holds.
-- **A pinpoint alongside subsequent history.** Thetis attaches the pinpoint to
+- **A pinpoint alongside subsequent history.** Themis attaches the pinpoint to
   the primary citation, before the `affd` clause, because that is the decision
   the pinpoint refers to. The guide shows no example of the two together.
 - **EU case numbers** are passed through as typed. OSCOLA prints them with an
-  en dash (`C–176/03`); Thetis does not silently convert a hyphen, because the
+  en dash (`C–176/03`); Themis does not silently convert a hyphen, because the
   official EU form uses a hyphen and guessing either way would be wrong.
 - **Shortened footnotes for EU cases** — §1.1.1's "name given in the text" rule
   is stated for case names, and the guide shows no shortened form for a
-  citation that leads with a registration number, so Thetis does not extrapolate.
+  citation that leads with a registration number, so Themis does not extrapolate.
 
 ## Not yet supported
 
@@ -583,7 +583,7 @@ MIT — see [LICENSE](LICENSE).
 
 ### Third-party assets
 
-The Thetis mark — the balance scale in the masthead and in the browser tab — is
+The Themis mark — the balance scale in the masthead and in the browser tab — is
 `balance` from [Google Material Symbols](https://github.com/google/material-design-icons),
 used under the [Apache License 2.0](https://www.apache.org/licenses/LICENSE-2.0).
 

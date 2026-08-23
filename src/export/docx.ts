@@ -38,7 +38,7 @@ export function planDocx(
 ): DocxPlan {
   const assembled = assemble(sources, mode);
   return {
-    title: 'Thetis citations',
+    title: 'Themis citations',
     intro:
       'Each line below carries a real Word footnote. Copy a footnote marker into your own ' +
       'document and Word will bring the footnote with it and renumber it.',
@@ -52,9 +52,9 @@ export function planDocx(
   };
 }
 
-/** `thetis-citations-2026-08-22.docx`. */
+/** `themis-citations-2026-08-22.docx`. */
 export function docxFilename(now: Date): string {
-  return `thetis-citations-${now.toISOString().slice(0, 10)}.docx`;
+  return `themis-citations-${now.toISOString().slice(0, 10)}.docx`;
 }
 
 /** True where there is anything worth exporting. */

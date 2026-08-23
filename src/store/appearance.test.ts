@@ -21,19 +21,19 @@ describe('appearance persistence', () => {
   });
 
   it('ignores a choice written by a different version', () => {
-    localStorage.setItem('thetis.appearance', JSON.stringify({ version: 99, ...chosen }));
+    localStorage.setItem('themis.appearance', JSON.stringify({ version: 99, ...chosen }));
     expect(load()).toBeUndefined();
   });
 
   it('ignores unparseable content rather than throwing', () => {
-    localStorage.setItem('thetis.appearance', 'not json {');
+    localStorage.setItem('themis.appearance', 'not json {');
     expect(load()).toBeUndefined();
   });
 
   // Half a stored choice is still half a choice worth keeping.
   it('falls back per half, so a bad typeface does not cost the theme', () => {
     localStorage.setItem(
-      'thetis.appearance',
+      'themis.appearance',
       JSON.stringify({ version: 1, theme: 'dark', typeface: 'Comic Sans' }),
     );
     expect(load()).toEqual({ theme: 'dark', typeface: DEFAULT_APPEARANCE.typeface });
@@ -49,7 +49,7 @@ describe('appearance persistence', () => {
   // Sources and appearance are separate keys on purpose.
   it('keeps the choice under its own key', () => {
     save(chosen);
-    expect(localStorage.getItem('thetis.library')).toBeNull();
-    expect(localStorage.getItem('thetis.appearance')).not.toBeNull();
+    expect(localStorage.getItem('themis.library')).toBeNull();
+    expect(localStorage.getItem('themis.appearance')).not.toBeNull();
   });
 });

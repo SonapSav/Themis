@@ -63,7 +63,7 @@ fi
 # an earlier `Co-authored-by:`, and so on.
 #
 # A one-line message is always a subject, never a trailer, even when it reads
-# like one: this repo's own subjects take the form `Thetis: OSCOLA citations`.
+# like one: this repo's own subjects take the form `Themis: OSCOLA citations`.
 # Without that guard the trailer would be glued onto the subject line.
 LAST_LINE=$(printf '%s\n' "$BODY" | tail -n 1)
 LINE_COUNT=$(printf '%s\n' "$BODY" | wc -l)

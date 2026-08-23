@@ -1,6 +1,6 @@
 # Things to check yourself
 
-Everything Thetis does is covered by tests, but some things cannot be verified
+Everything Themis does is covered by tests, but some things cannot be verified
 from this machine — no Word, no LibreOffice, no browser I can drive, and no
 access to Cite Them Right, which is paywalled. This is the list.
 
@@ -42,7 +42,7 @@ that footnote 2 is an `ibid` and footnote 4 a `Corr (n 1)` cross-citation.
 ## 2. Does a pasted citation keep its italics?
 
 **Why I can't check:** clipboard behaviour differs by browser and cannot be
-exercised outside a real one. I tested that Thetis offers both a `text/html`
+exercised outside a real one. I tested that Themis offers both a `text/html`
 and a `text/plain` flavour and falls back correctly, but not what Word does
 with them.
 
@@ -69,7 +69,7 @@ different problem: five templates the guide names but never works through.
 
 ### 3a. Plural editors
 
-The OU guide prints only the singular, `(ed.)`. Thetis uses `(eds)` for several.
+The OU guide prints only the singular, `(ed.)`. Themis uses `(eds)` for several.
 
 - [ ] Confirm CTR's plural form — `(eds)`, `(eds.)`, or something else
 
@@ -77,14 +77,14 @@ The OU guide prints only the singular, `(ed.)`. Thetis uses `(eds)` for several.
 
 The OU template prints `The Open University. (Year of publication)` with a full
 stop; its own worked example prints `The Open University (2025)` without one.
-Thetis follows the example.
+Themis follows the example.
 
 - [ ] Confirm which is right
 
 ### 3c. Same author, same year
 
 CTR distinguishes these with a letter after the date (`2014a`, `2014b`), but the
-OU guidance does not show the form, so Thetis **flags the clash and stops**
+OU guidance does not show the form, so Themis **flags the clash and stops**
 rather than guessing. You will see a warning in the Your lists panel.
 
 - [ ] Confirm the exact form, and whether the letter appears in both the in-text
@@ -92,7 +92,7 @@ rather than guessing. You will see a warning in the Your lists panel.
 
 ### 3d. Which CTR edition
 
-Thetis follows the **12th edition**, which drops the place of publication:
+Themis follows the **12th edition**, which drops the place of publication:
 `Bell, J. (2014) Doing your research project. Open University Press.`
 
 The OU's own two pages disagree — their 2019 Harvard quick guide still shows the
@@ -105,7 +105,7 @@ The OU's own two pages disagree — their 2019 Harvard quick guide still shows t
 These are different in kind from 3a–3d. The OU guide *names* each of these
 slots, but prints no worked example, so the exact form — capitalisation,
 abbreviation, punctuation, position — is not fixed by anything I can read.
-Rather than guess, Thetis does not model them at all, and the README records
+Rather than guess, Themis does not model them at all, and the README records
 each as a gap. Every one is a source a law student can actually hit.
 
 - [ ] **Book volumes.** The book template ends "Series and volume number if
@@ -115,7 +115,7 @@ each as a gap. Every one is a source a law student can actually hit.
 - [ ] **`doi:`** The journal template allows `doi: 10.1080/02619761003602246`
       as an optional tail. Not modelled.
 - [ ] **Case notes.** The OU guides have no case-note template at all. In
-      Harvard, Thetis renders an untitled case note's case name where the
+      Harvard, Themis renders an untitled case note's case name where the
       article title goes — the same substitution OSCOLA §3.3.2 makes — and does
       **not** add `(note)`, because that is an OSCOLA marker and no CTR
       equivalent has been seen.
@@ -132,7 +132,7 @@ half, so it is worth more than a guess from the public pages.
 ## 4. Does your module really exclude legal sources from the end list?
 
 You told me legal sources appear in footnotes only, with no table of cases or
-legislation at the end, and Thetis is built that way in **OU Dual** mode. This
+legislation at the end, and Themis is built that way in **OU Dual** mode. This
 is the single biggest structural assumption in the OU half.
 
 - [ ] Check your module handbook, or Sections 8–8.2.2 of the Law undergraduate
@@ -150,17 +150,17 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
 
 - [ ] **Closing full stops on shortened footnotes.** §1.1 says "Close footnotes
       with a full stop", but the display examples in §1.2 and §1.1.1 print
-      `Austin (n 1)` and `[1967] 2 AC 46 (HL)` without one. Thetis adds the full
+      `Austin (n 1)` and `[1967] 2 AC 46 (HL)` without one. Themis adds the full
       stop, reading the bare examples as display formatting.
 - [ ] **EU case numbers** are passed through exactly as you type them. The guide
       prints `Case C–176/03` with an **en dash**; the official EU form uses a
-      hyphen. Thetis does not convert either way, so type what you want.
+      hyphen. Themis does not convert either way, so type what you want.
 - [ ] **EU cases are excluded from the "named in your text" shortening.**
       §1.1.1's rule is stated for case names, and the guide shows no shortened
-      form for a citation that leads with a registration number, so Thetis does
+      form for a citation that leads with a registration number, so Themis does
       not extrapolate.
 - [ ] **A pinpoint on EU legislation that announces a short form** — no guide
-      example exists. Thetis puts the pinpoint after the bracket with a comma:
+      example exists. Themis puts the pinpoint after the bracket with a comma:
       `… OJ L307/18 (Working Time Directive), art 2`.
 - [ ] **A separate Table of EU legislation.** §1.6.3 suggests separate lists per
       jurisdiction, so EU legislation gets its own section rather than mixing in
@@ -173,7 +173,7 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
       different passages.
 - [ ] **`(note)` and `(forthcoming)` sit before a web address.** §3.3.2 puts
       `(note)` "at the end of the citation" and §3.3.4 describes the address as
-      *following* the citation, so Thetis takes the citation to end first:
+      *following* the citation, so Themis takes the citation to end first:
       `… EJLT (note) <http://…> accessed 27 July 2010`. No example combines
       them.
 - [ ] **A titled case note gets no automatic `(note)`.** §3.3.2 says to treat
@@ -182,15 +182,15 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
 - [ ] **No plural is inferred for a book's paragraphs.** §3.2.1 prints
       `para 76`, and the guide's looseleaf `para 8–106` is one paragraph's
       number rather than a range — so a dash proves nothing about plurals.
-      Type `paras 76, 78` yourself and Thetis will respect it.
+      Type `paras 76, 78` yourself and Themis will respect it.
 - [ ] **A bare, unbracketed journal year is not modelled.** §3.3.4's Boyle
       example prints `2004 Duke L & Tech Rev 0009` with no brackets at all,
-      following that journal's own citation advice rather than a rule. Thetis
+      following that journal's own citation advice rather than a rule. Themis
       gives it §3.3.1's square brackets, `[2004]`. If a journal's own guidance
       says otherwise, follow the journal.
 - [ ] **A pinpoint sits before an `affd` clause, not after it.** §2.1.8 says
       `affd` and `revd` "refer to the decision in the primary citation", so
-      Thetis attaches the pinpoint to that primary citation:
+      Themis attaches the pinpoint to that primary citation:
       `… [2006] EMLR 23 [12], affd [2007] EWCA Civ 721`. No example in the guide
       shows a pinpoint and a subsequent history together, and there is no way
       yet to pinpoint the *later* decision.
@@ -203,7 +203,7 @@ a worked example in the guide. Worth an eye if you have a tutor to ask.
       judgement decides whether the report-series list is worth extracting at
       all.
 - [ ] **A CPR pinpoint written `r 5.2` warns rather than being corrected.**
-      §2.5.3 says to omit `r` and `rr` for the CPR, but Thetis never silently
+      §2.5.3 says to omit `r` and `rr` for the CPR, but Themis never silently
       rewrites what you typed. The warning is stated for the CPR only; the RSC
       and CCR keep theirs, as `RSC Ord 24, r 14A` shows.
 
@@ -258,7 +258,7 @@ account settings, so none of this can be checked from here.
       authored with it. If it is not on the account, they will not link to your
       profile or count toward your contribution graph — https://github.com/settings/emails
       fixes it retroactively.
-- [ ] **Repository visibility.** `SonapSav/Thetis` may be public or private; I
+- [ ] **Repository visibility.** `SonapSav/Themis` may be public or private; I
       did not check and it is worth being deliberate. Nothing sensitive is in it
       — no keys, no backend, and `.gitignore` covers `node_modules` and `dist`.
 - [ ] **The SSH key.** `~/.ssh/id_ed25519` on this Pi, fingerprint

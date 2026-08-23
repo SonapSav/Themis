@@ -100,7 +100,7 @@ export function nameInTextForm(source: Source): NameInTextForm {
       return {
         footnoteRequired: true,
         note:
-          'OSCOLA 1.1.1 is stated for case names. Thetis does not extend it to EU cases, whose citation leads with the registration number.',
+          'OSCOLA 1.1.1 is stated for case names. Themis does not extend it to EU cases, whose citation leads with the registration number.',
       };
 
     case 'ouModuleMaterial':

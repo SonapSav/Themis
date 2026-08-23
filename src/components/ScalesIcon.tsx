@@ -1,5 +1,5 @@
 /**
- * The Thetis mark: a balance scale.
+ * The Themis mark: a balance scale.
  *
  * "balance" from Google Material Symbols (Outlined), path unmodified.
  * Source: https://github.com/google/material-design-icons — Apache License 2.0.
@@ -16,7 +16,7 @@ export function ScalesIcon({ className }: { className?: string }) {
       // Material Symbols draw on a 960 grid with a negative-y origin.
       viewBox="0 -960 960 960"
       xmlns="http://www.w3.org/2000/svg"
-      // Decorative: the wordmark beside it already says "Thetis".
+      // Decorative: the wordmark beside it already says "Themis".
       aria-hidden="true"
       focusable="false"
     >

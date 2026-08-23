@@ -29,7 +29,7 @@ describe('export', () => {
   it('writes a self-describing file', () => {
     const parsed = JSON.parse(toExportJson({ mode: 'oscola', sources: [page] }, NOW));
     expect(parsed).toMatchObject({
-      format: 'thetis-library',
+      format: 'themis-library',
       version: 1,
       exportedAt: '2026-08-22T14:30:00.000Z',
       mode: 'oscola',
@@ -38,7 +38,7 @@ describe('export', () => {
   });
 
   it('dates the filename so successive backups sort together', () => {
-    expect(exportFilename(NOW)).toBe('thetis-sources-2026-08-22.json');
+    expect(exportFilename(NOW)).toBe('themis-sources-2026-08-22.json');
   });
 });
 
@@ -57,21 +57,21 @@ describe('import', () => {
     });
   });
 
-  it('rejects JSON that is not a Thetis export', () => {
+  it('rejects JSON that is not a Themis export', () => {
     expect(parseImport('{"some":"object"}')).toMatchObject({ ok: false });
     expect(parseImport('{"some":"object"}')).toHaveProperty(
-      'error', 'That does not look like a Thetis export.',
+      'error', 'That does not look like a Themis export.',
     );
   });
 
   it('rejects an export from another version', () => {
-    const other = JSON.stringify({ format: 'thetis-library', version: 99, sources: [] });
+    const other = JSON.stringify({ format: 'themis-library', version: 99, sources: [] });
     expect(parseImport(other)).toMatchObject({ ok: false });
   });
 
   it('reports entries it had to drop rather than failing the whole import', () => {
     const mixed = JSON.stringify({
-      format: 'thetis-library', version: 1, mode: 'oscola',
+      format: 'themis-library', version: 1, mode: 'oscola',
       sources: [page, null, { type: 'notAType' }, 'nope'],
     });
     expect(parseImport(mixed)).toEqual({ ok: true, mode: 'oscola', sources: [page], dropped: 3 });

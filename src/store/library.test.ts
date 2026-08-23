@@ -33,19 +33,19 @@ describe('library persistence', () => {
   });
 
   it('ignores a library written by a different version', () => {
-    localStorage.setItem('thetis.library', JSON.stringify({ version: 99, mode: 'oscola', sources: [page] }));
+    localStorage.setItem('themis.library', JSON.stringify({ version: 99, mode: 'oscola', sources: [page] }));
     expect(load()).toBeUndefined();
   });
 
   it('ignores unparseable content rather than throwing', () => {
-    localStorage.setItem('thetis.library', 'not json {');
+    localStorage.setItem('themis.library', 'not json {');
     expect(load()).toBeUndefined();
   });
 
   // A corrupt entry should cost the student that one source, not the library.
   it('drops malformed sources and keeps the sound ones', () => {
     localStorage.setItem(
-      'thetis.library',
+      'themis.library',
       JSON.stringify({
         version: 1,
         mode: 'ou-dual',
@@ -63,14 +63,14 @@ describe('library persistence', () => {
 
   it('reads a library written before footnotes were stored', () => {
     localStorage.setItem(
-      'thetis.library',
+      'themis.library',
       JSON.stringify({ version: 1, mode: 'oscola', sources: [page] }),
     );
     expect(load()).toEqual({ mode: 'oscola', sources: [page], footnotes: [] });
   });
 
   it('falls back to the OU scheme when the stored mode is unrecognised', () => {
-    localStorage.setItem('thetis.library', JSON.stringify({ version: 1, mode: 'harvard', sources: [] }));
+    localStorage.setItem('themis.library', JSON.stringify({ version: 1, mode: 'harvard', sources: [] }));
     expect(load()?.mode).toBe('ou-dual');
   });
 

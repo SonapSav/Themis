@@ -12,7 +12,7 @@ import {
 } from '../appearance';
 import { storage } from './storage';
 
-const KEY = 'thetis.appearance';
+const KEY = 'themis.appearance';
 const VERSION = 1;
 
 interface Persisted extends Appearance {

@@ -10,7 +10,7 @@ import { SOURCE_TYPE_LABELS, type CitationMode, type Source } from '../model/typ
 import type { FootnoteInput } from '../document';
 import { storage } from './storage';
 
-const KEY = 'thetis.library';
+const KEY = 'themis.library';
 const VERSION = 1;
 
 export interface LibraryState {
