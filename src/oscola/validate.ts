@@ -813,7 +813,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
       }
       if (blank(source.year)) {
         issues.push(
-          error('year', 'Give the year of publication, or leave it blank to cite "n.d." for no date.'),
+          error('year', 'Give the year of publication, or leave it blank to cite "no date", which the OU\u2019s guide spells out rather than contracting.'),
         );
       }
       if (blank(source.url)) {

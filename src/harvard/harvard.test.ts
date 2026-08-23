@@ -112,8 +112,9 @@ describe('Harvard reference list — Cite Them Right', () => {
     );
   });
 
-  it('uses n.d. where there is no date', () => {
-    expect(ref({ ...bell, year: '' })).toContain('(n.d.)');
+  it('spells out "no date" rather than contracting it to n.d.', () => {
+    expect(ref({ ...bell, year: '' })).toContain('(no date)');
+    expect(ref({ ...bell, year: '' })).not.toContain('n.d.');
   });
 });
 

@@ -186,8 +186,14 @@ function sortedEntries(sources: readonly Source[], key: (s: Source) => string): 
 
 /**
  * Cite Them Right distinguishes several works by one author in the same year
- * with a letter after the date. The Open University's public guidance does not
- * show that form, so Themis flags the clash rather than guessing at it.
+ * with a letter after the date.
+ *
+ * The OU's quick guide for law modules does show the form — its in-text
+ * example for module units is `The Open University (2023a, 5.1)` — so the
+ * warning can now name it. Which item gets `a` and which `b` is still not
+ * assigned here: the letters run in the order the reference list is read, and
+ * a tool that hands them out silently would renumber a student's finished
+ * essay the moment another source was added.
  */
 function harvardWarnings(sources: readonly Source[]): string[] {
   const seen = new Map<string, number>();
@@ -200,7 +206,7 @@ function harvardWarnings(sources: readonly Source[]): string[] {
     .map(
       ([key]) =>
         `Two or more sources share an author and year (${key.split('|')[0] || 'no author'}, ${key.split('|')[1]}). ` +
-        'Cite Them Right distinguishes these with a letter after the date; check the form with your module guidance.',
+        'Cite Them Right distinguishes these with a letter after the date — 2023a, 2023b — assigned in the order they appear in the reference list. Add the letter yourself so it matches your in-text citations.',
     );
 }
 

@@ -287,7 +287,7 @@ and [Harvard quick guide](https://university.open.ac.uk/library/referencing-and-
 | **Harvard initials** | `Bell, J.`, `Franklin, A.W.` — full stops, no spaces. OSCOLA writes the same author `Bell J`. |
 | **Place of publication** | Omitted, following Cite Them Right 12th edn and the OU's current law page. Their 2019 Harvard PDF still shows the 11th edn form (`Maidenhead: Open University Press`); the two disagree and the newer one wins. |
 | **Web page titles** | Italic in Harvard (`Castles of Spain`), quoted in roman in OSCOLA. The same source renders differently by mode. |
-| **No author / no date** | An unattributed work is cited by its italicised title; a missing date gives `n.d.`. An unattributed OU module item is cited to `The Open University`. |
+| **No author / no date** | An unattributed work is cited by its italicised title; a missing date gives `no date`, spelled out. An unattributed OU module item is cited to `The Open University`. |
 | **Word count** | In-text Harvard citations count towards an OU word limit; footnotes and the reference list do not. Noted on each preview panel. |
 
 ## No inline citations in OSCOLA — by design

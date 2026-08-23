@@ -12,8 +12,16 @@ import type {
 import { editorMarker, formatAuthorsInText, formatAuthorsReference } from './authors';
 import { formatPages } from './pages';
 
-/** A source with no publication date is cited "n.d." (Cite Them Right). */
-const NO_DATE = 'n.d.';
+/**
+ * A source with no publication date is cited "no date", spelled out.
+ *
+ * Not "n.d.". The OU's own quick guide to Cite Them Right for law modules is
+ * express about it — "If the publication date is not given, the phrase 'no
+ * date' is used instead of a date in both the in-text citation and the full
+ * reference" — and Cite Them Right treats the contracted forms as outside the
+ * style rather than as an accepted alternative.
+ */
+const NO_DATE = 'no date';
 
 /** Types Harvard can format. Legal sources stay in OSCOLA footnotes. */
 export type HarvardSource =

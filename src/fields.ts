@@ -237,7 +237,7 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'shortTitle', label: 'Short title', hint: 'Used when you cite more than one work by this author.' },
   ],
   ouModuleMaterial: [
-    { key: 'year', label: 'Year', placeholder: '2025', hint: 'Leave blank to cite "n.d.".' },
+    { key: 'year', label: 'Year', placeholder: '2025', hint: 'Leave blank to cite "no date".' },
     { key: 'itemTitle', label: 'Item title', placeholder: 'Unit 4: Rules and regulations' },
     { key: 'moduleCode', label: 'Module code', placeholder: 'W111' },
     { key: 'moduleTitle', label: 'Module title', placeholder: 'Criminal law and the courts' },
