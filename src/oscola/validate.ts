@@ -24,6 +24,22 @@ const warning = (field: string, message: string): ValidationIssue => ({
 const blank = (value: string | undefined): boolean => !value || value.trim() === '';
 
 /**
+ * OSCOLA 3.1.4: include "http://" only where the address does not begin with
+ * "www". The guide's own examples are <www.nakedlaw.com/2009/05/index.html>
+ * and <http://ejlt.org/article/view/17>. The URL is never rewritten silently.
+ */
+function urlIssues(url: string): readonly ValidationIssue[] {
+  const trimmed = url.trim();
+  if (/^https?:\/\/www\./i.test(trimmed)) {
+    return [warning('url', 'OSCOLA omits "http://" where the address begins with "www".')];
+  }
+  if (!/^https?:\/\//i.test(trimmed) && !/^www\./i.test(trimmed)) {
+    return [warning('url', 'Addresses that do not begin with "www" are cited with "http://" or "https://".')];
+  }
+  return [];
+}
+
+/**
  * Check a source for missing or questionable data.
  *
  * `error` means the citation cannot be correct as it stands; `warning` means it
@@ -114,13 +130,45 @@ export function validate(source: Source): readonly ValidationIssue[] {
 
     case 'journalArticle': {
       if (source.authors.length === 0) issues.push(error('authors', 'A journal article needs an author.'));
-      if (blank(source.title)) issues.push(error('title', 'A journal article needs a title.'));
+      // 3.3.2: an untitled case note carries the case name in the title's place,
+      // so one of the two is required, not both.
+      if (blank(source.title) && blank(source.caseName)) {
+        issues.push(
+          error(
+            'title',
+            source.isCaseNote
+              ? 'A case note needs its own title, or the name of the case it discusses.'
+              : 'A journal article needs a title.',
+          ),
+        );
+      }
+      if (!blank(source.title) && !blank(source.caseName)) {
+        issues.push(
+          warning('caseName', 'A case note with its own title is cited as an ordinary article, so the case name has been left out.'),
+        );
+      }
       if (blank(source.journal)) issues.push(error('journal', 'A journal article needs the journal abbreviation, e.g. "MLR".'));
       if (blank(source.year)) issues.push(error('year', 'A journal article needs a year.'));
-      if (blank(source.firstPage)) issues.push(error('firstPage', 'A journal article needs its first page.'));
-      if (blank(source.volume)) {
+      // 3.3.4: online journals "may lack some of the publication elements (for
+      // example, many do not include page numbers)"; 3.3.3 says to omit an
+      // unknown page from a forthcoming article. Neither is an error.
+      const pageOptional = !blank(source.url) || source.forthcoming === true;
+      if (blank(source.firstPage) && !pageOptional) {
+        issues.push(error('firstPage', 'A journal article needs its first page.'));
+      }
+      if (blank(source.volume) && source.forthcoming !== true) {
         issues.push(
           warning('volume', 'No volume number, so the year will be cited in square brackets. Check the journal has no volumes.'),
+        );
+      }
+      if (!blank(source.url)) {
+        issues.push(...urlIssues(source.url!));
+        if (blank(source.accessDate)) {
+          issues.push(error('accessDate', 'An online article needs the date you last accessed it.'));
+        }
+      } else if (!blank(source.accessDate)) {
+        issues.push(
+          warning('accessDate', 'The access date is only cited alongside a web address, so it has been left out.'),
         );
       }
       break;
@@ -224,20 +272,7 @@ export function validate(source: Source): readonly ValidationIssue[] {
     case 'website': {
       if (blank(source.title)) issues.push(error('title', 'A web page needs a title.'));
       if (blank(source.url)) issues.push(error('url', 'A web page needs a URL.'));
-      else {
-        // OSCOLA 3.1.4: include "http://" only where the address does not
-        // begin with "www". The guide's own example is <www.nakedlaw.com/...>.
-        const url = source.url.trim();
-        if (/^https?:\/\/www\./i.test(url)) {
-          issues.push(
-            warning('url', 'OSCOLA omits "http://" where the address begins with "www".'),
-          );
-        } else if (!/^https?:\/\//i.test(url) && !/^www\./i.test(url)) {
-          issues.push(
-            warning('url', 'Addresses that do not begin with "www" are cited with "http://" or "https://".'),
-          );
-        }
-      }
+      else issues.push(...urlIssues(source.url));
       if (blank(source.accessDate)) issues.push(error('accessDate', 'A web page needs the date you accessed it.'));
       if (source.authors.length === 0) {
         issues.push(

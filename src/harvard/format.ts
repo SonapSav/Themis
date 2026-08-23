@@ -50,6 +50,17 @@ function yearOf(source: HarvardSource): string {
 }
 
 /**
+ * An untitled case note carries the name of the case where its title would go
+ * (OSCOLA 3.3.2). The OU's guide has no case-note template, so rather than
+ * invent one this renders the case name as the article title — the same
+ * substitution, without claiming a Cite Them Right rule that has not been seen.
+ */
+function articleTitle(source: JournalArticleSource): string {
+  const title = source.title.trim();
+  return title || (source.caseName?.trim() ?? '');
+}
+
+/**
  * The italicised title used in place of an author where a work is
  * unattributed: "(Information Literacy in Higher Education, 2015)".
  */
@@ -57,7 +68,7 @@ function titleFor(source: HarvardSource): string {
   switch (source.type) {
     case 'book': return source.title;
     case 'bookChapter': return source.chapterTitle;
-    case 'journalArticle': return source.title;
+    case 'journalArticle': return articleTitle(source);
     case 'website': return source.title;
     case 'ouModuleMaterial': return source.itemTitle;
   }
@@ -160,7 +171,7 @@ function journalArticleReference(source: JournalArticleSource): Part[] {
   const pages = formatPages(source.firstPage);
   return [
     ...opening(source),
-    `'${source.title.trim()}', `,
+    `'${articleTitle(source)}', `,
     italic(source.journal.trim()),
     issueInfo && `, ${issueInfo}`,
     pages && `, ${pages}`,

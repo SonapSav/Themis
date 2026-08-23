@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { validate } from '../validate';
-import type { CaseSource, Source, StatutoryInstrumentSource } from '../../model/types';
+import type { CaseSource, JournalArticleSource, Source, StatutoryInstrumentSource } from '../../model/types';
 import { person } from './helpers';
 
 const fields = (source: Source, severity?: 'error' | 'warning') =>
@@ -214,5 +214,74 @@ describe('validation — statutory instruments (2.5)', () => {
     expect(validate(source).map((issue) => issue.message)).toEqual([
       'A statutory instrument needs its SR & O number, e.g. "2004/3166".',
     ]);
+  });
+});
+
+describe('validation — journal articles (3.3.2–3.3.4)', () => {
+  const base: JournalArticleSource = {
+    id: 'j1',
+    type: 'journalArticle',
+    authors: [person('Andrew', 'Ashworth')],
+    title: 'Deference and Dignity',
+    year: '2006',
+    volume: '72',
+    journal: 'Crim LR',
+    firstPage: '441',
+  };
+
+  it('accepts a case name in place of a title (3.3.2)', () => {
+    const source: Source = {
+      ...base,
+      title: '',
+      caseName: 'R (Singh) v Chief Constable of the West Midlands Police',
+      isCaseNote: true,
+    };
+    expect(validate(source)).toEqual([]);
+  });
+
+  it('asks a case note for one of the two, not neither', () => {
+    expect(fields({ ...base, title: '', isCaseNote: true }, 'error')).toContain('title');
+  });
+
+  it('says a titled case note is cited as an ordinary article, so the case name is dropped', () => {
+    const source: Source = { ...base, caseName: 'R (Singh) v Chief Constable', isCaseNote: true };
+    expect(fields(source, 'warning')).toContain('caseName');
+    expect(fields(source, 'error')).toEqual([]);
+  });
+
+  // 3.3.3: "If volume and/or page numbers are not yet known, simply omit that
+  // information" — so neither absence is a fault on a forthcoming article.
+  it('does not require a page or warn about a volume on a forthcoming article', () => {
+    expect(validate({ ...base, volume: undefined, firstPage: '', forthcoming: true })).toEqual([]);
+  });
+
+  // 3.3.4: online journals "may lack some of the publication elements (for
+  // example, many do not include page numbers)".
+  it('does not require a page on an online article', () => {
+    const source: Source = {
+      ...base,
+      firstPage: '',
+      url: 'http://ejlt.org/article/view/17',
+      accessDate: '2010-07-27',
+    };
+    expect(validate(source)).toEqual([]);
+  });
+
+  it('still requires a page on an ordinary printed article', () => {
+    expect(fields({ ...base, firstPage: '' }, 'error')).toContain('firstPage');
+  });
+
+  it('requires an access date alongside a web address', () => {
+    expect(fields({ ...base, url: 'http://ejlt.org/article/view/17' }, 'error')).toContain('accessDate');
+  });
+
+  it('says an access date with no web address is left out', () => {
+    expect(fields({ ...base, accessDate: '2010-07-27' }, 'warning')).toContain('accessDate');
+  });
+
+  // 3.1.4 governs every URL, not just a web page's.
+  it('applies the 3.1.4 http:// rule to an article address', () => {
+    const source: Source = { ...base, url: 'http://www.example.com/x', accessDate: '2010-07-27' };
+    expect(fields(source, 'warning')).toContain('url');
   });
 });

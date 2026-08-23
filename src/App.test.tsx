@@ -884,6 +884,57 @@ describe('editing a saved source', () => {
   });
 });
 
+describe('journal articles online, forthcoming and as case notes', () => {
+  // A journal article is an academic source, so the OU scheme cites it in
+  // Harvard and shows no OSCOLA footnote. These rules are OSCOLA's.
+  const fillArticle = async (user: ReturnType<typeof setup>, title: string) => {
+    await user.click(screen.getByRole('button', { name: 'OSCOLA' }));
+    await chooseType(user, 'Journal article');
+    const authors = group('Authors');
+    await user.click(authors.getByRole('button', { name: 'Add author' }));
+    await user.type(authors.getByLabelText('Given names'), 'Graham');
+    await user.type(authors.getByLabelText('Surname'), 'Greenleaf');
+    if (title) await user.type(screen.getByLabelText('Article title'), title);
+    await user.type(screen.getByLabelText('Year'), '2010');
+    await user.type(screen.getByLabelText('Journal abbreviation'), 'EJLT');
+  };
+
+  it('appends the web address and access date, with no first page (3.3.4)', async () => {
+    const user = setup();
+    await fillArticle(user, 'Free Access');
+    await user.type(screen.getByLabelText('Volume'), '1');
+    await user.type(screen.getByLabelText('Issue'), '1');
+    await user.type(screen.getByLabelText('Web address'), 'http://ejlt.org/article/view/17');
+    fireEvent.change(screen.getByLabelText('Date accessed'), { target: { value: '2010-07-27' } });
+
+    expect(citation('Footnote')).toBe(
+      "Graham Greenleaf, 'Free Access' (2010) 1(1) EJLT <http://ejlt.org/article/view/17> accessed 27 July 2010.",
+    );
+    expect(screen.getByRole('button', { name: 'Add to sources' })).toBeEnabled();
+  });
+
+  it('closes a forthcoming article with (forthcoming) (3.3.3)', async () => {
+    const user = setup();
+    await fillArticle(user, 'Free Access');
+    await user.selectOptions(screen.getByLabelText('Forthcoming'), 'yes');
+
+    expect(citation('Footnote')).toBe("Graham Greenleaf, 'Free Access' [2010] EJLT (forthcoming).");
+  });
+
+  it('italicises the case name of an untitled case note (3.3.2)', async () => {
+    const user = setup();
+    await fillArticle(user, '');
+    await user.selectOptions(screen.getByLabelText('Case note'), 'yes');
+    await user.type(screen.getByLabelText('Case discussed'), 'R (Singh) v Chief Constable');
+    await user.type(screen.getByLabelText('First page'), '441');
+
+    expect(citation('Footnote')).toBe(
+      "Graham Greenleaf, 'R (Singh) v Chief Constable' [2010] EJLT 441 (note).",
+    );
+    expect(italics('Footnote')).toEqual(['R (Singh) v Chief Constable']);
+  });
+});
+
 describe('statutory instruments', () => {
   it('switches the number label to SR & O (2.5.1)', async () => {
     const user = setup();

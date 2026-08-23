@@ -115,3 +115,29 @@ describe('secondary sources named in the text', () => {
     expect(form.footnoteRequired).toBe(true);
   });
 });
+
+// OSCOLA 3.3.2 is the one exception among the secondary sources.
+describe('case notes named in the text', () => {
+  const ashworth: Source = {
+    id: 'j1', type: 'journalArticle', authors: [person('Andrew', 'Ashworth')],
+    title: '', caseName: 'R (Singh) v Chief Constable of the West Midlands Police',
+    isCaseNote: true, year: '2006', journal: 'Crim LR', firstPage: '441',
+  };
+
+  it('drops the case name from the footnote', () => {
+    const form = nameInTextForm(ashworth);
+    expect(form.footnote && toPlainText(form.footnote)).toBe(
+      'Andrew Ashworth [2006] Crim LR 441 (note).',
+    );
+    expect(form.footnoteRequired).toBe(true);
+  });
+
+  it('reminds the writer the case still belongs in the table of cases', () => {
+    expect(nameInTextForm(ashworth).note).toMatch(/table of cases/i);
+  });
+
+  it('leaves an ordinary article alone', () => {
+    const article: Source = { ...ashworth, isCaseNote: undefined, caseName: undefined, title: 'Deference' };
+    expect(nameInTextForm(article).footnote).toBeUndefined();
+  });
+});

@@ -19,7 +19,7 @@ For whoever picks this up next, including a future session of me.
 | 3. Word output | **Partial** — rich-text copy and a `.docx` with real Word footnotes; no Office add-in |
 | 4. Library management | **Done** — add, edit, remove, persist, export/import, search and filter |
 
-353 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
+380 tests. `npm test` runs everything; `npx vitest run src/oscola src/harvard
 src/document` runs just the engines in about two seconds.
 
 ---
@@ -112,13 +112,16 @@ Roughly in the order I would take them.
 
 ### 1. The remaining citation gaps — small each, listed in the README
 
-Every one is a wall a student can hit: "I cannot cite this source." SR & O
-numbers and rules of court (§2.5.1–2.5.2) are **done** — a `numbering` field on
-the statutory instrument. Cheapest of what is left: book volume numbers
-(§3.2.1), online journals with a URL (§3.3.4), case notes and forthcoming
-articles (§3.3.2–3.3.3), `sub nom` and subsequent history (§2.1.2, §2.1.8),
-multiple neutral citations (§2.1.3). On the Harvard side: forum messages,
-newspaper articles, and secondary referencing.
+Every one is a wall a student can hit: "I cannot cite this source."
+
+**Done so far:** SR & O numbers and rules of court (§2.5.1–2.5.2), a `numbering`
+field on the statutory instrument; case notes, forthcoming articles and online
+journals (§3.3.2–3.3.4), five fields on the journal article.
+
+**Cheapest of what is left:** book volume numbers (§3.2.1), `sub nom` and
+subsequent history (§2.1.2, §2.1.8), multiple neutral citations (§2.1.3). On the
+Harvard side: forum messages, newspaper articles, secondary referencing, and the
+`doi:` the OU's journal template allows.
 
 Each needs a field, a formatter branch, a verbatim test, and a README row.
 

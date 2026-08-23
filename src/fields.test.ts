@@ -62,6 +62,17 @@ const sources: Record<string, Source> = {
     id: 's8', type: 'euCase', caseNumber: 'T–277/08', joined: false,
     caseName: 'Bayer Healthcare v OHMI', court: 'CFI', judgmentDate: '2009-11-11',
   },
+  'an untitled case note': {
+    id: 's9a', type: 'journalArticle', authors: [person('Andrew', 'Ashworth')],
+    title: '', caseName: 'R (Singh) v Chief Constable of the West Midlands Police',
+    isCaseNote: true, year: '2006', journal: 'Crim LR', firstPage: '441',
+  },
+  'a forthcoming online article': {
+    id: 's9b', type: 'journalArticle', authors: [person('Graham', 'Greenleaf')],
+    title: 'Free Access', year: '2010', volume: '1', issue: '1', journal: 'EJLT',
+    firstPage: '', forthcoming: true,
+    url: 'http://ejlt.org/article/view/17', accessDate: '2010-07-27',
+  },
   'a journal article': {
     id: 's9', type: 'journalArticle', authors: [person('Alison L', 'Young')],
     title: 'In Defence of Due Deference', year: '2009', volume: '72', issue: '3',

@@ -68,14 +68,38 @@ export const FIELDS: Record<SourceType, readonly FieldSpec[]> = {
     { key: 'shortForm', label: 'Short form', placeholder: 'HRA 1998', hint: 'Abbreviation for repeat citations. Announced in brackets on the first citation, then used alone.' },
   ],
   journalArticle: [
-    { key: 'title', label: 'Article title', placeholder: 'In Defence of Due Deference', hint: 'Single quotation marks are added automatically.' },
+    { key: 'title', label: 'Article title', placeholder: 'In Defence of Due Deference', hint: 'Single quotation marks are added automatically. Leave blank on a case note that has no title of its own.' },
     { key: 'year', label: 'Year', placeholder: '2009' },
     { key: 'volume', label: 'Volume', placeholder: '72', hint: 'Leave blank only if the journal genuinely has no volumes — the year then takes square brackets.' },
     { key: 'issue', label: 'Issue', placeholder: '3', hint: 'Only where pagination restarts each issue.' },
     { key: 'journal', label: 'Journal abbreviation', placeholder: 'MLR' },
-    { key: 'firstPage', label: 'First page', placeholder: '554' },
+    { key: 'firstPage', label: 'First page', placeholder: '554', hint: 'Online journals often have none, and a forthcoming article may not have one yet.' },
     { key: 'pinpoint.value', label: 'Pinpoint page', placeholder: '560' },
-    { key: 'shortTitle', label: 'Short title', placeholder: 'Testing Fidelity to Legal Values', hint: 'Used when you cite more than one work by this author.' },
+    {
+      key: 'isCaseNote',
+      label: 'Case note',
+      control: 'select',
+      group: 'Case note, forthcoming, online',
+      options: [
+        { value: '', label: 'No' },
+        { value: 'yes', label: 'Yes — adds (note)' },
+      ],
+      hint: 'A note on a decided case. One with its own title is cited as an ordinary article.',
+    },
+    { key: 'caseName', label: 'Case discussed', placeholder: 'R (Singh) v Chief Constable of the West Midlands Police', hint: 'Only for a case note with no title of its own: the case name is italicised and takes the title\u2019s place. Cite the case itself in the table of cases too.' },
+    {
+      key: 'forthcoming',
+      label: 'Forthcoming',
+      control: 'select',
+      options: [
+        { value: '', label: 'No' },
+        { value: 'yes', label: 'Yes — adds (forthcoming)' },
+      ],
+      hint: 'Accepted but not yet published. Leave the volume and first page blank where they are not yet known.',
+    },
+    { key: 'url', label: 'Web address', placeholder: 'http://ejlt.org/article/view/17', hint: 'Only for an article published electronically. Printed in angled brackets, after any pinpoint.' },
+    { key: 'accessDate', label: 'Date accessed', control: 'date', hint: 'The date you last read the article online.' },
+    { key: 'shortTitle', label: 'Short title', placeholder: 'Testing Fidelity to Legal Values', hint: 'Used when you cite more than one work by this author.', group: 'Other' },
   ],
   book: [
     {
@@ -282,6 +306,13 @@ export function buildSource(
         journal: req(draft, 'journal'),
         firstPage: req(draft, 'firstPage'),
         pinpoint: pinpointValue ? { kind: 'page', value: pinpointValue } : undefined,
+        caseName: opt(draft, 'caseName'),
+        // Left undefined rather than false, so a library saved before these
+        // fields existed round-trips through an edit unchanged.
+        isCaseNote: draft['isCaseNote'] ? true : undefined,
+        forthcoming: draft['forthcoming'] ? true : undefined,
+        url: opt(draft, 'url'),
+        accessDate: opt(draft, 'accessDate'),
         shortTitle: opt(draft, 'shortTitle'),
       };
       return source;
@@ -526,6 +557,11 @@ export function toDraft(source: Source): DraftState {
       break;
 
     case 'journalArticle':
+      draft['isCaseNote'] = source.isCaseNote ? 'yes' : '';
+      draft['forthcoming'] = source.forthcoming ? 'yes' : '';
+      set(draft, 'caseName', source.caseName);
+      set(draft, 'url', source.url);
+      set(draft, 'accessDate', source.accessDate);
       set(draft, 'title', source.title);
       set(draft, 'year', source.year);
       set(draft, 'volume', source.volume);

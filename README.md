@@ -24,7 +24,7 @@ Three documents sit alongside this one:
 ```
 npm install
 npm run dev        # http://localhost:5173
-npm test           # 353 tests
+npm test           # 380 tests
 npm run typecheck
 ```
 
@@ -296,6 +296,9 @@ Nothing in the suite is invented.
 | **Table of cases** | §1.6.2: case names are **not** italicised in a table of cases, though they are in footnotes (§2.1.1). The two formatters differ accordingly. |
 | **Neutral citations** | Modelled separately from the law report and cited first: `Corr v IBC Vehicles Ltd [2008] UKHL 13, [2008] 1 AC 884`. The two carry independent years, because they differ (`[2004] EWCA Civ 1031, [2005] QB 410`). |
 | **Journal year brackets** | Inferred, unlike cases. §3.3.1: square "if it identifies the volume", round "if there is a separate volume number". An issue number goes in brackets immediately after the volume, and only where pagination restarts each issue. |
+| **Case notes** | §3.3.2: a case note with its own title is cited as an ordinary article. One without a title puts the case name, **italicised**, where the title would go, and closes with `(note)`: `Andrew Ashworth, 'R (Singh) v Chief Constable of the West Midlands Police' [2006] Crim LR 441 (note)`. Where the text identifies the case, the name is dropped from the citation and the comma after the author goes with it — `Andrew Ashworth [2006] Crim LR 441 (note)` — which the preview offers as the name-in-text form. The section also says the case belongs in the table of cases even when not separately cited, so the panel says so. |
+| **Forthcoming articles** | §3.3.3: cited as published articles, closing with `(forthcoming)`. "If volume and/or page numbers are not yet known, simply omit that information", so neither a missing volume nor a missing page is flagged on a forthcoming article. |
+| **Online journals** | §3.3.4: ordinary publication details, then `<web address> accessed date`. Pinpoints "follow the citation and come before the web address". Online journals "may lack some of the publication elements (for example, many do not include page numbers)" — the guide's own EJLT example has none — so the first page stops being required once there is a URL. §3.1.4's `http://` rule applies to the address, as it does to a web page's. |
 | **What is italicised** | Book titles (§3.1.2) and case names in footnotes (§2.1.1). *Not* italicised: article titles and journal names, both roman (§3.3.1); Act short titles (§2.4.1); case names in a table of cases (§1.6.2). The website or blog name **is** italicised (§3.4.8) — the page's own title stays in roman inside quotation marks, as with newspapers (§3.4.9). |
 | **Terminal punctuation** | Footnotes close with a full stop; bibliography and table entries do not. |
 | **Acts** | §2.4.1: short title and year in roman, no comma before the year. §2.4.2: a provision follows a comma after the year, with a space and no full stop before the number (`Human Rights Act 1998, s 15(1)(b)`). Provisions are dropped from the table of legislation. |
@@ -343,16 +346,21 @@ is planned next, and `VERIFY.md` for what needs checking by hand.
 - **Harvard forum messages, newspaper articles and secondary referencing**
   (`Fernandez (2015, quoted in Nabokov, 2017)`) are templated in the OU guide
   but not yet modelled here.
+- **Online articles carry no address in Harvard, deliberately.** The OU guide's
+  journal template says in terms: "Reference online articles the same way as
+  print articles." So an article's URL appears in its OSCOLA footnote (§3.3.4)
+  and not in its Harvard reference. The `doi:` the same template allows is not
+  yet modelled.
+- **Case notes have no Cite Them Right template** in the OU's guides. An
+  untitled one renders its case name where the article title goes — the same
+  substitution OSCOLA §3.3.2 makes — rather than inventing a CTR rule. `(note)`
+  is not added in Harvard.
 
 **Secondary sources**
 
 - **Book volume numbers** — §3.2.1: the volume follows the publication details
   (`(CH Beck 2000) vol 2`), unless the volumes' publication details vary, in
   which case it precedes them and follows the title.
-- **Online journals** — §3.3.4 appends `<web address> accessed date` to an
-  otherwise ordinary article citation. The journal type has no URL field.
-- **Case notes** (§3.3.2, `… [2006] Crim LR 441 (note)`) and **forthcoming
-  articles** (§3.3.3, `(forthcoming)`).
 - **No publisher** — §3.2.1 requires one, but its own research-report example
   (`(Ministry of Justice Research Series 1/09, 2009)`) has none. Validation
   currently treats a missing publisher as an error; such reports belong to

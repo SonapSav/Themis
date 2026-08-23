@@ -6,6 +6,7 @@ import type {
   StatutoryInstrumentSource,
 } from '../../model/types';
 import { formatCaseFootnoteNamedInText } from './case';
+import { formatCaseNoteFootnoteNamedInText } from './journalArticle';
 
 /**
  * What changes when the source is named in the surrounding prose.
@@ -109,7 +110,26 @@ export function nameInTextForm(source: Source): NameInTextForm {
           'OU module material is cited in Harvard, in the text, not in an OSCOLA footnote.',
       };
 
+    // 3.3.2 gives a case note its own shortened form, the one exception among
+    // the secondary sources: where the text identifies the case, the citation
+    // drops the case name and the comma that would follow the author.
     case 'journalArticle':
+      if (source.isCaseNote) {
+        return {
+          footnote: formatCaseNoteFootnoteNamedInText(source),
+          footnoteRequired: true,
+          note:
+            'OSCOLA 3.3.2: where the text identifies the case discussed, the case name is not repeated in the case-note citation. ' +
+            'The case still belongs in the table of cases, cited to its best report.',
+        };
+      }
+      return {
+        footnoteRequired: true,
+        note:
+          'OSCOLA 1.1.3: a secondary source is always cited in a footnote, in full, even where the text names the author or work. ' +
+          'Shortened repeat citations come later, at the second citation onwards.',
+      };
+
     case 'book':
     case 'bookChapter':
     case 'website':

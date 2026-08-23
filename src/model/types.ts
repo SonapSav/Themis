@@ -186,8 +186,29 @@ export interface JournalArticleSource extends SourceBase {
   readonly issue?: string;
   /** Journal abbreviation, e.g. "MLR", "PL". */
   readonly journal: string;
+  /**
+   * May be empty. OSCOLA 3.3.4 notes that online journals often have no page
+   * numbers — its own EJLT example has none — and 3.3.3 says to omit the page
+   * of a forthcoming article where it is not yet known.
+   */
   readonly firstPage: string;
   readonly pinpoint?: Pinpoint;
+  /**
+   * OSCOLA 3.3.2: a case note with no title of its own carries the name of the
+   * case, italicised, where the title would go. A case note that *has* a title
+   * is "treated as if it were a journal article", so it uses `title` instead.
+   */
+  readonly caseName?: string;
+  /** OSCOLA 3.3.2: `(note)` closes a case-note citation. */
+  readonly isCaseNote?: boolean;
+  /** OSCOLA 3.3.3: `(forthcoming)` closes an article not yet published. */
+  readonly forthcoming?: boolean;
+  /**
+   * OSCOLA 3.3.4: an article published only electronically is followed by its
+   * address in angled brackets and the date it was last accessed.
+   */
+  readonly url?: string;
+  readonly accessDate?: string;
   /**
    * Short form of the title for repeat citations, used where several works
    * by the same author are cited (OSCOLA 1.2.1).
